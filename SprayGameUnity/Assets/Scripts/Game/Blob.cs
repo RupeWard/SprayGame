@@ -35,6 +35,12 @@ abstract public class Blob : MonoBehaviour
 
 	private List<Blob> connections_ = new List<Blob>( );
 
+	private BlobType blobType_ = null;
+	public BlobType blobType
+	{
+		get { return blobType_; }
+	}
+
 	#endregion private data
 
 	private void Awake()
@@ -64,7 +70,13 @@ abstract public class Blob : MonoBehaviour
 
 	}
 
-	public abstract void SetAppearanceByType( BlobType t );
+	protected abstract void SetAppearanceByType( BlobType t );
+
+	public void SetType(BlobType t)
+	{
+		blobType_ = t;
+		SetAppearanceByType( blobType_ );
+	}
 
 	public void AddConnection(Blob b)
 	{

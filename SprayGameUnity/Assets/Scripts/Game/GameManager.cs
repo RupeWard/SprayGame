@@ -72,12 +72,12 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 		if (blobTypes.Length == 0)
 		{
-			Debug.LogWarning( "No blobTyoes definedm using default" );
+			Debug.LogWarning( "No blobTyoes defined, using default" );
 		}
 		else
 		{
 			BlobType t = blobTypes[ UnityEngine.Random.Range(0, blobTypes.Length) ];
-			blob.SetAppearanceByType( t );
+			blob.SetType( t );
 		}
 		return blob;
 	}

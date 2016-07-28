@@ -17,7 +17,7 @@ public class Blob_SimpleSphere : Blob
 		cachedRenderer_.material = cachedMaterial_;
 	}
 
-	public override void SetAppearanceByType(BlobType t)
+	protected override void SetAppearanceByType(BlobType t)
 	{
 		cachedMaterial_.color = t.colour;
 	}
