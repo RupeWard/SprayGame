@@ -5,6 +5,12 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 {
 	static readonly bool DEBUG_GAME = true;
 
+	#region inspector data
+
+	public BlobType[] blobTypes = new BlobType[0];
+
+	#endregion inspector data
+
 	#region inspector hooks
 
 	public Cannon cannon;
@@ -64,6 +70,15 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 		blob = (GameObject.Instantiate<GameObject>( simplesphereBlobPrefab ) as GameObject).GetComponent<Blob>( );
 
+		if (blobTypes.Length == 0)
+		{
+			Debug.LogWarning( "No blobTyoes definedm using default" );
+		}
+		else
+		{
+			BlobType t = blobTypes[ UnityEngine.Random.Range(0, blobTypes.Length) ];
+			blob.SetAppearanceByType( t );
+		}
 		return blob;
 	}
 

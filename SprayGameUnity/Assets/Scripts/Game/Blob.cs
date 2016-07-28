@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using RJWard.Core;
 
-public class Blob : MonoBehaviour
+abstract public class Blob : MonoBehaviour
 {
 	static private readonly bool DEBUG_BLOB = true;
 	static private int nextNum_ = 0;
@@ -63,6 +63,8 @@ public class Blob : MonoBehaviour
 		cachedTransform.rotation = cannon.cachedTransform.rotation;
 
 	}
+
+	public abstract void SetAppearanceByType( BlobType t );
 
 	public void AddConnection(Blob b)
 	{
