@@ -109,8 +109,9 @@ public class Blob : MonoBehaviour
 			if (wall.stickiness != UnityExtensions.ETriBehaviour.Never)
 			{
 				cachedRB_.velocity = Vector3.zero;
-				cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY;
-				//				cachedRB_.isKinematic = true;
+//				cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY;
+				cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionY;
+
 				MessageBus.instance.sendBlobFinishedAction( this );
 			}
 		}
