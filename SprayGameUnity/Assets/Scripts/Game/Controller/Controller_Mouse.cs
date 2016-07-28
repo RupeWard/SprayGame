@@ -32,46 +32,5 @@ public class Controller_Mouse : Controller_Base
 		{
 			doPointerMoveAction( Input.mousePosition );
 		}
-		Event e = Event.current;
-		if (e != null)
-		{
-			if (e.isMouse)
-			{
-				Vector2 pos = e.mousePosition;
-				switch (e.type)
-				{
-					case EventType.MouseDown:
-						{
-							doPointerDownAction( pos );
-							break;
-						}
-					case EventType.MouseUp:
-						{
-							doPointerUpAction( pos );
-							break;
-						}
-					case EventType.MouseDrag:
-						{
-							doPointerMoveAction( pos );
-							break;
-						}
-					default:
-						{
-							if (DEBUG_CONTROLLER)
-							{
-								Debug.Log( "Mouse event of type " + e.type.ToString( ) + " at " + pos );
-							}
-							break;
-						}
-				}
-			}
-			else
-			{
-				if (DEBUG_CONTROLLER)
-				{
-					Debug.Log( "Event of type " + e.type.ToString( ) );
-				}
-			}
-		}
 	}
 }

@@ -26,7 +26,11 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 		if (Application.platform == RuntimePlatform.Android)
 		{
-			Debug.LogError( "Android not implemented" );
+			if (DEBUG_GAME)
+			{
+				Debug.Log( "Creating touch controller" );
+			}
+			controller_ = Controller_Touch.Create( cannon );
 		}
 		else
 		{
