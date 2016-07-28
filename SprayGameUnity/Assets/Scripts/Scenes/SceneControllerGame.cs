@@ -30,5 +30,9 @@ public class SceneControllerGame : SceneController_Base
 
 #endregion SceneController_Base
 
+	public void HandleBackButton()
+	{
+		SceneManager.Instance.SwitchScene( SceneManager.EScene.DevSetup );
+	}
 }
 
