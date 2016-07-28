@@ -1,0 +1,59 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public partial class MessageBus
+{
+	public System.Action<Vector2> pointerDownAction;
+	public void sendPointerDownAction(Vector2 v)
+	{
+		if (pointerDownAction != null)
+		{
+			pointerDownAction( v );
+		}
+		else
+		{
+			Debug.LogWarning( "No pointerDownAction" );
+		}
+	}
+
+	public System.Action<Vector2> pointerUpAction;
+	public void sendPointerUpAction( Vector2 v )
+	{
+		if (pointerUpAction != null)
+		{
+			pointerUpAction( v );
+		}
+		else
+		{
+			Debug.LogWarning( "No pointerUpAction" );
+		}
+	}
+
+	public System.Action<Vector2> pointerMoveAction;
+	public void sendPointerMoveAction( Vector2 v )
+	{
+		if (pointerMoveAction != null)
+		{
+			pointerMoveAction( v );
+		}
+		else
+		{
+			Debug.LogWarning( "No pointerMoveAction" );
+		}
+	}
+
+	public System.Action<Vector2> pointerAbortAction;
+	public void sendPointerAbortAction( Vector2 v )
+	{
+		if (pointerAbortAction != null)
+		{
+			pointerAbortAction( v );
+		}
+		else
+		{
+			Debug.LogWarning( "No pointerAbortAction" );
+		}
+	}
+
+
+}
