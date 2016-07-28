@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using RJWard.Core;
 
 public class Blob : MonoBehaviour
@@ -32,6 +33,8 @@ public class Blob : MonoBehaviour
 		get { return id_; }
 	}
 
+	private List<Blob> connections_ = new List<Blob>( );
+
 	#endregion private data
 
 	private void Awake()
@@ -43,6 +46,10 @@ public class Blob : MonoBehaviour
 		cachedTransform_ = transform;
 		cachedRB_ = GetComponent<Rigidbody>( );
 		PostAwake( );
+		if (DEBUG_BLOB)
+		{
+			Debug.Log( "Created Blob " + gameObject.name );
+		}
 	}
 
 	protected virtual void PostAwake()
@@ -57,6 +64,14 @@ public class Blob : MonoBehaviour
 
 	}
 
+	public void AddConnection(Blob b)
+	{
+		if (false == connections_.Contains( b ))
+		{
+			connections_.Add( b );
+		}
+	}
+
 	private void OnCollisionEnter( Collision c)
 	{
 		Wall wall = c.gameObject.GetComponent<Wall>( );
@@ -64,9 +79,9 @@ public class Blob : MonoBehaviour
 		{
 			if (DEBUG_BLOB)
 			{
-				Debug.Log( "Blob Collision with Wall " + c.gameObject.name );
+				Debug.Log( "Blob " + gameObject.name + "Collision with Wall " + c.gameObject.name );
 			}
-			if (wall.stickiness == UnityExtensions.ETriBehaviour.Always)
+			if (wall.stickiness != UnityExtensions.ETriBehaviour.Never)
 			{
 				cachedRB_.velocity = Vector3.zero;
 				cachedRB_.isKinematic = true;
@@ -79,17 +94,26 @@ public class Blob : MonoBehaviour
 			{
 				if (DEBUG_BLOB)
 				{
-					Debug.Log( "Blob Collision with blob " + c.gameObject.name );
+					Debug.Log( "Blob "+gameObject.name+" Collision with blob " + c.gameObject.name );
 				}
-				cachedRB_.velocity = Vector3.zero;
-//				cachedRB_.isKinematic = true;
+				//cachedRB_.velocity = Vector3.zero;
+
+				if (!connections_.Contains(blob))
+				{
+					HingeJoint hinge = gameObject.AddComponent<HingeJoint>( );
+					hinge.connectedBody = blob.cachedRB;
+					AddConnection( blob );
+					blob.AddConnection( this );
+				}
+
+				//				cachedRB_.isKinematic = true;
 
 			}
 			else // NOT BLOB
 			{
 				if (DEBUG_BLOB)
 				{
-					Debug.Log( "Blob Collision with unhandled " + c.gameObject.name );
+					Debug.Log( "Blob " + gameObject.name + "Collision with unhandled " + c.gameObject.name );
 				}
 			}
 		}

@@ -4,7 +4,7 @@ using System.Collections;
 [RequireComponent (typeof(AudioSource))]
 public class Cannon : MonoBehaviour
 {
-	static private readonly bool DEBUG_CANNON = true;
+//	static private readonly bool DEBUG_CANNON = true;
 	static private readonly bool DEBUG_CANNON_PTR = false;
 	static private readonly bool DEBUG_CANNON_FORCE = true;
 
@@ -188,7 +188,7 @@ public class Cannon : MonoBehaviour
 				blob.cachedRB.AddForce( forceVector, ForceMode.VelocityChange );
 				if (DEBUG_CANNON_FORCE)
 				{
-					Debug.Log( "Cannon applying force of " + forceVector );
+					Debug.Log( "Cannon applying force of " + forceVector + " to blob "+blob.gameObject.name );
 				}
 			}
 			else
