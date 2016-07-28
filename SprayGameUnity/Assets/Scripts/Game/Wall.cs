@@ -1,18 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using RJWard.Core;
 
 public class Wall : MonoBehaviour
 {
-	public enum ETriBehaviour
-	{
-		Always,
-		Never,
-		Sometimes
-	}
-
 	#region inspector data
 
-	public ETriBehaviour stickiness = ETriBehaviour.Sometimes;
+	public UnityExtensions.ETriBehaviour stickiness = UnityExtensions.ETriBehaviour.Sometimes;
 
 	#endregion inspector data
+
 }

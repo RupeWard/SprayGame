@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using RJWard.Core;
 
 public class Blob : MonoBehaviour
 {
 	static private readonly bool DEBUG_BLOB = true;
+	static private int nextNum_ = 0;
 
 	#region private hooks
 
@@ -22,8 +24,22 @@ public class Blob : MonoBehaviour
 
 	#endregion private hooks
 
+	#region private data
+
+	private int id_ = 0;
+	public int id
+	{
+		get { return id_; }
+	}
+
+	#endregion private data
+
 	private void Awake()
 	{
+		id_ = nextNum_;
+		nextNum_++;
+		gameObject.name = "Blob_" + id_.ToString( );
+
 		cachedTransform_ = transform;
 		cachedRB_ = GetComponent<Rigidbody>( );
 		PostAwake( );
@@ -43,9 +59,39 @@ public class Blob : MonoBehaviour
 
 	private void OnCollisionEnter( Collision c)
 	{
-		if (DEBUG_BLOB)
+		Wall wall = c.gameObject.GetComponent<Wall>( );
+		if (wall != null)
 		{
-			Debug.Log( "Blob Collision with " + c.gameObject.name );
+			if (DEBUG_BLOB)
+			{
+				Debug.Log( "Blob Collision with Wall " + c.gameObject.name );
+			}
+			if (wall.stickiness == UnityExtensions.ETriBehaviour.Always)
+			{
+				cachedRB_.velocity = Vector3.zero;
+				cachedRB_.isKinematic = true;
+			}
+		}
+		else // NOT WALL
+		{
+			Blob blob = c.gameObject.GetComponent<Blob>( );
+			if (blob != null)
+			{
+				if (DEBUG_BLOB)
+				{
+					Debug.Log( "Blob Collision with blob " + c.gameObject.name );
+				}
+				cachedRB_.velocity = Vector3.zero;
+//				cachedRB_.isKinematic = true;
+
+			}
+			else // NOT BLOB
+			{
+				if (DEBUG_BLOB)
+				{
+					Debug.Log( "Blob Collision with unhandled " + c.gameObject.name );
+				}
+			}
 		}
 	}
 }

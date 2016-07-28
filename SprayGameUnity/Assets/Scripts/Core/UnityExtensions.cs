@@ -5,8 +5,15 @@ namespace RJWard.Core
 {
 	public static class UnityExtensions
 	{
+		public enum ETriBehaviour
+		{
+			Always,
+			Never,
+			Sometimes
+		}
 
-#region Transform
+
+		#region Transform
 
 		public static void SetLocalXYPosition( this Transform t, float x, float y )
 		{
