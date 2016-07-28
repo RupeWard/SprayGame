@@ -3,12 +3,16 @@ using System.Text.RegularExpressions;
 
 namespace RJWard.Core
 {
-	public static class Version
+	public static partial class Version
 	{
+		/* 
+		THIS SHOULD GO IN A PROJECT-SPECIFIC FILE
+
 		// Change this to match whenever updating version number in build settings
 		// Put a 'D' at the start to make a Dev version 
-		public static VersionNumber versionNumber = new VersionNumber( "D0.0.4 (16)" );
+		public static VersionNumber versionNumber = new VersionNumber( "D0.0.1 (1)" );
 
+		*/
 		public static string platformLabel
 		{
 			get
