@@ -84,7 +84,9 @@ public class Blob : MonoBehaviour
 			if (wall.stickiness != UnityExtensions.ETriBehaviour.Never)
 			{
 				cachedRB_.velocity = Vector3.zero;
-				cachedRB_.isKinematic = true;
+				cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY;
+				//				cachedRB_.isKinematic = true;
+				MessageBus.instance.sendBlobFinishedAction( this );
 			}
 		}
 		else // NOT WALL
@@ -107,13 +109,26 @@ public class Blob : MonoBehaviour
 				}
 
 				//				cachedRB_.isKinematic = true;
+				MessageBus.instance.sendBlobFinishedAction( this );
 
 			}
 			else // NOT BLOB
 			{
-				if (DEBUG_BLOB)
+				if (c.gameObject.name == "BlobKillZone")
 				{
-					Debug.Log( "Blob " + gameObject.name + "Collision with unhandled " + c.gameObject.name );
+					if (DEBUG_BLOB)
+					{
+						Debug.Log( "Blob " + gameObject.name + " hit kill zone " + c.gameObject.name );
+					}
+					MessageBus.instance.sendBlobFinishedAction( this );
+					GameObject.Destroy( this );
+				}
+				else
+				{
+					if (DEBUG_BLOB)
+					{
+						Debug.Log( "Blob " + gameObject.name + "Collision with unhandled " + c.gameObject.name );
+					}
 				}
 			}
 		}

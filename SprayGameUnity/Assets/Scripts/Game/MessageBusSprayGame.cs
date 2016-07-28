@@ -55,5 +55,30 @@ public partial class MessageBus
 		}
 	}
 
+	public System.Action< Blob> firedBlobAction;
+	public void sendFiredBlobAction( Blob b )
+	{
+		if (firedBlobAction != null)
+		{
+			firedBlobAction( b );
+		}
+		else
+		{
+			Debug.LogWarning( "No firedBlobAction" );
+		}
+	}
+
+	public System.Action<Blob> blobFinishedAction;
+	public void sendBlobFinishedAction( Blob b)
+	{
+		if (blobFinishedAction != null)
+		{
+			blobFinishedAction( b );
+		}
+		else
+		{
+			Debug.LogWarning( "No blobFinishedAction" );
+		}
+	}
 
 }

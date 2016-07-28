@@ -39,6 +39,8 @@ public class Cannon : MonoBehaviour
 
 	bool shouldFire_ = false;
 
+	bool canFire_ = true;
+
 	#endregion private data
 
 	private void Awake( )
@@ -73,6 +75,7 @@ public class Cannon : MonoBehaviour
 		MessageBus.instance.pointerUpAction += HandlePointerUp;
 		MessageBus.instance.pointerMoveAction += HandlePointerMove;
 		MessageBus.instance.pointerAbortAction += HandlePointerAbort;
+		MessageBus.instance.blobFinishedAction += HandleFiredBlobFinished;
 	}
 
 	private void removeListeners( )
@@ -138,16 +141,24 @@ public class Cannon : MonoBehaviour
 	{
 		if (isControlled_)
 		{
-			shouldFire_ = true;
+			if (canFire_)
+			{
+				shouldFire_ = true;
+			}
+			else
+			{
+				cachedAudioSource_.clip = abortClip;
+				cachedAudioSource_.Play( );
+			}
 
 			PointAt( v );
+
 			if (DEBUG_CANNON_PTR)
 			{
 				Debug.Log( "Cannon: Ptr UP at " + v );
 			}
 
 			isControlled_ = false;
-
 		}
 		else
 		{
@@ -171,18 +182,24 @@ public class Cannon : MonoBehaviour
 		}
 	}
 
+	public void HandleFiredBlobFinished(Blob b)
+	{
+		canFire_ = true;
+	}
+
 	private void FixedUpdate()
 	{
 		if (shouldFire_)
 		{
 			shouldFire_ = false;
-
-			cachedAudioSource_.clip = fireClip;
-			cachedAudioSource_.Play( );
+			canFire_ = false;
 
 			Blob blob = GameManager.Instance.GetNewBlob( );
 			if (blob != null)
 			{
+				cachedAudioSource_.clip = fireClip;
+				cachedAudioSource_.Play( );
+
 				blob.Init( this );
 				Vector3 forceVector = blob.cachedTransform.up * force;
 				blob.cachedRB.AddForce( forceVector, ForceMode.VelocityChange );
@@ -190,6 +207,8 @@ public class Cannon : MonoBehaviour
 				{
 					Debug.Log( "Cannon applying force of " + forceVector + " to blob "+blob.gameObject.name );
 				}
+
+				MessageBus.instance.sendFiredBlobAction( blob );
 			}
 			else
 			{
