@@ -3,9 +3,11 @@ using System.Collections;
 
 public class SceneControllerGame : SceneController_Base 
 {
-//	static private readonly bool DEBUG_LOCAL = false;
+	//	static private readonly bool DEBUG_LOCAL = false;
 
 	#region inspector hooks
+
+	public GameSettingsPanel gameSettingsPanel;
 
 	#endregion inspector hooks
 
@@ -22,6 +24,7 @@ public class SceneControllerGame : SceneController_Base
 
 	override protected void PostStart()
 	{
+		gameSettingsPanel.gameObject.SetActive( false );
 	}
 
 	override protected void PostAwake()
@@ -33,6 +36,11 @@ public class SceneControllerGame : SceneController_Base
 	public void HandleBackButton()
 	{
 		SceneManager.Instance.SwitchScene( SceneManager.EScene.DevSetup );
+	}
+
+	public void HandleSettingsButton()
+	{
+		gameSettingsPanel.Init( );
 	}
 }
 

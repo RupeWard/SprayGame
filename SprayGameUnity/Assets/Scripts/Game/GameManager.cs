@@ -56,4 +56,43 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 		return blob;
 	}
+
+	private bool isPaused_ = false;
+	public bool isPaused
+	{
+		get { return isPaused_;  }
+	}
+
+	public void PauseGame()
+	{
+		if (isPaused_)
+		{
+			Debug.LogWarning( "Already paused" );
+		}
+		else
+		{
+			isPaused_ = true;
+			if (controller_ != null)
+			{
+				controller_.gameObject.SetActive( false );
+			}
+		}
+	}
+
+	public void ResumeGame()
+	{
+		if (!isPaused_)
+		{
+			Debug.LogWarning( "Not paused" );
+		}
+		else
+		{
+			isPaused_ = false;
+			if (controller_ != null)
+			{
+				controller_.gameObject.SetActive( true );
+			}
+		}
+
+	}
 }

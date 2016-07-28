@@ -47,26 +47,13 @@ public class Cannon : MonoBehaviour
 	{
 		cachedTransform_ = transform;
 		cachedAudioSource_ = GetComponent<AudioSource>( );
+
+		force = SettingsStore.retrieveSetting<float>( SettingsIds.cannonSpeed );
     }
 
 	private void Start()
 	{
 		addListeners( );
-	}
-
-	private bool isQuitting_ = false;
-
-	private void OnApplicationQuit()
-	{
-		isQuitting_ = true;
-	}
-
-	private void OnDestroy()
-	{
-		if (!isQuitting_)
-		{
-			removeListeners( );
-		}
 	}
 
 	private void addListeners()
@@ -80,10 +67,13 @@ public class Cannon : MonoBehaviour
 
 	private void removeListeners( )
 	{
-		MessageBus.instance.pointerDownAction -= HandlePointerDown;
-		MessageBus.instance.pointerUpAction -= HandlePointerUp;
-		MessageBus.instance.pointerMoveAction -= HandlePointerMove;
-		MessageBus.instance.pointerAbortAction -= HandlePointerAbort;
+		if (MessageBus.exists)
+		{
+			MessageBus.instance.pointerDownAction -= HandlePointerDown;
+			MessageBus.instance.pointerUpAction -= HandlePointerUp;
+			MessageBus.instance.pointerMoveAction -= HandlePointerMove;
+			MessageBus.instance.pointerAbortAction -= HandlePointerAbort;
+		}
 	}
 
 	private void PointAt(Vector2 v)

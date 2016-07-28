@@ -20,6 +20,11 @@ public partial class MessageBus : MonoBehaviour
 		}
 	}
 
+	public static bool exists
+	{
+		get { return _instance != null;  }
+	}
+
 	/*
 	public void dispatchBootsChanged(BootsData bd)
 	{
