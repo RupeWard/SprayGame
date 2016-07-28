@@ -54,14 +54,24 @@ public class Controller_Base : MonoBehaviour
 	{
 		v = GetPositionRelativeToCannon( v );
 		previousPosition_ = v;
-		MessageBus.instance.sendPointerDownAction( v );
+		if (v.y > 0f)
+		{
+			MessageBus.instance.sendPointerDownAction( v );
+		}
 	}
 
 	protected void doPointerUpAction( Vector2 v )
 	{
 		v = GetPositionRelativeToCannon( v );
 		previousPosition_ = v;
-		MessageBus.instance.sendPointerUpAction( v );
+		if (v.y > 0f)
+		{
+			MessageBus.instance.sendPointerUpAction( v );
+		}
+		else
+		{
+			MessageBus.instance.sendPointerAbortAction( v );
+		}
 	}
 
 	protected void doPointerMoveAction( Vector2 v )
@@ -70,7 +80,14 @@ public class Controller_Base : MonoBehaviour
 		if (Vector2.Distance(v, previousPosition_) >= movementThreshold_)
 		{
 			previousPosition_ = v;
-			MessageBus.instance.sendPointerMoveAction( v );
+			if (v.y > 0f)
+			{
+				MessageBus.instance.sendPointerMoveAction( v );
+			}
+			else
+			{
+				MessageBus.instance.sendPointerAbortAction( v );
+			}
 		}
 	}
 

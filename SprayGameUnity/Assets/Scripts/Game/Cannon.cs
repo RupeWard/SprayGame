@@ -13,9 +13,9 @@ public class Cannon : MonoBehaviour
 
 	public AudioClip pointerDownClip;
 	public AudioClip fireClip;
+	public AudioClip abortClip;
 
 	#endregion inspector data
-
 
 	#region private hooks
 
@@ -29,6 +29,12 @@ public class Cannon : MonoBehaviour
 
 	#endregion private hooks
 
+	#region private data
+
+	bool isControlled_ = false;
+
+	#endregion private data
+
 	private void Awake( )
 	{
 		cachedTransform_ = transform;
@@ -40,11 +46,27 @@ public class Cannon : MonoBehaviour
 		addListeners( );
 	}
 
+	private bool isQuitting_ = false;
+
+	private void OnApplicationQuit()
+	{
+		isQuitting_ = true;
+	}
+
+	private void OnDestroy()
+	{
+		if (!isQuitting_)
+		{
+			removeListeners( );
+		}
+	}
+
 	private void addListeners()
 	{
 		MessageBus.instance.pointerDownAction += HandlePointerDown;
 		MessageBus.instance.pointerUpAction += HandlePointerUp;
 		MessageBus.instance.pointerMoveAction += HandlePointerMove;
+		MessageBus.instance.pointerAbortAction += HandlePointerAbort;
 	}
 
 	private void removeListeners( )
@@ -52,6 +74,7 @@ public class Cannon : MonoBehaviour
 		MessageBus.instance.pointerDownAction -= HandlePointerDown;
 		MessageBus.instance.pointerUpAction -= HandlePointerUp;
 		MessageBus.instance.pointerMoveAction -= HandlePointerMove;
+		MessageBus.instance.pointerAbortAction -= HandlePointerAbort;
 	}
 
 	private void PointAt(Vector2 v)
@@ -64,36 +87,81 @@ public class Cannon : MonoBehaviour
 		cachedTransform_.rotation = Quaternion.Euler( new Vector3( 0f,0f,angle - 90f ) );
 	}
 
+	public void HandlePointerAbort( Vector2 v )
+	{
+		if (isControlled_)
+		{
+			cachedAudioSource_.clip = abortClip;
+			cachedAudioSource_.Play( );
+
+			if (DEBUG_CANNON)
+			{
+				Debug.Log( "Cannon: Ptr ABORT at " + v );
+			}
+			cachedTransform_.rotation = Quaternion.identity;
+			isControlled_ = false;
+		}
+		else
+		{
+//			Debug.LogWarning( "HandlePointerAbort when not controlled" );
+		}
+	}
+
+
 	public void HandlePointerDown(Vector2 v)
 	{
-		cachedAudioSource_.clip = pointerDownClip;
-		cachedAudioSource_.Play( );
-
-		if (DEBUG_CANNON)
+		if (!isControlled_)
 		{
-			Debug.Log( "Cannon: Ptr DOWN at " + v );
+			cachedAudioSource_.clip = pointerDownClip;
+			cachedAudioSource_.Play( );
+
+			if (DEBUG_CANNON)
+			{
+				Debug.Log( "Cannon: Ptr DOWN at " + v );
+			}
+			PointAt( v );
+			isControlled_ = true;
 		}
-		PointAt( v );
+		else
+		{
+			Debug.LogWarning( "HandlePointerDown when already controlled" );
+		}
 	}
 
 	public void HandlePointerUp( Vector2 v )
 	{
-		cachedAudioSource_.clip = fireClip;
-		cachedAudioSource_.Play( );
-
-		PointAt( v );
-		if (DEBUG_CANNON)
+		if (isControlled_)
 		{
-			Debug.Log( "Cannon: Ptr UP at " + v );
+			cachedAudioSource_.clip = fireClip;
+			cachedAudioSource_.Play( );
+
+			PointAt( v );
+			if (DEBUG_CANNON)
+			{
+				Debug.Log( "Cannon: Ptr UP at " + v );
+			}
+
+			isControlled_ = false;
+		}
+		else
+		{
+			Debug.LogWarning( "HandlePointerUp when not controlled" );
 		}
 	}
 
 	public void HandlePointerMove( Vector2 v )
 	{
-		PointAt( v );
-		if (DEBUG_CANNON)
+		if (isControlled_)
 		{
-			Debug.Log( "Cannon: Ptr MOVE at " + v );
+			PointAt( v );
+			if (DEBUG_CANNON)
+			{
+				Debug.Log( "Cannon: Ptr MOVE at " + v );
+			}
+		}
+		else
+		{
+			Debug.LogWarning( "HandlePointerMove when not controlled" );
 		}
 	}
 }
