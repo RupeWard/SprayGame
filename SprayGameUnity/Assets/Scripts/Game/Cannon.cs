@@ -5,11 +5,15 @@ using System.Collections;
 public class Cannon : MonoBehaviour
 {
 	static private readonly bool DEBUG_CANNON = true;
+	static private readonly bool DEBUG_CANNON_PTR = false;
+	static private readonly bool DEBUG_CANNON_FORCE = true;
 
 	#region inspector hooks
 	#endregion inspector hooks
 
 	#region inspector data
+
+	public float force = 1f;
 
 	public AudioClip pointerDownClip;
 	public AudioClip fireClip;
@@ -32,6 +36,8 @@ public class Cannon : MonoBehaviour
 	#region private data
 
 	bool isControlled_ = false;
+
+	bool shouldFire_ = false;
 
 	#endregion private data
 
@@ -80,7 +86,7 @@ public class Cannon : MonoBehaviour
 	private void PointAt(Vector2 v)
 	{
 		float angle = Mathf.Rad2Deg * Mathf.Atan2( v.y, v.x );
-		if (DEBUG_CANNON)
+		if (DEBUG_CANNON_PTR)
 		{
 			Debug.Log( "Cannon Angle is " + angle );
 		}
@@ -94,7 +100,7 @@ public class Cannon : MonoBehaviour
 			cachedAudioSource_.clip = abortClip;
 			cachedAudioSource_.Play( );
 
-			if (DEBUG_CANNON)
+			if (DEBUG_CANNON_PTR)
 			{
 				Debug.Log( "Cannon: Ptr ABORT at " + v );
 			}
@@ -115,7 +121,7 @@ public class Cannon : MonoBehaviour
 			cachedAudioSource_.clip = pointerDownClip;
 			cachedAudioSource_.Play( );
 
-			if (DEBUG_CANNON)
+			if (DEBUG_CANNON_PTR)
 			{
 				Debug.Log( "Cannon: Ptr DOWN at " + v );
 			}
@@ -132,16 +138,16 @@ public class Cannon : MonoBehaviour
 	{
 		if (isControlled_)
 		{
-			cachedAudioSource_.clip = fireClip;
-			cachedAudioSource_.Play( );
+			shouldFire_ = true;
 
 			PointAt( v );
-			if (DEBUG_CANNON)
+			if (DEBUG_CANNON_PTR)
 			{
 				Debug.Log( "Cannon: Ptr UP at " + v );
 			}
 
 			isControlled_ = false;
+
 		}
 		else
 		{
@@ -154,7 +160,7 @@ public class Cannon : MonoBehaviour
 		if (isControlled_)
 		{
 			PointAt( v );
-			if (DEBUG_CANNON)
+			if (DEBUG_CANNON_PTR)
 			{
 				Debug.Log( "Cannon: Ptr MOVE at " + v );
 			}
@@ -162,6 +168,35 @@ public class Cannon : MonoBehaviour
 		else
 		{
 			Debug.LogWarning( "HandlePointerMove when not controlled" );
+		}
+	}
+
+	private void FixedUpdate()
+	{
+		if (shouldFire_)
+		{
+			shouldFire_ = false;
+
+			cachedAudioSource_.clip = fireClip;
+			cachedAudioSource_.Play( );
+
+			Blob blob = GameManager.Instance.GetNewBlob( );
+			if (blob != null)
+			{
+				blob.Init( this );
+				Vector3 forceVector = blob.cachedTransform.up * force;
+				blob.cachedRB.AddForce( forceVector, ForceMode.VelocityChange );
+				if (DEBUG_CANNON_FORCE)
+				{
+					Debug.Log( "Cannon applying force of " + forceVector );
+				}
+			}
+			else
+			{
+				cachedAudioSource_.clip = abortClip;
+				cachedAudioSource_.Play( );
+				Debug.LogWarning( "Failed to get blob from GameManager" );
+			}
 		}
 	}
 }

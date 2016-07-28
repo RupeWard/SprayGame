@@ -11,6 +11,12 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	#endregion inspector hooks
 
+	#region inspector prefabs
+
+	public GameObject simplesphereBlobPrefab;
+
+	#endregion inspector prefabs
+
 	#region private objects
 
 	Controller_Base controller_ = null;
@@ -42,4 +48,12 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		}
 	}
 
+	public Blob GetNewBlob()
+	{
+		Blob blob = null;
+
+		blob = (GameObject.Instantiate<GameObject>( simplesphereBlobPrefab ) as GameObject).GetComponent<Blob>( );
+
+		return blob;
+	}
 }
