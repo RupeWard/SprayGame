@@ -72,6 +72,31 @@ public class Blob : MonoBehaviour
 		}
 	}
 
+	private void FixedUpdate()
+	{
+		Vector3 velocity = cachedRB_.velocity;
+		float speed = velocity.magnitude;
+        if (speed > 0f)
+		{
+			Ray ray = new Ray( cachedTransform_.position, velocity.normalized );
+			RaycastHit hitInfo;
+			bool hit = Physics.Raycast( ray, out hitInfo, speed * Time.fixedDeltaTime * GameManager.Instance.blobSlowDistance );
+			if (hit)
+			{
+				BlobSlower blobSlower = hitInfo.collider.gameObject.GetComponent<BlobSlower>( );
+				if (blobSlower != null)
+				{
+					Debug.Log( "Blob Encountering "+blobSlower.gameObject.name+"... Slowing" );
+					cachedRB_.velocity = velocity * GameManager.Instance.blobSlowFactor * blobSlower.slowFactor;
+				}
+			}
+			else
+			{
+//				Debug.Log( "No hit" );
+			}
+		}
+	}
+
 	private void OnCollisionEnter( Collision c)
 	{
 		Wall wall = c.gameObject.GetComponent<Wall>( );

@@ -17,6 +17,13 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	#endregion inspector prefabs
 
+	#region gameSettings
+
+	public float blobSlowDistance = 5f;
+	public float blobSlowFactor = 0.5f;
+
+	#endregion gameSettings
+
 	#region private objects
 
 	Controller_Base controller_ = null;
@@ -25,6 +32,9 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	protected override void PostAwake( )
 	{
+		blobSlowDistance = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowDistance);
+		blobSlowFactor = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowFactor);
+
 		if (cannon == null)
 		{
 			Debug.LogError( "No cannon" );
