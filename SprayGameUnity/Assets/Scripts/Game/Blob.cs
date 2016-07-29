@@ -165,6 +165,8 @@ abstract public class Blob : MonoBehaviour
 
 					AddConnection( blob );
 					blob.AddConnection( this );
+
+					BlobConnector_Base connection = BlobConnector_Base.CreateConnection( this, blob );
 				}
 
 				//				cachedRB_.isKinematic = true;
