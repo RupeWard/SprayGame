@@ -42,9 +42,14 @@ public class BlobConnector_SimpleSphere : BlobConnector_Base
 			return cachedSrcMaterial_;
 		}
 	}
-	
+
 	#endregion private hooks
 
+	#region private data
+
+	static readonly Color defaultColor_ = new Color( 1f, 1f, 1f, 0.2f );
+
+	#endregion private data
 
 
 	private void Init( Blob_SimpleSphere b0, Blob_SimpleSphere b1 )
@@ -57,6 +62,10 @@ public class BlobConnector_SimpleSphere : BlobConnector_Base
 		if (parentBlob_.blobType == childBlob_.blobType)
 		{
 			cachedMaterial_.color = parentBlob_.blobType.colour;
+		}
+		else
+		{
+			cachedMaterial_.color = defaultColor_;
 		}
 	}
 

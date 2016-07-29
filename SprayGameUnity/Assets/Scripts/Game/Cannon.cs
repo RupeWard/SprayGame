@@ -18,6 +18,7 @@ public class Cannon : MonoBehaviour
 	public AudioClip pointerDownClip;
 	public AudioClip fireClip;
 	public AudioClip abortClip;
+	public AudioClip loadClip;
 
 	#endregion inspector data
 
@@ -31,29 +32,48 @@ public class Cannon : MonoBehaviour
 
 	private AudioSource cachedAudioSource_ = null;
 
+	private Material cachedMaterial_ = null;
+
 	#endregion private hooks
 
 	#region private data
 
-	bool isControlled_ = false;
+	private bool isControlled_ = false;
 
-	bool shouldFire_ = false;
+	private bool shouldFire_ = false;
 
-	bool canFire_ = true;
+	private bool canFire_ = true;
+
+	private Blob loadedBlob_ = null;
 
 	#endregion private data
+
+	static private readonly Color defaultColour_ = new Color( 0.4f, 0.4f, 0.4f );
 
 	private void Awake( )
 	{
 		cachedTransform_ = transform;
 		cachedAudioSource_ = GetComponent<AudioSource>( );
-
+		cachedMaterial_ = GetComponent<MeshRenderer>( ).sharedMaterial;
+		SetColour( );
 		force = SettingsStore.retrieveSetting<float>( SettingsIds.cannonSpeed );
     }
+
+	private void SetColour( )
+	{
+		SetColour( defaultColour_ );
+	}
+
+	private void SetColour(Color c)
+	{
+		cachedMaterial_.color = c;
+	}
 
 	private void Start()
 	{
 		addListeners( );
+
+		StartCoroutine( LoadBlobCR( ) );
 	}
 
 	private void addListeners()
@@ -131,7 +151,7 @@ public class Cannon : MonoBehaviour
 	{
 		if (isControlled_)
 		{
-			if (canFire_)
+			if (canFire_ && loadedBlob_ != null)
 			{
 				shouldFire_ = true;
 			}
@@ -184,28 +204,69 @@ public class Cannon : MonoBehaviour
 			shouldFire_ = false;
 			canFire_ = false;
 
-			Blob blob = GameManager.Instance.GetNewBlob( );
-			if (blob != null)
+			if (loadedBlob_ != null)
 			{
 				cachedAudioSource_.clip = fireClip;
 				cachedAudioSource_.Play( );
 
-				blob.Init( this );
-				Vector3 forceVector = blob.cachedTransform.up * force;
-				blob.cachedRB.AddForce( forceVector, ForceMode.VelocityChange );
+				loadedBlob_.Init( this );
+
+				Vector3 forceVector = loadedBlob_.cachedTransform.up * force;
+				loadedBlob_.cachedRB.AddForce( forceVector, ForceMode.VelocityChange );
 				if (DEBUG_CANNON_FORCE)
 				{
-					Debug.Log( "Cannon applying force of " + forceVector + " to blob "+blob.gameObject.name );
+					Debug.Log( "Cannon applying force of " + forceVector + " to blob "+ loadedBlob_.gameObject.name );
 				}
 
-				MessageBus.instance.sendFiredBlobAction( blob );
+				MessageBus.instance.sendFiredBlobAction( loadedBlob_ );
+				loadedBlob_ = null;
+				SetColour( );
+				StartCoroutine( LoadBlobCR( ) );
 			}
 			else
 			{
 				cachedAudioSource_.clip = abortClip;
 				cachedAudioSource_.Play( );
-				Debug.LogWarning( "Failed to get blob from GameManager" );
+				Debug.LogWarning( "No blob loaded" );
 			}
 		}
+	}
+
+	public float blobLoadDelay = 2f;
+
+	private IEnumerator LoadBlobCR()
+	{
+		while (loadedBlob_ == null)
+		{
+			yield return new WaitForSeconds( blobLoadDelay );
+			Blob blob = GameManager.Instance.GetNewBlob( );
+			if (blob != null)
+			{
+				LoadBlob( blob );
+			}
+			else
+			{
+				Debug.LogWarning( "Cannin failed to get blob from GM" );
+			}
+		}
+	}
+
+	public bool LoadBlob(Blob b)
+	{
+		bool result = false;
+		if (loadedBlob_ == null)
+		{
+			loadedBlob_ = b;
+			loadedBlob_.Init( this );
+			SetColour( loadedBlob_.blobType.colour );
+
+			cachedAudioSource_.clip = loadClip;
+			cachedAudioSource_.Play( );
+		}
+		else
+		{
+			Debug.LogWarning( "Can;'t load second blob" );
+		}
+		return result;
 	}
 }
