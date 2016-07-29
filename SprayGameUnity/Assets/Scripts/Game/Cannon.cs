@@ -219,7 +219,7 @@ public class Cannon : MonoBehaviour
 				}
 
 				MessageBus.instance.sendFiredBlobAction( loadedBlob_ );
-				loadedBlob_.SetFired( );
+				loadedBlob_.Fire( );
 				loadedBlob_ = null;
 				SetColour( );
 				StartCoroutine( LoadBlobCR( ) );
@@ -240,7 +240,7 @@ public class Cannon : MonoBehaviour
 		while (loadedBlob_ == null)
 		{
 			yield return new WaitForSeconds( blobLoadDelay );
-			Blob blob = GameManager.Instance.GetNewBlob( );
+			Blob blob = GameManager.Instance.ReleaseBlobFromPending( );
 			if (blob != null)
 			{
 				LoadBlob( blob );
@@ -258,6 +258,7 @@ public class Cannon : MonoBehaviour
 		if (loadedBlob_ == null)
 		{
 			loadedBlob_ = b;
+			loadedBlob_.Load( );
 			loadedBlob_.Init( this );
 			SetColour( loadedBlob_.blobType.colour );
 
