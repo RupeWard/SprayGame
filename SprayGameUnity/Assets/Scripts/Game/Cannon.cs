@@ -219,6 +219,7 @@ public class Cannon : MonoBehaviour
 				}
 
 				MessageBus.instance.sendFiredBlobAction( loadedBlob_ );
+				loadedBlob_.SetFired( );
 				loadedBlob_ = null;
 				SetColour( );
 				StartCoroutine( LoadBlobCR( ) );

@@ -27,6 +27,8 @@ abstract public class Blob : MonoBehaviour
 
 	#region private data
 
+	private bool directlyConnectedToWall_ = false;
+
 	private float radius_ = 0.5f;
 	public float radius
 	{
@@ -92,31 +94,46 @@ abstract public class Blob : MonoBehaviour
 		}
 	}
 
+	private bool isFired_ = false;
+	public void SetFired()
+	{
+		isFired_ = true;
+	}
+
 	private void FixedUpdate()
 	{
 		Vector3 velocity = cachedRB_.velocity;
 		float speed = velocity.magnitude;
         if (speed > 0f)
 		{
-			Ray ray = new Ray( cachedTransform_.position, velocity.normalized );
-			RaycastHit hitInfo;
-			bool hit = Physics.Raycast( ray, out hitInfo, speed * Time.fixedDeltaTime * GameManager.Instance.blobSlowDistance );
-			if (hit)
+			if (isFired_)
 			{
-				BlobSlower blobSlower = hitInfo.collider.gameObject.GetComponent<BlobSlower>( );
-				if (blobSlower != null)
+				Ray ray = new Ray( cachedTransform_.position, velocity.normalized );
+				RaycastHit hitInfo;
+				bool hit = Physics.Raycast( ray, out hitInfo, speed * Time.fixedDeltaTime * GameManager.Instance.blobSlowDistance );
+				if (hit)
 				{
-					Debug.Log( "Blob Encountering "+blobSlower.gameObject.name+"... Slowing" );
-					cachedRB_.velocity = velocity * GameManager.Instance.blobSlowFactor * blobSlower.slowFactor;
+					BlobSlower blobSlower = hitInfo.collider.gameObject.GetComponent<BlobSlower>( );
+					if (blobSlower != null)
+					{
+						Debug.Log( "Blob Encountering " + blobSlower.gameObject.name + "... Slowing" );
+						cachedRB_.velocity = velocity * GameManager.Instance.blobSlowFactor * blobSlower.slowFactor;
+					}
+				}
+				else
+				{
+					//				Debug.Log( "No hit" );
 				}
 			}
-			else
+			else if (directlyConnectedToWall_)
 			{
-//				Debug.Log( "No hit" );
+				Debug.Log( "Applying drag" );
+				cachedRB_.AddForce( cachedRB_.velocity * -1f * wallDrag, ForceMode.VelocityChange );
 			}
 		}
 	}
 
+	static private readonly float wallDrag = 0.5f;
 	private void OnCollisionEnter( Collision c)
 	{
 		Wall wall = c.gameObject.GetComponent<Wall>( );
@@ -133,6 +150,9 @@ abstract public class Blob : MonoBehaviour
 				cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionY;
 
 				MessageBus.instance.sendBlobFinishedAction( this );
+
+				directlyConnectedToWall_ = true;
+				isFired_ = false;
 			}
 		}
 		else // NOT WALL
@@ -145,6 +165,8 @@ abstract public class Blob : MonoBehaviour
 					Debug.Log( "Blob "+gameObject.name+" Collision with blob " + c.gameObject.name );
 				}
 				//cachedRB_.velocity = Vector3.zero;
+
+				isFired_ = false;
 
 				if (!connections_.Contains(blob))
 				{
