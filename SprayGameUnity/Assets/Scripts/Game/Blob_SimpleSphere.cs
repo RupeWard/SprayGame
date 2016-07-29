@@ -15,6 +15,7 @@ public class Blob_SimpleSphere : Blob
 		cachedRenderer_ = GetComponent<MeshRenderer>( );
 		cachedMaterial_ = new Material( cachedRenderer_.sharedMaterial );
 		cachedRenderer_.material = cachedMaterial_;
+		cachedTransform.localScale = radius * Vector3.one;
 	}
 
 	protected override void SetAppearanceByType(BlobType t)

@@ -27,6 +27,12 @@ abstract public class Blob : MonoBehaviour
 
 	#region private data
 
+	private float radius_ = 0.5f;
+	public float radius
+	{
+		get { return radius_; }
+	}
+
 	private int id_ = 0;
 	public int id
 	{
@@ -142,8 +148,21 @@ abstract public class Blob : MonoBehaviour
 
 				if (!connections_.Contains(blob))
 				{
-					HingeJoint hinge = gameObject.AddComponent<HingeJoint>( );
-					hinge.connectedBody = blob.cachedRB;
+					SpringJoint joint = gameObject.AddComponent<SpringJoint>( );
+					joint.anchor = Vector3.zero;
+					joint.connectedAnchor = Vector3.zero;
+
+					float distance = 0.5f * (this.radius + blob.radius);
+					joint.minDistance = distance;
+					joint.maxDistance = distance;
+					joint.tolerance = 0.01f;// FIXME magic
+					joint.spring = 40000f;// FIXME magic
+					joint.damper= 10000f;// FIXME magic
+					joint.autoConfigureConnectedAnchor = false;
+					joint.connectedBody = blob.cachedRB;
+					joint.anchor = Vector3.zero;
+					joint.connectedAnchor = Vector3.zero;
+
 					AddConnection( blob );
 					blob.AddConnection( this );
 				}
