@@ -5,6 +5,12 @@ using RJWard.Core;
 
 abstract public class Blob : MonoBehaviour
 {
+	public enum EType
+	{
+		SimpleSphere,
+		SimpleCylinder
+	}
+
 	static private readonly bool DEBUG_BLOB = true;
 	static private int nextNum_ = 0;
 
@@ -64,7 +70,7 @@ abstract public class Blob : MonoBehaviour
 		}
 	}
 
-	private float radius_ = 0.5f;
+	protected float radius_ = 0.5f;
 	public float radius
 	{
 		get { return radius_; }
@@ -106,12 +112,7 @@ abstract public class Blob : MonoBehaviour
 
 	}
 
-	public void Init(Cannon cannon)
-	{
-		cachedTransform.position = cannon.cachedTransform.position;
-		cachedTransform.rotation = cannon.cachedTransform.rotation;
-
-	}
+	abstract public void Init( Cannon cannon );
 
 	protected abstract void SetAppearanceByType( BlobType t );
 

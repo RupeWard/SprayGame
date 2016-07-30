@@ -219,7 +219,7 @@ public class Cannon : MonoBehaviour
 
 				loadedBlob_.Init( this );
 
-				Vector3 forceVector = loadedBlob_.cachedTransform.up * force;
+				Vector3 forceVector = cachedTransform.up * force;
 				loadedBlob_.cachedRB.AddForce( forceVector, ForceMode.VelocityChange );
 				if (DEBUG_CANNON_FORCE)
 				{

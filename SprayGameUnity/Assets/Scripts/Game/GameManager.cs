@@ -22,6 +22,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	#region inspector prefabs
 
 	public GameObject simplesphereBlobPrefab;
+	public GameObject simplecylinderBlobPrefab;
 
 	#endregion inspector prefabs
 
@@ -29,7 +30,9 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public float blobSlowDistance = 5f;
 	public float blobSlowFactor = 0.5f;
-	public float minPending = 4; 
+	public float minPending = 4;
+
+	public Blob.EType blobType = Blob.EType.SimpleSphere;
 
 	#endregion gameSettings
 
@@ -75,7 +78,17 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	{
 		Blob blob = null;
 
-		blob = (GameObject.Instantiate<GameObject>( simplesphereBlobPrefab ) as GameObject).GetComponent<Blob>( );
+		GameObject prefab = null;
+		switch (blobType)
+		{
+			case Blob.EType.SimpleSphere:
+				prefab = simplesphereBlobPrefab;
+				break;
+			case Blob.EType.SimpleCylinder:
+				prefab = simplecylinderBlobPrefab;
+				break;
+		}
+		blob = (GameObject.Instantiate<GameObject>( prefab ) as GameObject).GetComponent<Blob>( );
 		blob.cachedTransform.parent = gameWorld;
 		if (blobTypes.Length == 0)
 		{

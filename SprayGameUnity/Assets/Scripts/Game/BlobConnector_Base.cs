@@ -15,8 +15,8 @@ abstract public class BlobConnector_Base : MonoBehaviour
 
 	#region private data
 
-	protected Blob_SimpleSphere parentBlob_ = null;
-	protected Blob_SimpleSphere childBlob_ = null;
+	protected Blob parentBlob_ = null;
+	protected Blob childBlob_ = null;
 
 	#endregion private data
 
@@ -46,6 +46,20 @@ abstract public class BlobConnector_Base : MonoBehaviour
 		{
 			result = BlobConnector_SimpleSphere.CreateConnection( bs0, bs1 );
 		}
+		else
+		{
+			Blob_SimpleCylinder bc0 = b0 as Blob_SimpleCylinder;
+			Blob_SimpleCylinder bc1 = b1 as Blob_SimpleCylinder;
+			if (bc0 != null && bc1 != null)
+			{
+				result = BlobConnector_SimpleCylinder.CreateConnection( bc0, bc1 );
+			}
+			else
+			{
+				Debug.LogError( "Can't connect blob types" );
+			}
+		}
+
 		return result;
 	}
 }
