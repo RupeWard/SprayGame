@@ -9,6 +9,9 @@ public class Cannon : MonoBehaviour
 	static private readonly bool DEBUG_CANNON_FORCE = true;
 
 	#region inspector hooks
+
+	public MeshRenderer turretRenderer;
+
 	#endregion inspector hooks
 
 	#region inspector data
@@ -54,7 +57,12 @@ public class Cannon : MonoBehaviour
 	{
 		cachedTransform_ = transform;
 		cachedAudioSource_ = GetComponent<AudioSource>( );
-		cachedMaterial_ = GetComponent<MeshRenderer>( ).sharedMaterial;
+
+		MeshRenderer renderer = GetComponent<MeshRenderer>( );
+        cachedMaterial_ = new Material( renderer.sharedMaterial);
+		renderer.sharedMaterial= cachedMaterial_;
+		turretRenderer.sharedMaterial = cachedMaterial_;
+
 		SetColour( );
 		force = SettingsStore.retrieveSetting<float>( SettingsIds.cannonSpeed );
     }
