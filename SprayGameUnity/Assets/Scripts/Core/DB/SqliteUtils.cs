@@ -292,7 +292,14 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 		}
 	}
 
-
+	protected override void PostOnApplicationQuit( )
+	{
+		foreach (SqliteConnection connection in storedConnections_.Values)
+		{
+			connection.Close( );
+		}
+		storedConnections_.Clear( );
+	}
 
 
 }
