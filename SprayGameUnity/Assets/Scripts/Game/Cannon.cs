@@ -45,7 +45,7 @@ public class Cannon : MonoBehaviour
 
 	private bool shouldFire_ = false;
 
-	private bool canFire_ = true;
+//	private bool canFire_ = true;
 
 	private Blob loadedBlob_ = null;
 
@@ -162,7 +162,7 @@ public class Cannon : MonoBehaviour
 	{
 		if (isControlled_)
 		{
-			if (canFire_ && loadedBlob_ != null)
+			if (/*canFire_ && */ loadedBlob_ != null)
 			{
 				shouldFire_ = true;
 			}
@@ -215,7 +215,7 @@ public class Cannon : MonoBehaviour
 
 	public void HandleFiredBlobFinished(Blob b)
 	{
-		canFire_ = true;
+		//canFire_ = true;
 	}
 
 	private void FixedUpdate()
@@ -223,7 +223,7 @@ public class Cannon : MonoBehaviour
 		if (shouldFire_)
 		{
 			shouldFire_ = false;
-			canFire_ = false;
+			//canFire_ = false;
 
 			if (loadedBlob_ != null)
 			{

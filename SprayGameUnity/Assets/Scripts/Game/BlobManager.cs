@@ -55,7 +55,6 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		}
 		//cachedRB_.velocity = Vector3.zero;
 
-#if UNITY_EDITOR
 		bool b01 = b0.connectedBlobs.Contains( b1 );
 		bool b10 = b1.connectedBlobs.Contains( b0 );
 
@@ -64,7 +63,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			Debug.LogError( "Containment mismatch, b01/b10 = " + b01 + "/" + b10 + " for " + b0.gameObject.name + " and " + b1.gameObject.name );
 			return;
 		}
-#endif
+
 		if (!b01 )
 		{
 			SpringJoint joint = b0.gameObject.AddComponent<SpringJoint>( );
@@ -89,14 +88,29 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			connection.joint = joint;
 			blobConnectors_[new KeyValuePair<Blob, Blob>( b0, b1 )] = connection;
 
-			MergeConnectedGroups( b0.connectedGroup, b1.connectedGroup );
+			if (b0.connectedGroup == b1.connectedGroup)
+			{
+				Debug.LogWarning( "Blobs " + b0.gameObject.name + " and " + b1.gameObject.name + " are both already in connected group " + b0.connectedGroup.name );
+			}
+			else
+			{
+				MergeConnectedGroups( b0.connectedGroup, b1.connectedGroup );
+			}
 
 			if (b0.blobType == b1.blobType)
 			{
-				BlobGroupSameType bgt = MergeTypeGroups( b0.typeGroup, b1.typeGroup );
-				if (bgt.blobs.Count >= GameManager.Instance.numBlobs)
+				BlobGroupSameType bgt = b0.typeGroup;
+				if (bgt != b1.typeGroup)
 				{
-					DeleteBlobTypeGroup( bgt );
+					bgt = MergeTypeGroups( b0.typeGroup, b1.typeGroup );
+				}
+				if (typeGroupsToCheck_.Contains( bgt ))
+				{
+					Debug.LogWarning( "Already checking " + bgt.DebugDescribe( ) );
+				}
+				else
+				{
+					typeGroupsToCheck_.Add( bgt );
 				}
 			}
 
@@ -107,33 +121,72 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		}
 	}
 
+	private List<BlobGroupSameType> typeGroupsToCheck_ = new List<BlobGroupSameType>( );
+
+	private void LateUpdate()
+	{
+		int num = 0;
+		foreach (BlobGroupSameType bg in typeGroupsToCheck_)
+		{
+			if (bg.blobs.Count >= GameManager.Instance.numBlobs)
+			{
+				DeleteBlobTypeGroup( bg );
+				num++;
+			}
+		}
+		typeGroupsToCheck_.Clear( );
+		if (num >0)
+		{
+			if (DEBUG_BLOBMANAGER)
+			{
+				Debug.Log( "Following "+num+" deletions: " + this.DebugDescribe( ) );
+			}
+		}
+	}
+
 	private BlobGroupConnected MergeConnectedGroups( BlobGroupConnected retainGroup, BlobGroupConnected loseGroup )
 	{
-		retainGroup.blobs.UnionWith( loseGroup.blobs );
+		if (retainGroup == loseGroup)
+		{
+			Debug.LogError( "Identical params" );
+			return retainGroup;
+		}
 		foreach( Blob b in loseGroup.blobs)
 		{
 			b.connectedGroup = retainGroup;
+			retainGroup.blobs.Add( b );
 		}
+		loseGroup.blobs.Clear( );
+		connectedGroups_.Remove( loseGroup );
 		if (loseGroup.isConnectedToWall)
 		{
 			retainGroup.isConnectedToWall = true;
 		}
-		connectedGroups_.Remove( loseGroup );
 		return retainGroup;
 	}
 
 	private BlobGroupSameType MergeTypeGroups( BlobGroupSameType retainGroup, BlobGroupSameType loseGroup )
 	{
-		retainGroup.blobs.UnionWith( loseGroup.blobs );
+		if (retainGroup == loseGroup)
+		{
+			Debug.LogError( "Identical params" );
+			return retainGroup;
+		}
 		foreach (Blob b in loseGroup.blobs)
 		{
 			b.typeGroup = retainGroup;
+			retainGroup.blobs.Add( b );
 		}
+		loseGroup.blobs.Clear( );
+		typeGroups_.Remove( loseGroup );
 		if (loseGroup.isConnectedToWall)
 		{
 			retainGroup.isConnectedToWall = true;
 		}
-		typeGroups_.Remove( loseGroup );
+		if (typeGroupsToCheck_.Contains( loseGroup ))
+		{
+			typeGroupsToCheck_.Remove( loseGroup );
+		}
 		return retainGroup;
 	}
 
@@ -184,8 +237,11 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			{
 				connectedGroups_.Remove( b.connectedGroup );
 			}
-			GameObject.Destroy( b.gameObject );
-			
+			if (sb != null)
+			{
+				sb.Append( "\n  Deleting empty connected group " + b.connectedGroup.name);
+			}
+			GameObject.Destroy( b.gameObject );			
 		}
 		if (sb != null)
 		{
@@ -198,25 +254,29 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		}
 	}
 
-	private void RemoveConnection(Blob b0, Blob b1)
+	private BlobConnector_Base FindConnection(Blob b0, Blob b1, ref KeyValuePair<Blob, Blob> kvp)
 	{
 		BlobConnector_Base bcb;
-		KeyValuePair < Blob, Blob >  kvp = new KeyValuePair<Blob, Blob>( b0, b1 );
-        if (blobConnectors_.TryGetValue( kvp, out bcb))
+		kvp = new KeyValuePair<Blob, Blob>( b0, b1 );
+		if (!blobConnectors_.TryGetValue( kvp, out bcb ))
+		{
+			kvp = new KeyValuePair<Blob, Blob>( b1, b0 );
+			blobConnectors_.TryGetValue( kvp, out bcb );
+		}
+		return bcb;
+	}
+
+	private void RemoveConnection(Blob b0, Blob b1)
+	{
+		KeyValuePair<Blob, Blob> kvp = new KeyValuePair<Blob, Blob>( null, null );
+		BlobConnector_Base bcb = FindConnection(b0, b1, ref kvp );
+
+		if (bcb != null)
 		{
 			blobConnectors_.Remove( kvp );
 			GameObject.Destroy( bcb.gameObject );
 		}
 		else
-		{
-			kvp = new KeyValuePair<Blob, Blob>( b1, b0 );
-			if (blobConnectors_.TryGetValue( kvp, out bcb ))
-            {
-				blobConnectors_.Remove( kvp );
-				GameObject.Destroy( bcb.gameObject );
-			}
-		}
-		if (bcb == null)
 		{
 			Debug.LogError( "On Delete, failed to find connection between " + b0.name + " and " + b1.name );
 		}
