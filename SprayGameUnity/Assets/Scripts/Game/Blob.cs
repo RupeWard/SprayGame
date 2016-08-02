@@ -278,7 +278,7 @@ abstract public class Blob : MonoBehaviour
 						Debug.Log( "Blob " + gameObject.name + " hit kill zone " + c.gameObject.name );
 					}
 					MessageBus.instance.sendBlobFinishedAction( this );
-					GameObject.Destroy( this );
+					GameObject.Destroy( this.gameObject );
 				}
 				else
 				{

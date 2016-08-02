@@ -180,7 +180,12 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 				sb.Append( "\n  Deleting" + b.name );
 			}
 			b.connectedGroup.blobs.Remove( b );
+			if (b.connectedGroup.blobs.Count == 0)
+			{
+				connectedGroups_.Remove( b.connectedGroup );
+			}
 			GameObject.Destroy( b.gameObject );
+			
 		}
 		if (sb != null)
 		{
