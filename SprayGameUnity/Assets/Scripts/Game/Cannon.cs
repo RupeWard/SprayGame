@@ -80,7 +80,10 @@ public class Cannon : MonoBehaviour
 	private void Start()
 	{
 		addListeners( );
+	}
 
+	public void StartGame()
+	{
 		StartCoroutine( LoadBlobCR( ) );
 	}
 
@@ -184,11 +187,21 @@ public class Cannon : MonoBehaviour
 		}
 	}
 
+	private float minAngle = 15f;
+
 	public void HandlePointerMove( Vector2 v )
 	{
 		if (isControlled_)
 		{
-			PointAt( v );
+			float angle = Mathf.Rad2Deg * Mathf.Atan2( v.y, v.x );
+			if (angle > minAngle && angle < 180f-minAngle)
+			{
+				PointAt( v );
+			}
+			else
+			{
+				Debug.LogWarning( "Ptr move too low: "+v+" gives "+angle );
+			}
 			if (DEBUG_CANNON_PTR)
 			{
 				Debug.Log( "Cannon: Ptr MOVE at " + v );

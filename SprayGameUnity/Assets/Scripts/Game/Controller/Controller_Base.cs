@@ -80,14 +80,18 @@ public class Controller_Base : MonoBehaviour
 		if (Vector2.Distance(v, previousPosition_) >= movementThreshold_)
 		{
 			previousPosition_ = v;
+
 			if (v.y > 0f)
 			{
 				MessageBus.instance.sendPointerMoveAction( v );
 			}
+			/*
 			else
 			{
+				float angle = Mathf.Rad2Deg * Mathf.Atan2( v.y, v.x );
+				Debug.Log( "Aborting at " + angle );
 				MessageBus.instance.sendPointerAbortAction( v );
-			}
+			}*/
 		}
 	}
 

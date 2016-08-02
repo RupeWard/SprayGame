@@ -24,7 +24,10 @@ public class GameSettingsPanel : MonoBehaviour
 		floatSettingPanel.gameObject.SetActive( false );
 		intSettingPanel.gameObject.SetActive( false );
 		gameObject.SetActive( true );
-		GameManager.Instance.PauseGame( );
+		if (GameManager.Instance.isPlaying && !GameManager.Instance.isPaused)
+		{
+			GameManager.Instance.PauseGame( );
+		}
 	}
 
 	private void SetNumBlobsText( )
@@ -49,7 +52,6 @@ public class GameSettingsPanel : MonoBehaviour
 
 	public void HandleDoneButton()
 	{
-		GameManager.Instance.ResumeGame( );
 		gameObject.SetActive( false );
 	}
 

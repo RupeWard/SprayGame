@@ -74,7 +74,7 @@ abstract public class BlobConnector_Base : MonoBehaviour
 		}
 		else
 		{
-			Debug.LogWarning( "No joint on destropying connection " + gameObject.name );
+			Debug.LogWarning( "No joint on destroying connection " + gameObject.name );
 		}
 		if (parentBlob_ != null)
 		{

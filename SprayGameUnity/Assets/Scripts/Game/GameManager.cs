@@ -75,13 +75,17 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 			}
 			controller_ = Controller_Mouse.Create( cannon );
 		}
+		controller_.gameObject.SetActive( false );
 	}
 
 	public void Start()
 	{
-		blobManager_ = (new GameObject( "BlobManager" )).AddComponent<BlobManager>( );
+		playPauseButtonText.text = "Play";
 	}
 
+	public UnityEngine.UI.Text playPauseButtonText;
+
+	private float savedTimeScale_ = 0f;
 	private Blob GetNewBlob()
 	{
 		Blob blob = null;
@@ -110,43 +114,80 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		return blob;
 	}
 
+	private bool isPlaying_ = false;
+	public bool isPlaying
+	{
+		get { return isPlaying_; }
+	}
+
+
 	private bool isPaused_ = false;
 	public bool isPaused
 	{
 		get { return isPaused_;  }
 	}
 
+	public void PlayGame( )
+	{
+		if (isPlaying_ == false)
+		{
+			blobManager_ = (new GameObject( "BlobManager" )).AddComponent<BlobManager>( );
+			isPlaying_ = true;
+			playPauseButtonText.text = "Pause";
+			cannon.StartGame( );
+			controller_.gameObject.SetActive( true );
+		}
+	}
+
 	public void PauseGame()
 	{
-		if (isPaused_)
+		if (!isPlaying_)
 		{
-			Debug.LogWarning( "Already paused" );
+			Debug.LogError( "Pause when not playing" );
 		}
 		else
 		{
-			isPaused_ = true;
-			if (controller_ != null)
+			if (isPaused_)
 			{
-				controller_.gameObject.SetActive( false );
+				Debug.LogWarning( "Already paused" );
+			}
+			else
+			{
+				isPaused_ = true;
+				playPauseButtonText.text = "Continue";
+				savedTimeScale_ = Time.timeScale;
+				Time.timeScale = 0f;
+				if (controller_ != null)
+				{
+					controller_.gameObject.SetActive( false );
+				}
 			}
 		}
 	}
 
 	public void ResumeGame()
 	{
-		if (!isPaused_)
+		if (!isPlaying_)
 		{
-			Debug.LogWarning( "Not paused" );
+			Debug.LogError( "Resume when not playing" );
 		}
 		else
 		{
-			isPaused_ = false;
-			if (controller_ != null)
+			if (!isPaused_)
 			{
-				controller_.gameObject.SetActive( true );
+				Debug.LogWarning( "Not paused" );
+			}
+			else
+			{
+				isPaused_ = false;
+				playPauseButtonText.text = "Pause";
+				Time.timeScale = savedTimeScale_;
+				if (controller_ != null)
+				{
+					controller_.gameObject.SetActive( true );
+				}
 			}
 		}
-
 	}
 
 	public void Update()
@@ -170,7 +211,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	private void PositionPendingBlobs()
 	{
-		Vector3 basePosition = cannon.cachedTransform.position - 1f * Vector3.up;
+		Vector3 basePosition = cannon.cachedTransform.position - 0.25f * Vector3.up;
 		foreach (Blob b in pendingBlobs_)
 		{
 			basePosition += 0.5f * b.radius * Vector3.left;
@@ -226,4 +267,22 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		}
 	}
 
+	public void HandlePlayPauseButton()
+	{
+		if (!isPlaying_)
+		{
+			PlayGame( );
+		}
+		else
+		{
+			if (isPaused_)
+			{
+				ResumeGame( );
+			}
+			else
+			{
+				PauseGame( );
+			}
+		}
+	}
 }

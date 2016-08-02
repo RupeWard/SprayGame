@@ -89,7 +89,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			connection.joint = joint;
 			blobConnectors_[new KeyValuePair<Blob, Blob>( b0, b1 )] = connection;
 
-			BlobGroupConnected bgc = MergeConnectedGroups( b0.connectedGroup, b1.connectedGroup );
+			MergeConnectedGroups( b0.connectedGroup, b1.connectedGroup );
 
 			if (b0.blobType == b1.blobType)
 			{
