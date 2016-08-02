@@ -5,6 +5,8 @@ abstract public class BlobConnector_Base : MonoBehaviour
 {
 	#region private hooks
 
+	public SpringJoint joint = null;
+
 	private Transform cachedTransform_ = null;
 	public Transform cachedTransform
 	{
@@ -37,14 +39,14 @@ abstract public class BlobConnector_Base : MonoBehaviour
 		}
 	}
 
-	static public BlobConnector_Base CreateConnection( Blob b0, Blob b1)
+	static public BlobConnector_Base CreateConnection(Transform t, Blob b0, Blob b1)
 	{
 		BlobConnector_Base result = null;
 		Blob_SimpleSphere bs0 = b0 as Blob_SimpleSphere;
 		Blob_SimpleSphere bs1 = b1 as Blob_SimpleSphere;
 		if (bs0 != null && bs1 != null)
 		{
-			result = BlobConnector_SimpleSphere.CreateConnection( bs0, bs1 );
+			result = BlobConnector_SimpleSphere.CreateConnection(t, bs0, bs1 );
 		}
 		else
 		{
@@ -52,7 +54,7 @@ abstract public class BlobConnector_Base : MonoBehaviour
 			Blob_SimpleCylinder bc1 = b1 as Blob_SimpleCylinder;
 			if (bc0 != null && bc1 != null)
 			{
-				result = BlobConnector_SimpleCylinder.CreateConnection( bc0, bc1 );
+				result = BlobConnector_SimpleCylinder.CreateConnection(t, bc0, bc1 );
 			}
 			else
 			{
@@ -61,5 +63,23 @@ abstract public class BlobConnector_Base : MonoBehaviour
 		}
 
 		return result;
+	}
+
+	private void OnDestroy()
+	{
+		if (joint != null)
+		{
+			Component.Destroy( joint );
+			joint = null;
+		}
+		else
+		{
+			Debug.LogWarning( "No joint on destropying connection " + gameObject.name );
+		}
+		if (parentBlob_ != null)
+		{
+			parentBlob_.connectedBlobs.Remove( childBlob_ );
+			childBlob_.connectedBlobs.Remove( parentBlob_ );
+		}
 	}
 }

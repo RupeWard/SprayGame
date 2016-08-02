@@ -31,5 +31,8 @@ public class Blob_SimpleSphere : Blob
 		cachedTransform.rotation = cannon.cachedTransform.rotation;
     }
 
+	override public void SetFlashState( float f )
+	{
+	}
 
 }

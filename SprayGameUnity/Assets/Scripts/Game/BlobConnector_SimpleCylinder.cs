@@ -84,18 +84,18 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 		Vector3 end = childBlob_.cachedTransform.position - childBlob_.radius * heightOffset;
 		Vector3 sum = start + end;
 		Vector3 diff = end - start;
-		float length = diff.magnitude;
+		float length = 0.5f * diff.magnitude;
 		cachedTransform.position = 0.5f * sum;
 		cachedTransform.localScale = new Vector3( 0.1f, length, 0.1f );
 		float angleDegs = Mathf.Rad2Deg * Mathf.Atan2( diff.y, diff.x ) - 90f;
 		cachedTransform.rotation = Quaternion.Euler( 0f, 0f, angleDegs );
 	}
 
-	public static BlobConnector_SimpleCylinder CreateConnection( Blob_SimpleCylinder b0, Blob_SimpleCylinder b1 )
+	public static BlobConnector_SimpleCylinder CreateConnection(Transform t, Blob_SimpleCylinder b0, Blob_SimpleCylinder b1 )
 	{
 		GameObject go = GameObject.Instantiate( cachedPrefab ) as GameObject;
-		go.name = "To_" + b1.gameObject.name;
-		go.transform.parent = b0.gameObject.transform;
+		go.name =b0.gameObject.name+ "To_" + b1.gameObject.name;
+		go.transform.parent = t;
 
 		BlobConnector_SimpleCylinder result = go.GetComponent<BlobConnector_SimpleCylinder>();
 		result.Init( b0, b1 );

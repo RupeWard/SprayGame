@@ -81,4 +81,30 @@ public partial class MessageBus
 		}
 	}
 
+	public System.Action<Blob, Blob> blobHitBlobAction;
+	public void sendBlobHitBlobAction(Blob b0, Blob b1)
+	{
+		if (blobHitBlobAction != null)
+		{
+			blobHitBlobAction( b0, b1 );
+		}
+		else
+		{
+			Debug.LogWarning( "No blobhitblob action" );
+		}
+	}
+
+	public System.Action<Blob, Wall> blobHitWallAction;
+	public void sendBlobHitWallAction( Blob b, Wall w)
+	{
+		if (blobHitWallAction != null)
+		{
+			blobHitWallAction( b, w );
+		}
+		else
+		{
+			Debug.LogWarning( "No blobhitwall action" );
+		}
+	}
+
 }

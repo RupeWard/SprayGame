@@ -91,11 +91,11 @@ public class BlobConnector_SimpleSphere : BlobConnector_Base
 		cachedTransform.rotation = Quaternion.Euler( 0f, 0f, angleDegs );
 	}
 
-	public static BlobConnector_SimpleSphere CreateConnection( Blob_SimpleSphere b0, Blob_SimpleSphere b1 )
+	public static BlobConnector_SimpleSphere CreateConnection(Transform t, Blob_SimpleSphere b0, Blob_SimpleSphere b1 )
 	{
 		GameObject go = GameObject.Instantiate( cachedPrefab ) as GameObject;
-		go.name = "To_" + b1.gameObject.name;
-		go.transform.parent = b0.gameObject.transform;
+		go.name = b0.gameObject.name + "To_" + b1.gameObject.name;
+		go.transform.parent = t;
 
 		BlobConnector_SimpleSphere result = go.GetComponent<BlobConnector_SimpleSphere>();
 		result.Init( b0, b1 );

@@ -22,6 +22,9 @@ abstract public class Blob : MonoBehaviour
 		Hit
 	}
 
+	public BlobGroupConnected connectedGroup = null;
+	public BlobGroupSameType typeGroup = null;
+
 	#region private hooks
 
 	private Transform cachedTransform_ = null;
@@ -45,6 +48,8 @@ abstract public class Blob : MonoBehaviour
 
 	private EState state_ = EState.Pending;
 
+	abstract public void SetFlashState(float f);
+
 	public void Fire()
 	{
 		if (state_ != EState.Loaded)
@@ -55,6 +60,7 @@ abstract public class Blob : MonoBehaviour
 		{
 			state_ = EState.Fired;
 //			isFired_ = true;
+			
 		}
 	}
 
@@ -82,7 +88,11 @@ abstract public class Blob : MonoBehaviour
 		get { return id_; }
 	}
 
-	private List<Blob> connections_ = new List<Blob>( );
+	private List<Blob> connectedBlobs_ = new List<Blob>( );
+	public List<Blob> connectedBlobs
+	{
+		get { return connectedBlobs_;  }
+	}
 
 	private BlobType blobType_ = null;
 	public BlobType blobType
@@ -103,7 +113,7 @@ abstract public class Blob : MonoBehaviour
 		PostAwake( );
 		if (DEBUG_BLOB)
 		{
-			Debug.Log( "Created Blob " + gameObject.name );
+//			Debug.Log( "Created Blob " + gameObject.name );
 		}
 	}
 
@@ -124,9 +134,9 @@ abstract public class Blob : MonoBehaviour
 
 	public void AddConnection(Blob b)
 	{
-		if (false == connections_.Contains( b ))
+		if (false == connectedBlobs_.Contains( b ))
 		{
-			connections_.Add( b );
+			connectedBlobs_.Add( b );
 		}
 	}
 
@@ -194,14 +204,16 @@ abstract public class Blob : MonoBehaviour
 			}
 			if (wall.stickiness != UnityExtensions.ETriBehaviour.Never)
 			{
+				state_ = EState.Hit;
+				directlyConnectedToWall_ = true;
+
 				cachedRB_.velocity = Vector3.zero;
 //				cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY;
 				cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionY;
 
+				MessageBus.instance.sendBlobHitWallAction( this, wall );
 				MessageBus.instance.sendBlobFinishedAction( this );
 
-				directlyConnectedToWall_ = true;
-				state_ = EState.Hit;
 			}
 		}
 		else // NOT WALL
@@ -209,6 +221,9 @@ abstract public class Blob : MonoBehaviour
 			Blob blob = c.gameObject.GetComponent<Blob>( );
 			if (blob != null)
 			{
+				state_ = EState.Hit;
+				MessageBus.instance.sendBlobHitBlobAction( this, blob );
+				/*
 				if (DEBUG_BLOB)
 				{
 					Debug.Log( "Blob "+gameObject.name+" Collision with blob " + c.gameObject.name );
@@ -233,12 +248,22 @@ abstract public class Blob : MonoBehaviour
 					joint.connectedBody = blob.cachedRB;
 					joint.anchor = Vector3.zero;
 					joint.connectedAnchor = Vector3.zero;
-
+				
 					AddConnection( blob );
 					blob.AddConnection( this );
 
 					BlobConnector_Base connection = BlobConnector_Base.CreateConnection( this, blob );
+
+#if UNITY_EDITOR
+					BlobGroupConnected connectedGroup = new BlobGroupConnected( this );
+#endif
+					BlobGroupSameType typeGroup = new BlobGroupSameType( this );
+					if (typeGroup.blobs.Count > 2)
+					{
+						GameManager.Instance.FlashBlobGroup( typeGroup );
+					}
 				}
+				*/
 
 				//				cachedRB_.isKinematic = true;
 				MessageBus.instance.sendBlobFinishedAction( this );

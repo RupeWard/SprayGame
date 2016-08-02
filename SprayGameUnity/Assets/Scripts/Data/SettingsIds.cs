@@ -9,6 +9,7 @@ public static class SettingsIds
 	static public readonly string cannonSpeed = "cannonSpeed";
 	static public readonly string blobSlowDistance = "blobSlowDistance";
 	static public readonly string blobSlowFactor = "blobSlowFactor";
+	static public readonly string numBlobs = "numBlobs";
 
 	public static readonly Dictionary<string, string> defaults = new Dictionary<string, string>( )
 	{
@@ -16,6 +17,7 @@ public static class SettingsIds
 		{  cannonSpeed, "6" },
 		{  blobSlowDistance, "4" },
 		{  blobSlowFactor, "0.5" },
+		{ numBlobs, "4" },
 	};
 
 	public static readonly List<string> encrypted = new List<string>( )

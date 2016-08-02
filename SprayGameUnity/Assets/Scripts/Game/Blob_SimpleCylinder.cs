@@ -15,7 +15,7 @@ public class Blob_SimpleCylinder : Blob
 		radius_ = cachedTransform.localScale.x;
 		 
 		cachedMaterial_ = new Material( myRenderer.sharedMaterial );
-		myRenderer.material = cachedMaterial_;
+		myRenderer.sharedMaterial = cachedMaterial_;
 		cachedTransform.localScale = new Vector3 ( radius, 0.5f, radius);
 	}
 
@@ -28,6 +28,12 @@ public class Blob_SimpleCylinder : Blob
 	{
 		cachedTransform.position = cannon.cachedTransform.position;
 		cachedTransform.rotation = cannon.cachedTransform.rotation;
+	}
+
+	override public void SetFlashState( float f )
+	{
+        //cachedMaterial_.SetColor( "_EmissionColor", Color.Lerp( Color.black, blobType.colour, f ) );
+		cachedMaterial_.color = Color.Lerp( blobType.colour, Color.black, f ) ;
 	}
 
 }

@@ -31,6 +31,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	public float blobSlowDistance = 5f;
 	public float blobSlowFactor = 0.5f;
 	public float minPending = 4;
+	public int numBlobs = 4;
 
 	public Blob.EType blobType = Blob.EType.SimpleSphere;
 
@@ -42,14 +43,16 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	private List<Blob> activeBlobs_ = new List<Blob>( );
 	private Queue<Blob> pendingBlobs_ = new Queue<Blob>( );
-	
-	
+
+	private BlobManager blobManager_ = null;
+
 	#endregion private objects
 
 	protected override void PostAwake( )
 	{
 		blobSlowDistance = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowDistance);
 		blobSlowFactor = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowFactor);
+		numBlobs = SettingsStore.retrieveSetting<int>( SettingsIds.numBlobs );
 
 		if (cannon == null)
 		{
@@ -72,6 +75,11 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 			}
 			controller_ = Controller_Mouse.Create( cannon );
 		}
+	}
+
+	public void Start()
+	{
+		blobManager_ = (new GameObject( "BlobManager" )).AddComponent<BlobManager>( );
 	}
 
 	private Blob GetNewBlob()
@@ -149,6 +157,15 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 			pendingBlobs_.Enqueue( newBlob );
 			PositionPendingBlobs( );
 		}
+
+		if (pendingFlashGroups.Count > 0)
+		{
+			if (isFlashingGroup_ == false)
+			{
+				BlobGroup bg = pendingFlashGroups.Dequeue( );
+				StartCoroutine( FlashBlobGroupCR( bg, 0.6f ) );
+			}
+		}
 	}
 
 	private void PositionPendingBlobs()
@@ -172,4 +189,41 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		}
 		return result;
 	}
+
+	private bool isFlashingGroup_ = false;
+
+	public IEnumerator FlashBlobGroupCR(BlobGroup blobs, float duration)
+	{
+		Debug.LogWarning( "START Flashing blob group " + blobs.name + " " + blobs.blobs.Count );
+		isFlashingGroup_ = true;
+		float elapsed = 0f;
+		while (elapsed < duration)
+		{
+			float tFraction = elapsed / duration;
+			float sFraction = Mathf.Sin( tFraction * Mathf.PI );
+			foreach (Blob b in blobs.blobs)
+			{
+				b.SetFlashState( sFraction );
+			}
+			elapsed += Time.deltaTime;
+			yield return null;
+		}
+		foreach (Blob b in blobs.blobs)
+		{
+			b.SetFlashState( 0f );
+		}
+		isFlashingGroup_ = false;
+		Debug.LogWarning( "END Flashing blob group " + blobs.name );
+	}
+
+	private Queue<BlobGroup> pendingFlashGroups = new Queue<BlobGroup>( );
+	public void FlashBlobGroup(BlobGroup b)
+	{
+		if (!pendingFlashGroups.Contains( b ))
+		{
+			Debug.LogWarning( "QUEUE Flashing blob group " + b.name );
+			pendingFlashGroups.Enqueue( b );
+		}
+	}
+
 }
