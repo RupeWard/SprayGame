@@ -12,6 +12,11 @@ public class Cannon : MonoBehaviour
 
 	public MeshRenderer turretRenderer;
 
+	public Transform trace0;
+	public Transform trace1;
+
+	public float traceLength = 8f;
+
 	#endregion inspector hooks
 
 	#region inspector data
@@ -36,6 +41,7 @@ public class Cannon : MonoBehaviour
 	private AudioSource cachedAudioSource_ = null;
 
 	private Material cachedMaterial_ = null;
+	private Material cachedTrace0Material_ = null;
 
 	#endregion private hooks
 
@@ -58,13 +64,18 @@ public class Cannon : MonoBehaviour
 		cachedTransform_ = transform;
 		cachedAudioSource_ = GetComponent<AudioSource>( );
 
-		MeshRenderer renderer = GetComponent<MeshRenderer>( );
+		cachedTrace0Material_ = new Material( trace0.GetComponent<MeshRenderer>().sharedMaterial);
+		trace0.GetComponent<MeshRenderer>( ).sharedMaterial = cachedTrace0Material_;
+
+        MeshRenderer renderer = GetComponent<MeshRenderer>( );
         cachedMaterial_ = new Material( renderer.sharedMaterial);
 		renderer.sharedMaterial= cachedMaterial_;
 		turretRenderer.sharedMaterial = cachedMaterial_;
 
 		SetColour( );
 		force = SettingsStore.retrieveSetting<float>( SettingsIds.cannonSpeed );
+		trace0.gameObject.SetActive( false );
+		trace1.gameObject.SetActive( false );
     }
 
 	private void SetColour( )
@@ -107,6 +118,7 @@ public class Cannon : MonoBehaviour
 		}
 	}
 
+	private readonly Vector3 heightOffset = new Vector3( 0f, 0f, -0.1f );
 	private void PointAt(Vector2 v)
 	{
 		float angle = Mathf.Rad2Deg * Mathf.Atan2( v.y, v.x );
@@ -115,6 +127,30 @@ public class Cannon : MonoBehaviour
 			Debug.Log( "Cannon Angle is " + angle );
 		}
 		cachedTransform_.rotation = Quaternion.Euler( new Vector3( 0f,0f,angle - 90f ) );
+		if (traceLength > 0f && loadedBlob_ != null)
+		{
+			float lengthSoFar = traceLength;
+			Vector3 direction = v.normalized;
+			Vector3 traceEnd = cachedTransform_.position + direction * traceLength;
+			Ray ray = new Ray( cachedTransform.position, direction );
+			RaycastHit hitInfo;
+			if (Physics.Raycast(ray, out hitInfo, traceLength, 1))
+			{
+				Debug.Log( "Ray hit " + hitInfo.collider.gameObject.name +" "+hitInfo.ToString());
+				traceEnd = hitInfo.point;
+				lengthSoFar = Vector3.Distance( traceEnd, cachedTransform_.position );
+			}
+			trace0.transform.position = 0.5f * (cachedTransform_.position + traceEnd) + heightOffset;
+			trace0.transform.localScale = new Vector3( lengthSoFar / cachedTransform_.localScale.x, 0.1f, 0.1f ) ;
+			trace0.transform.rotation = Quaternion.Euler( new Vector3( 0f, 0f, angle ) ); ;// Quaternion.Euler( direction );
+			trace0.gameObject.SetActive( true );
+			cachedTrace0Material_.mainTextureScale = new Vector2( lengthSoFar, 0f );
+		}
+		else
+		{
+			trace0.gameObject.SetActive( false );
+			trace1.gameObject.SetActive( false );
+		}
 	}
 
 	public void HandlePointerAbort( Vector2 v )
