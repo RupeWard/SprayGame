@@ -183,7 +183,7 @@ abstract public class Blob : MonoBehaviour
 			else if (directlyConnectedToWall_)
 			{
 //				Debug.Log( "Applying drag" );
-				cachedRB_.AddForce( cachedRB_.velocity * -1f * wallDrag, ForceMode.VelocityChange );
+				cachedRB_.AddForce( cachedRB_.velocity * -1f * GameManager.Instance.wallDrag, ForceMode.VelocityChange );
 			}
 		}
 	}

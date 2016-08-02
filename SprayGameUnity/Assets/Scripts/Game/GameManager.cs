@@ -32,6 +32,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	public float blobSlowFactor = 0.5f;
 	public float minPending = 4;
 	public int numBlobs = 4;
+	public float wallDrag = 0.3f;
 
 	public Blob.EType blobType = Blob.EType.SimpleSphere;
 
