@@ -127,7 +127,7 @@ public class Cannon : MonoBehaviour
 			Debug.Log( "Cannon Angle is " + angle );
 		}
 		cachedTransform_.rotation = Quaternion.Euler( new Vector3( 0f,0f,angle - 90f ) );
-		if (traceLength > 0f && loadedBlob_ != null)
+		if (traceLength > 0f && loadedBlob_ != null && isControlled_)
 		{
 			float lengthSoFar = traceLength;
 			Vector3 direction = v.normalized;
@@ -144,7 +144,7 @@ public class Cannon : MonoBehaviour
 			trace0.transform.localScale = new Vector3( lengthSoFar / cachedTransform_.localScale.x, 0.1f, 0.1f ) ;
 			trace0.transform.rotation = Quaternion.Euler( new Vector3( 0f, 0f, angle ) ); ;// Quaternion.Euler( direction );
 			trace0.gameObject.SetActive( true );
-			cachedTrace0Material_.mainTextureScale = new Vector2( lengthSoFar, 0f );
+			cachedTrace0Material_.mainTextureScale = new Vector2( 2 * lengthSoFar, 0f );
 		}
 		else
 		{
@@ -166,6 +166,8 @@ public class Cannon : MonoBehaviour
 			}
 			cachedTransform_.rotation = Quaternion.identity;
 			isControlled_ = false;
+			trace0.gameObject.SetActive( false );
+			trace1.gameObject.SetActive( false );
 		}
 		else
 		{
@@ -216,6 +218,8 @@ public class Cannon : MonoBehaviour
 			}
 
 			isControlled_ = false;
+			trace0.gameObject.SetActive( false );
+			trace1.gameObject.SetActive( false );
 		}
 		else
 		{
