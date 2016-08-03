@@ -212,19 +212,22 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public void Update()
 	{
-		if (pendingBlobs_.Count < minPending)
+		if (isPlaying_)
 		{
-			Blob newBlob = GetNewBlob( );
-			pendingBlobs_.Enqueue( newBlob );
-			PositionPendingBlobs( );
-		}
-
-		if (pendingFlashGroups.Count > 0)
-		{
-			if (isFlashingGroup_ == false)
+			if (pendingBlobs_.Count < minPending)
 			{
-				BlobGroup bg = pendingFlashGroups.Dequeue( );
-				StartCoroutine( FlashBlobGroupCR( bg, 0.6f ) );
+				Blob newBlob = GetNewBlob( );
+				pendingBlobs_.Enqueue( newBlob );
+				PositionPendingBlobs( );
+			}
+
+			if (pendingFlashGroups.Count > 0)
+			{
+				if (isFlashingGroup_ == false)
+				{
+					BlobGroup bg = pendingFlashGroups.Dequeue( );
+					StartCoroutine( FlashBlobGroupCR( bg, 0.6f ) );
+				}
 			}
 		}
 	}
