@@ -36,6 +36,25 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public Blob.EType blobType = Blob.EType.SimpleSphere;
 
+	public enum ELayer
+	{
+		Default,
+		Cannon,
+		Trace
+	}
+
+	public readonly static Dictionary<ELayer, int> layerIndices = new Dictionary<ELayer, int>( )
+	{
+		{ ELayer.Default, 0 },
+		{ ELayer.Cannon, 8 },
+		{ ELayer.Trace, 9 }
+	};
+
+	public static int layerMask( ELayer l)
+	{
+		return 1 >> layerIndices[l];
+	}
+
 	#endregion gameSettings
 
 	#region private objects

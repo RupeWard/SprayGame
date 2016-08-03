@@ -134,7 +134,7 @@ public class Cannon : MonoBehaviour
 			Vector3 traceEnd = cachedTransform_.position + direction * traceLength;
 			Ray ray = new Ray( cachedTransform.position, direction );
 			RaycastHit hitInfo;
-			if (Physics.Raycast(ray, out hitInfo, traceLength, 1))
+			if (Physics.Raycast(ray, out hitInfo, traceLength, GameManager.layerMask(GameManager.ELayer.Default)))
 			{
 				Debug.Log( "Ray hit " + hitInfo.collider.gameObject.name +" "+hitInfo.ToString());
 				traceEnd = hitInfo.point;
