@@ -33,6 +33,12 @@ public class Blob_SimpleSphere : Blob
 
 	override public void SetFlashState( float f )
 	{
+		Debug.LogWarning( "Not implemeneted" );
+	}
+
+	override public void SetCountdownState( float fraction01 )
+	{
+		Debug.LogWarning( "Not implemeneted" );
 	}
 
 }

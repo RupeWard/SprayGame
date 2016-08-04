@@ -18,15 +18,26 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		get { return name_;  }
 	}
 	public bool isConnectedToWall = false;
-	
+
+	static private int s_counter_ = 0;
+
 	protected BlobGroup(string n, Blob seedBlob)
 	{
-		name_ = n;
+		name_ = s_counter_.ToString()+"_"+ n;
+		s_counter_++;
 	}
 
 	public bool ContainsBlob(Blob b)
 	{
 		return blobs_.Contains( b );
+	}
+
+	public void SetCountdownState( float fraction01 )
+	{
+		foreach (Blob b in blobs_)
+		{
+			b.SetCountdownState( fraction01 );
+		}
 	}
 
 	public void SeedFrom(Blob seedBlob)

@@ -126,19 +126,107 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		{
 			if (bg.blobs.Count >= GameManager.Instance.numBlobs)
 			{
-				DeleteBlobTypeGroup( bg );
+				AddGroupCountdownToDelete( bg );
 				num++;
 			}
 		}
 		typeGroupsToCheck_.Clear( );
-		if (num >0)
+
+		foreach (GroupCountdownInfo gci in groupCountdowns_)
+		{
+			gci.Update( );
+		}
+
+		foreach (BlobGroupSameType g in groupsToDelete_)
+		{
+			DeleteBlobTypeGroup( g );
+		}
+		groupsToDelete_.Clear( );
+	}
+
+	private void AddGroupCountdownToDelete( BlobGroupSameType bg)
+	{
+		GroupCountdownInfo gci = null;
+		foreach (GroupCountdownInfo i in groupCountdowns_)
+		{
+			if (i.group == bg)
+			{
+				gci = i;
+				gci.Restart( );
+				if (DEBUG_BLOBMANAGER)
+				{
+					Debug.Log( "Restarting countdown for group " + bg.name );
+				}
+				break;
+			}
+		}
+		if (gci == null)
 		{
 			if (DEBUG_BLOBMANAGER)
 			{
-				Debug.Log( "Following "+num+" deletions: " + this.DebugDescribe( ) );
+				Debug.Log( "Adding countdown for group " + bg.name );
+			}
+			groupCountdowns_.Add( new GroupCountdownInfo( bg, 4f, HandleCountdownToDeleteFinished ) );
+		}
+	}
+
+	private void HandleCountdownToDeleteFinished(BlobGroupSameType bg)
+	{
+		if (DEBUG_BLOBMANAGER)
+		{
+			Debug.Log( "Countdown to delete finished for group " + bg.name );
+		}
+		groupsToDelete_.Add( bg );
+	}
+
+	private HashSet<BlobGroupSameType> groupsToDelete_ = new HashSet<BlobGroupSameType>( );
+
+	private class GroupCountdownInfo
+	{
+		public BlobGroupSameType group;
+		public float startTime;
+		public float endTime;
+		public System.Action<BlobGroupSameType > endAction;
+
+		public float duration
+		{
+			get { return endTime - startTime; }
+		}
+
+		public GroupCountdownInfo( BlobGroupSameType g, float durn, System.Action<BlobGroupSameType> ea)
+		{
+			group = g;
+			startTime = Time.time;
+			endTime = startTime + durn;
+			endAction = ea;
+		}
+
+		public void Restart()
+		{
+			float durn = endTime - startTime;
+			startTime = Time.time;
+			endTime = startTime + durn;
+		}
+
+		public void Update()
+		{
+			float fraction = (Time.time - startTime) / duration;
+			group.SetCountdownState( Mathf.Clamp01( fraction ) );
+			if (fraction > 1f)
+			{
+				if (endAction != null)
+				{
+					endAction( group );
+				}
+				else
+				{
+					Debug.LogWarning( "No endAction" );
+				}
 			}
 		}
 	}
+
+	private List<GroupCountdownInfo> groupCountdowns_ = new List<GroupCountdownInfo>( );
 
 	private BlobGroupConnected MergeConnectedGroups( BlobGroupConnected retainGroup, BlobGroupConnected loseGroup )
 	{
@@ -231,11 +319,11 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			b.connectedGroup.blobs.Remove( b );
 			if (b.connectedGroup.blobs.Count == 0)
 			{
+				if (sb != null)
+				{
+					sb.Append( "\n  Deleting empty connected group " + b.connectedGroup.name );
+				}
 				connectedGroups_.Remove( b.connectedGroup );
-			}
-			if (sb != null)
-			{
-				sb.Append( "\n  Deleting empty connected group " + b.connectedGroup.name);
 			}
 			GameObject.Destroy( b.gameObject );			
 		}
@@ -244,6 +332,20 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			sb.Append( "\nRemoving group from list" );
 		}
 		typeGroups_.Remove( bg );
+
+		List<GroupCountdownInfo> toRemove = new List<GroupCountdownInfo>( );
+		foreach (GroupCountdownInfo info in groupCountdowns_)
+		{
+			if (info.group == bg)
+			{
+				toRemove.Add( info );
+			}
+		}
+		foreach (GroupCountdownInfo info in toRemove)
+		{
+			groupCountdowns_.Remove( info );
+		}
+
 		if (sb!= null)
 		{
 			Debug.Log( sb.ToString( ) );

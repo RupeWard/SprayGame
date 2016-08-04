@@ -249,4 +249,6 @@ abstract public class Blob : MonoBehaviour
 			}
 		}
 	}
+
+	abstract public void SetCountdownState( float fraction01 );
 }
