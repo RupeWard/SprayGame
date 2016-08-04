@@ -97,13 +97,9 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 				MergeConnectedGroups( b0.connectedGroup, b1.connectedGroup );
 			}
 
-			if (b0.blobType == b1.blobType)
+			if (GameManager.Instance.ShouldMergeTypeGroups( b0.typeGroup, b1.typeGroup))
 			{
-				BlobGroupSameType bgt = b0.typeGroup;
-				if (bgt != b1.typeGroup)
-				{
-					bgt = MergeTypeGroups( b0.typeGroup, b1.typeGroup );
-				}
+				BlobGroupSameType bgt = MergeTypeGroups( b0.typeGroup, b1.typeGroup );
 				if (typeGroupsToCheck_.Contains( bgt ))
 				{
 					Debug.LogWarning( "Already checking " + bgt.DebugDescribe( ) );

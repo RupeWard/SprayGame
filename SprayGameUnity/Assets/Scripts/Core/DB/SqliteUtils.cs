@@ -8,7 +8,7 @@ using Mono.Data.Sqlite;
 
 public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLifetimeLazy< SqliteUtils >
 {
-	public static readonly bool DEBUG_SQL = true;
+	public static readonly bool DEBUG_SQL = false;
 
 	private Dictionary<string, SqliteConnection> storedConnections_ = new Dictionary<string, SqliteConnection>( );
 	private string databaseFolder_ = "ERR_DBFOLDER_NOT_SET";

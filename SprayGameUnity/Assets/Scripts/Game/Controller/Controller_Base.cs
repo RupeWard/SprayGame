@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Controller_Base : MonoBehaviour
 {
-	static protected readonly bool DEBUG_CONTROLLER = true;
+	static protected readonly bool DEBUG_CONTROLLER = false;
 
 	#region private data
 

@@ -308,4 +308,18 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 			}
 		}
 	}
+
+	public bool ShouldMergeTypeGroups(BlobGroupSameType g0, BlobGroupSameType g1)
+	{
+		bool result = false;
+		if (g0 == null || g1 == null)
+		{
+			Debug.LogWarning( "Null type group passed to ShouldMergeTypeGroups" );
+		}
+		else if (g0 != g1 )
+		{
+			result = (g0.blobType == g1.blobType);
+		}
+		return result; 
+	}
 }

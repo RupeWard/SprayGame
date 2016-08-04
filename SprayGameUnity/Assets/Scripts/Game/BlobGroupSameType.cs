@@ -4,6 +4,10 @@ using System.Collections;
 public class BlobGroupSameType: BlobGroup
 {
 	private BlobType blobType_ = null;
+	public BlobType blobType
+	{
+		get { return blobType_;  }
+	}
 
 	public BlobGroupSameType( Blob b): base("Col="+b.blobType.colour.ToString(), b)
 	{

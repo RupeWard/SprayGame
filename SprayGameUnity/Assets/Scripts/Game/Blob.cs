@@ -12,6 +12,7 @@ abstract public class Blob : MonoBehaviour
 	}
 
 	static private readonly bool DEBUG_BLOB = true;
+	static private readonly bool DEBUG_COLLISIONS = true;
 	static private int nextNum_ = 0;
 
 	public enum EState
@@ -188,7 +189,6 @@ abstract public class Blob : MonoBehaviour
 		}
 	}
 
-	static private readonly float wallDrag = 0.5f;
 	private void OnCollisionEnter( Collision c)
 	{
 		if (!HasBeenFired())
@@ -198,7 +198,7 @@ abstract public class Blob : MonoBehaviour
 		Wall wall = c.gameObject.GetComponent<Wall>( );
 		if (wall != null)
 		{
-			if (DEBUG_BLOB)
+			if (DEBUG_COLLISIONS)
 			{
 				Debug.Log( "Blob " + gameObject.name + "Collision with Wall " + c.gameObject.name );
 			}
@@ -208,12 +208,10 @@ abstract public class Blob : MonoBehaviour
 				directlyConnectedToWall_ = true;
 
 				cachedRB_.velocity = Vector3.zero;
-//				cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY;
 				cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionY;
 
 				MessageBus.instance.sendBlobHitWallAction( this, wall );
 				MessageBus.instance.sendBlobFinishedAction( this );
-
 			}
 		}
 		else // NOT WALL
@@ -221,53 +219,13 @@ abstract public class Blob : MonoBehaviour
 			Blob blob = c.gameObject.GetComponent<Blob>( );
 			if (blob != null)
 			{
+				if (DEBUG_COLLISIONS)
+				{
+					Debug.Log( "Blob " + gameObject.name + " Collision with blob " + c.gameObject.name );
+				}
 				state_ = EState.Hit;
 				MessageBus.instance.sendBlobHitBlobAction( this, blob );
-				/*
-				if (DEBUG_BLOB)
-				{
-					Debug.Log( "Blob "+gameObject.name+" Collision with blob " + c.gameObject.name );
-				}
-				//cachedRB_.velocity = Vector3.zero;
-
-				state_ = EState.Hit;
-
-				if (!connections_.Contains(blob))
-				{
-					SpringJoint joint = gameObject.AddComponent<SpringJoint>( );
-					joint.anchor = Vector3.zero;
-					joint.connectedAnchor = Vector3.zero;
-
-					float distance = 0.5f * (this.radius + blob.radius);
-					joint.minDistance = distance;
-					joint.maxDistance = distance;
-					joint.tolerance = 0.01f;// FIXME magic
-					joint.spring = 40000f;// FIXME magic
-					joint.damper= 10000f;// FIXME magic
-					joint.autoConfigureConnectedAnchor = false;
-					joint.connectedBody = blob.cachedRB;
-					joint.anchor = Vector3.zero;
-					joint.connectedAnchor = Vector3.zero;
-				
-					AddConnection( blob );
-					blob.AddConnection( this );
-
-					BlobConnector_Base connection = BlobConnector_Base.CreateConnection( this, blob );
-
-#if UNITY_EDITOR
-					BlobGroupConnected connectedGroup = new BlobGroupConnected( this );
-#endif
-					BlobGroupSameType typeGroup = new BlobGroupSameType( this );
-					if (typeGroup.blobs.Count > 2)
-					{
-						GameManager.Instance.FlashBlobGroup( typeGroup );
-					}
-				}
-				*/
-
-				//				cachedRB_.isKinematic = true;
 				MessageBus.instance.sendBlobFinishedAction( this );
-
 			}
 			else // NOT BLOB
 			{
@@ -277,6 +235,7 @@ abstract public class Blob : MonoBehaviour
 					{
 						Debug.Log( "Blob " + gameObject.name + " hit kill zone " + c.gameObject.name );
 					}
+					// TODO remove from groups etc
 					MessageBus.instance.sendBlobFinishedAction( this );
 					GameObject.Destroy( this.gameObject );
 				}
