@@ -28,11 +28,14 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	#region gameSettings
 
+	public AudioClip deleteClip;
+
 	public float blobSlowDistance = 5f;
 	public float blobSlowFactor = 0.5f;
 	public float minPending = 4;
 	public int numBlobs = 4;
 	public float wallDrag = 0.3f;
+	public float groupDeleteCountdown = 6f;
 
 	public Blob.EType blobType = Blob.EType.SimpleSphere;
 
@@ -65,11 +68,14 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	private Queue<Blob> pendingBlobs_ = new Queue<Blob>( );
 
 	private BlobManager blobManager_ = null;
+	private AudioSource cachedAudioSource_ = null;
 
 	#endregion private objects
 
 	protected override void PostAwake( )
 	{
+		cachedAudioSource_ = GetComponent<AudioSource>( );
+
 		blobSlowDistance = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowDistance);
 		blobSlowFactor = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowFactor);
 		numBlobs = SettingsStore.retrieveSetting<int>( SettingsIds.numBlobs );
@@ -321,5 +327,11 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 			result = (g0.blobType == g1.blobType);
 		}
 		return result; 
+	}
+
+	public void PlayDeleteClip()
+	{
+		cachedAudioSource_.clip = deleteClip;
+		cachedAudioSource_.Play( );
 	}
 }

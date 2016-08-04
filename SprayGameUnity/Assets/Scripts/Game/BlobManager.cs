@@ -139,7 +139,15 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 
 		foreach (BlobGroupSameType g in groupsToDelete_)
 		{
-			DeleteBlobTypeGroup( g );
+			if (g.blobs.Count > 0)
+			{
+				DeleteBlobTypeGroup( g );
+				GameManager.Instance.PlayDeleteClip( );
+			}
+			else
+			{
+				Debug.Log( "Empty group in deletre list" );
+			}
 		}
 		groupsToDelete_.Clear( );
 	}
@@ -166,7 +174,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			{
 				Debug.Log( "Adding countdown for group " + bg.name );
 			}
-			groupCountdowns_.Add( new GroupCountdownInfo( bg, 4f, HandleCountdownToDeleteFinished ) );
+			groupCountdowns_.Add( new GroupCountdownInfo( bg, GameManager.Instance.groupDeleteCountdown, HandleCountdownToDeleteFinished ) );
 		}
 	}
 
