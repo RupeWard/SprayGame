@@ -64,6 +64,8 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			return;
 		}
 
+		bool bKillZone = (b0.IsInKillZone || b1.IsInKillZone);
+
 		if (!b01 )
 		{
 			SpringJoint joint = b0.gameObject.AddComponent<SpringJoint>( );
@@ -106,7 +108,10 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 				}
 				else
 				{
-					typeGroupsToCheck_.Add( bgt );
+					if (!bKillZone)
+					{
+						typeGroupsToCheck_.Add( bgt );
+					}
 				}
 			}
 
@@ -114,6 +119,10 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			{
 				Debug.Log( this.DebugDescribe( ) );
 			}
+		}
+		if (bKillZone)
+		{
+			MessageBus.instance.sendBlobHitInKillZoneAction( b0, b1 );
 		}
 	}
 
@@ -141,13 +150,9 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		{
 			if (g.blobs.Count > 0)
 			{
-				DeleteBlobTypeGroup( g );
 				GameManager.Instance.PlayDeleteClip( );
 			}
-			else
-			{
-				Debug.Log( "Empty group in deletre list" );
-			}
+			DeleteBlobTypeGroup( g );
 		}
 		groupsToDelete_.Clear( );
 	}
@@ -243,17 +248,31 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			Debug.LogError( "Identical params" );
 			return retainGroup;
 		}
-		foreach( Blob b in loseGroup.blobs)
+		if (loseGroup != null)
 		{
-			b.connectedGroup = retainGroup;
-			retainGroup.blobs.Add( b );
+			if (loseGroup.isConnectedToWall)
+			{
+				retainGroup.isConnectedToWall = true;
+			}
+			if (loseGroup.blobs != null)
+			{
+				foreach (Blob b in loseGroup.blobs)
+				{
+					b.connectedGroup = retainGroup;
+					retainGroup.blobs.Add( b );
+				}
+				loseGroup.blobs.Clear( );
+			}
+			else
+			{
+				Debug.LogError( "null loseGroup.blobs" );
+			}
 		}
-		loseGroup.blobs.Clear( );
+		else 
+		{
+			Debug.LogError( "null loseGroup" );
+		}
 		connectedGroups_.Remove( loseGroup );
-		if (loseGroup.isConnectedToWall)
-		{
-			retainGroup.isConnectedToWall = true;
-		}
 		return retainGroup;
 	}
 

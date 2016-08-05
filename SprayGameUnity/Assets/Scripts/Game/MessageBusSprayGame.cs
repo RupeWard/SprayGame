@@ -107,4 +107,31 @@ public partial class MessageBus
 		}
 	}
 
+	public System.Action<Blob, Blob> blobHitInKillZoneAction;
+	public void sendBlobHitInKillZoneAction( Blob b0, Blob b1 )
+	{
+		if (blobHitInKillZoneAction  != null)
+		{
+			blobHitInKillZoneAction( b0, b1);
+		}
+		else
+		{
+			Debug.LogWarning( "No blobHitInKillZoneAction" );
+		}
+	}
+
+	public System.Action<Blob> hitBlobInKillZoneAction;
+	public void sendHitBlobHitKillZoneAction( Blob b )
+	{
+		if (hitBlobInKillZoneAction != null)
+		{
+			hitBlobInKillZoneAction( b);
+		}
+		else
+		{
+			Debug.LogWarning( "No hitBlobInKillZoneAction" );
+		}
+	}
+
+
 }

@@ -19,6 +19,8 @@ public class Blob_SimpleCylinder : Blob
 		cachedMaterial_ = new Material( myRenderer.sharedMaterial );
 		myRenderer.sharedMaterial = cachedMaterial_;
 		cachedTransform.localScale = new Vector3 ( radius, 0.5f, radius);
+
+		top.gameObject.SetActive( false );
 	}
 
 	protected override void SetAppearanceByType(BlobType t)

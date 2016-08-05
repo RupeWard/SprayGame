@@ -74,6 +74,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	protected override void PostAwake( )
 	{
+	
 		cachedAudioSource_ = GetComponent<AudioSource>( );
 
 		blobSlowDistance = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowDistance);
@@ -104,9 +105,16 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		controller_.gameObject.SetActive( false );
 	}
 
+	private void registerHandlers()
+	{
+		MessageBus.instance.blobHitInKillZoneAction += HandleBlobHitInKillZone;
+		MessageBus.instance.hitBlobInKillZoneAction += HandleHitBlobInKillZone;
+	}
+
 	public void Start()
 	{
 		playPauseButtonText.text = "Play";
+		registerHandlers( );
 	}
 
 	public UnityEngine.UI.Text playPauseButtonText;
@@ -333,5 +341,22 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	{
 		cachedAudioSource_.clip = deleteClip;
 		cachedAudioSource_.Play( );
+	}
+
+	public void HandleHitBlobInKillZone(Blob b)
+	{
+		if (DEBUG_GAME)
+		{
+			Debug.Log( "Blob " + b.gameObject.name + " in killzone" );
+		}
+	}
+
+	public void HandleBlobHitInKillZone(Blob b0, Blob b1)
+	{
+		if (DEBUG_GAME)
+		{
+			Debug.Log( "Blob " + b0.gameObject.name + " hit "+b1.gameObject.name+ " in killzone" );
+		}
+		// Game over
 	}
 }

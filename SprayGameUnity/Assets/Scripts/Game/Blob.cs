@@ -45,6 +45,48 @@ abstract public class Blob : MonoBehaviour
 
 	#region private data
 
+	private bool inKillZone_ = false;
+	public bool IsInKillZone
+	{
+		get { return inKillZone_;  }
+	}
+
+	public void HandleEnterKillZone()
+	{
+		if (!inKillZone_)
+		{
+			if (BlobKillZone.DEBUG_KILLZONE)
+			{
+				Debug.Log( "Blob " + gameObject.name + " enter killzone with state "+state_ );
+			}
+			inKillZone_ = true;
+			if (state_ == EState.Hit )
+			{
+				MessageBus.instance.sendHitBlobHitKillZoneAction( this );
+			}
+		}
+		else
+		{
+			Debug.LogWarning( "HandleEntreKillzone when flag already set on " + gameObject.name );
+		}
+	}
+
+	public void HandleExitKillZone( )
+	{
+		if (inKillZone_)
+		{
+			if (BlobKillZone.DEBUG_KILLZONE)
+			{
+				Debug.Log( "Blob " + gameObject.name + " exit killzone" );
+			}
+			inKillZone_ = false;
+		}
+		else
+		{
+			Debug.LogWarning( "HandleExitKillzone when flag not set on " + gameObject.name );
+		}
+	}
+
 	private bool directlyConnectedToWall_ = false;
 
 	private EState state_ = EState.Pending;
@@ -189,6 +231,22 @@ abstract public class Blob : MonoBehaviour
 		}
 	}
 
+	private void OnTriggerEnter(Collider c)
+	{
+		if (c.gameObject.GetComponent<BlobKillZone>() != null)
+		{
+			HandleEnterKillZone( );
+		}
+	}
+
+	private void OnTriggerExit( Collider c )
+	{
+		if (c.gameObject.GetComponent<BlobKillZone>( ) != null)
+		{
+			HandleExitKillZone( );
+		}
+	}
+
 	private void OnCollisionEnter( Collision c)
 	{
 		if (!HasBeenFired())
@@ -198,7 +256,7 @@ abstract public class Blob : MonoBehaviour
 		Wall wall = c.gameObject.GetComponent<Wall>( );
 		if (wall != null)
 		{
-			if (DEBUG_COLLISIONS)
+			if (DEBUG_COLLISIONS && !directlyConnectedToWall_)
 			{
 				Debug.Log( "Blob " + gameObject.name + "Collision with Wall " + c.gameObject.name );
 			}
@@ -219,9 +277,9 @@ abstract public class Blob : MonoBehaviour
 			Blob blob = c.gameObject.GetComponent<Blob>( );
 			if (blob != null)
 			{
-				if (DEBUG_COLLISIONS)
+				if (DEBUG_COLLISIONS && connectedBlobs.Contains(blob)== false)
 				{
-					Debug.Log( "Blob " + gameObject.name + " Collision with blob " + c.gameObject.name );
+					Debug.Log( "Blob " + gameObject.name + " Collision with new blob " + c.gameObject.name );
 				}
 				state_ = EState.Hit;
 				MessageBus.instance.sendBlobHitBlobAction( this, blob );
