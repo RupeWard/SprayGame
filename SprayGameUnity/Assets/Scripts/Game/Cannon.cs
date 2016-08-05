@@ -118,6 +118,8 @@ public class Cannon : MonoBehaviour
 		}
 	}
 
+	private static readonly bool DEBUG_FIRINGLINE = false;
+
 	private readonly Vector3 heightOffset = new Vector3( 0f, 0f, -0.1f );
 	private void PointAt(Vector2 v)
 	{
@@ -136,7 +138,10 @@ public class Cannon : MonoBehaviour
 			RaycastHit hitInfo;
 			if (Physics.Raycast(ray, out hitInfo, traceLength, GameManager.layerMask(GameManager.ELayer.Default)))
 			{
-				Debug.Log( "Ray hit " + hitInfo.collider.gameObject.name +" "+hitInfo.ToString());
+				if (DEBUG_FIRINGLINE)
+				{
+					Debug.Log( "Ray hit " + hitInfo.collider.gameObject.name + " " + hitInfo.ToString( ) );
+				}
 				traceEnd = hitInfo.point;
 				lengthSoFar = Vector3.Distance( traceEnd, cachedTransform_.position );
 			}
@@ -210,7 +215,7 @@ public class Cannon : MonoBehaviour
 				cachedAudioSource_.Play( );
 			}
 
-			PointAt( v );
+			PointAtIFAngleOk( v );
 
 			if (DEBUG_CANNON_PTR)
 			{
@@ -229,19 +234,27 @@ public class Cannon : MonoBehaviour
 
 	private float minAngle = 15f;
 
+	private bool PointAtIFAngleOk(Vector2 v)
+	{
+		bool result = false;
+		float angle = Mathf.Rad2Deg * Mathf.Atan2( v.y, v.x );
+		if (angle > minAngle && angle < 180f - minAngle)
+		{
+			PointAt( v );
+			result = true;
+		}
+		else
+		{
+			Debug.LogWarning( "Ptr move too low: " + v + " gives " + angle );
+		}
+		return result;
+	}
+
 	public void HandlePointerMove( Vector2 v )
 	{
 		if (isControlled_)
 		{
-			float angle = Mathf.Rad2Deg * Mathf.Atan2( v.y, v.x );
-			if (angle > minAngle && angle < 180f-minAngle)
-			{
-				PointAt( v );
-			}
-			else
-			{
-				Debug.LogWarning( "Ptr move too low: "+v+" gives "+angle );
-			}
+			PointAtIFAngleOk( v );
 			if (DEBUG_CANNON_PTR)
 			{
 				Debug.Log( "Cannon: Ptr MOVE at " + v );
