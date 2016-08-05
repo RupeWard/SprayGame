@@ -153,6 +153,7 @@ abstract public class Blob : MonoBehaviour
 
 		cachedTransform_ = transform;
 		cachedRB_ = GetComponent<Rigidbody>( );
+		defaultConstraints_ = cachedRB_.constraints;
 		PostAwake( );
 		if (DEBUG_BLOB)
 		{
@@ -253,23 +254,32 @@ abstract public class Blob : MonoBehaviour
 		{
 			return;
 		}
-		Wall wall = c.gameObject.GetComponent<Wall>( );
+		TopWall wall = c.gameObject.GetComponent<TopWall>( );
 		if (wall != null)
 		{
 			if (DEBUG_COLLISIONS && !directlyConnectedToWall_)
 			{
-				Debug.Log( "Blob " + gameObject.name + "Collision with Wall " + c.gameObject.name );
+				Debug.Log( "Blob " + gameObject.name + "Collision with TopWall " + c.gameObject.name );
 			}
-			if (wall.stickiness != UnityExtensions.ETriBehaviour.Never)
+			if (!directlyConnectedToWall_)
 			{
-				state_ = EState.Hit;
-				directlyConnectedToWall_ = true;
+				{
+					state_ = EState.Hit;
+					directlyConnectedToWall_ = true;
 
-				cachedRB_.velocity = Vector3.zero;
-				cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionY;
+					cachedRB_.velocity = Vector3.zero;
+					//					cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionY;
+					
+					cachedRB_.isKinematic = true;
 
-				MessageBus.instance.sendBlobHitWallAction( this, wall );
-				MessageBus.instance.sendBlobFinishedAction( this );
+					MessageBus.instance.onWallMoveAction += HandleWallMove;
+					MessageBus.instance.sendBlobHitWallAction( this, wall.gameObject.GetComponent<Wall>( ) );
+					MessageBus.instance.sendBlobFinishedAction( this );
+				}
+			}
+			else
+			{
+				Debug.Log( "Blob " + gameObject.name + " already connected to wall" );
 			}
 		}
 		else // NOT WALL
@@ -304,6 +314,37 @@ abstract public class Blob : MonoBehaviour
 						Debug.Log( "Blob " + gameObject.name + "Collision with unhandled " + c.gameObject.name );
 					}
 				}
+			}
+		}
+	}
+	
+	private RigidbodyConstraints defaultConstraints_;
+
+	public void HandleWallMove(float f)
+	{
+		if (directlyConnectedToWall_)
+		{
+			if (GameManager.DEBUG_WALLS)
+			{
+				Debug.Log( gameObject.name + " receiving wall move by " + f );
+			}
+
+//			cachedRB_.constraints = defaultConstraints_;
+			cachedTransform_.position = new Vector3( cachedTransform_.position.x, cachedTransform_.position.y + f, cachedTransform_.position.z );
+//			cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionY;
+		}
+		else
+		{
+			Debug.LogWarning( "Blob " + gameObject.name + " receving wall move moessge when not connected to it" );
+		}
+	}
+	private void OnDestroy()
+	{
+		if (directlyConnectedToWall_)
+		{
+			if (MessageBus.exists)
+			{
+				MessageBus.instance.onWallMoveAction -= HandleWallMove;
 			}
 		}
 	}

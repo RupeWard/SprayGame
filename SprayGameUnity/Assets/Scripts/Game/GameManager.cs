@@ -4,7 +4,8 @@ using System.Collections.Generic;
 
 public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameManager>
 {
-	static readonly bool DEBUG_GAME = true;
+	static public readonly bool DEBUG_GAME = true;
+	static public readonly bool DEBUG_WALLS = true;
 
 	#region inspector data
 
@@ -19,6 +20,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	
 	public EndGamePanel endGamePanel;
 
+	public Transform topWall;
 
 	#endregion inspector hooks
 
@@ -39,6 +41,8 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	public int numBlobs = 4;
 	public float wallDrag = 0.3f;
 	public float groupDeleteCountdown = 6f;
+	public float topWallAnimSpeed = 1f;
+	public float topWallDistPerBlob = 0.005f;
 
 	public Blob.EType blobType = Blob.EType.SimpleSphere;
 
@@ -75,13 +79,23 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	private BlobManager blobManager_ = null;
 	private AudioSource cachedAudioSource_ = null;
 
+	private float topWallTargetHeight_ = 0f;
+	private float topWallStartingHeight_ = 0f;
+
 	#endregion private objects
 
 	#region flow
 
 	protected override void PostAwake( )
 	{
-	
+		topWallStartingHeight_ = topWall.position.y;
+		topWallTargetHeight_ = topWallStartingHeight_;
+
+		if (DEBUG_WALLS)
+		{
+			Debug.Log( "Starting/target = " + topWallStartingHeight_ + "/" + topWallTargetHeight_ );
+		}
+
 		cachedAudioSource_ = GetComponent<AudioSource>( );
 
 		blobSlowDistance = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowDistance);
@@ -116,6 +130,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	{
 		MessageBus.instance.blobHitInKillZoneAction += HandleBlobHitInKillZone;
 		MessageBus.instance.hitBlobInKillZoneAction += HandleHitBlobInKillZone;
+		MessageBus.instance.firedBlobAction += HandleBlobFired;
 	}
 
 	public void Start( )
@@ -425,5 +440,63 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	private void ShowEndGamePanel()
 	{
 		endGamePanel.Init( );
+	}
+
+	private void FixedUpdate()
+	{
+		if (!isGameOver_)
+		{
+			if (isPlaying_)
+			{
+				if (!isPaused_)
+				{
+					float currentTopWallHeight = topWall.position.y;
+					float oldTopWallHeight = currentTopWallHeight;
+					if (topWallTargetHeight_ > currentTopWallHeight)
+					{
+						currentTopWallHeight = currentTopWallHeight + Time.fixedDeltaTime * topWallAnimSpeed;
+						if (currentTopWallHeight > topWallTargetHeight_)
+						{
+							currentTopWallHeight = topWallTargetHeight_;
+						}
+						topWall.position = new Vector3( topWall.position.x, currentTopWallHeight, topWall.position.z );
+						if (DEBUG_WALLS)
+						{
+							Debug.Log( "Walls moved up to " + topWall.position );
+						}
+					}
+					else if (topWallTargetHeight_ < currentTopWallHeight)
+					{
+						currentTopWallHeight = currentTopWallHeight - Time.fixedDeltaTime * topWallAnimSpeed;
+						if (currentTopWallHeight < topWallTargetHeight_)
+						{
+							currentTopWallHeight = topWallTargetHeight_;
+						}
+						topWall.position = new Vector3( topWall.position.x, currentTopWallHeight, topWall.position.z );
+						if (DEBUG_WALLS)
+						{
+							Debug.Log( "Walls moved down to " + topWall.position );
+						}
+					}
+					if (oldTopWallHeight != currentTopWallHeight)
+					{
+						if (DEBUG_WALLS)
+						{
+							Debug.Log( "Sending WallMove" );
+						}
+						MessageBus.instance.sendWallMoveAction( currentTopWallHeight - oldTopWallHeight );
+					}
+				}
+			}
+		}
+	}
+
+	public void HandleBlobFired(Blob b)
+	{
+		topWallTargetHeight_ -= topWallDistPerBlob;
+		if (DEBUG_WALLS)
+		{
+			Debug.Log( "Target height now " + topWallTargetHeight_ );
+		}
 	}
 }

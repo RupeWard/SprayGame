@@ -133,5 +133,26 @@ public partial class MessageBus
 		}
 	}
 
+	public System.Action<string> scoreTextUpdateAction;
+	public void sendScoreTextUpdate( string s )
+	{
+		if (scoreTextUpdateAction != null)
+		{
+			scoreTextUpdateAction( s );
+		}
+		else
+		{
+			Debug.LogWarning( "No scoreTextUpdateAction" );
+		}
+	}
+
+	public System.Action<float> onWallMoveAction;
+	public void sendWallMoveAction(float f)
+	{
+		if (onWallMoveAction != null)
+		{
+			onWallMoveAction( f );
+		}
+	}
 
 }
