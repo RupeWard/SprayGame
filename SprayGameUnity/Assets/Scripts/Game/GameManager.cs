@@ -16,6 +16,9 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public Cannon cannon;
 	public Transform gameWorld;
+	
+	public EndGamePanel endGamePanel;
+
 
 	#endregion inspector hooks
 
@@ -62,6 +65,8 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	#region private objects
 
+	private bool isGameOver_ = false;
+
 	private Controller_Base controller_ = null;
 
 	private List<Blob> activeBlobs_ = new List<Blob>( );
@@ -71,6 +76,8 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	private AudioSource cachedAudioSource_ = null;
 
 	#endregion private objects
+
+	#region flow
 
 	protected override void PostAwake( )
 	{
@@ -111,11 +118,13 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		MessageBus.instance.hitBlobInKillZoneAction += HandleHitBlobInKillZone;
 	}
 
-	public void Start()
+	public void Start( )
 	{
 		playPauseButtonText.text = "Play";
 		registerHandlers( );
 	}
+
+	#endregion flow
 
 	public UnityEngine.UI.Text playPauseButtonText;
 
@@ -154,7 +163,6 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		get { return isPlaying_; }
 	}
 
-
 	private bool isPaused_ = false;
 	public bool isPaused
 	{
@@ -163,10 +171,15 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public void PlayGame( )
 	{
-		if (isPlaying_ == false)
+		if (isGameOver_)
+		{
+			Debug.LogError( "PlayGanme when game over" );
+		}
+		else if (isPlaying_ == false)
 		{
 			blobManager_ = (new GameObject( "BlobManager" )).AddComponent<BlobManager>( );
 			isPlaying_ = true;
+			isPaused_ = false;
 			playPauseButtonText.text = "Pause";
 			cannon.StartGame( );
 			controller_.gameObject.SetActive( true );
@@ -175,25 +188,32 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public void PauseGame()
 	{
-		if (!isPlaying_)
+		if (isGameOver_)
 		{
-			Debug.LogError( "Pause when not playing" );
+			Debug.LogError( "Pause when gae over" );
 		}
 		else
 		{
-			if (isPaused_)
+			if (!isPlaying_)
 			{
-				Debug.LogWarning( "Already paused" );
+				Debug.LogError( "Pause when not playing" );
 			}
 			else
 			{
-				isPaused_ = true;
-				playPauseButtonText.text = "Continue";
-				savedTimeScale_ = Time.timeScale;
-				Time.timeScale = 0f;
-				if (controller_ != null)
+				if (isPaused_)
 				{
-					controller_.gameObject.SetActive( false );
+					Debug.LogWarning( "Already paused" );
+				}
+				else
+				{
+					isPaused_ = true;
+					playPauseButtonText.text = "Continue";
+					savedTimeScale_ = Time.timeScale;
+					Time.timeScale = 0f;
+					if (controller_ != null)
+					{
+						controller_.gameObject.SetActive( false );
+					}
 				}
 			}
 		}
@@ -201,24 +221,31 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public void ResumeGame()
 	{
-		if (!isPlaying_)
+		if (isGameOver_)
 		{
-			Debug.LogError( "Resume when not playing" );
+			Debug.LogError( "Pause when gae over" );
 		}
 		else
 		{
-			if (!isPaused_)
+			if (!isPlaying_)
 			{
-				Debug.LogWarning( "Not paused" );
+				Debug.LogError( "Resume when not playing" );
 			}
 			else
 			{
-				isPaused_ = false;
-				playPauseButtonText.text = "Pause";
-				Time.timeScale = savedTimeScale_;
-				if (controller_ != null)
+				if (!isPaused_)
 				{
-					controller_.gameObject.SetActive( true );
+					Debug.LogWarning( "Not paused" );
+				}
+				else
+				{
+					isPaused_ = false;
+					playPauseButtonText.text = "Pause";
+					Time.timeScale = savedTimeScale_;
+					if (controller_ != null)
+					{
+						controller_.gameObject.SetActive( true );
+					}
 				}
 			}
 		}
@@ -226,7 +253,9 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public void Update()
 	{
-		if (isPlaying_)
+		if (isGameOver_)
+		{ }
+		else if (isPlaying_)
 		{
 			if (pendingBlobs_.Count < minPending)
 			{
@@ -306,19 +335,26 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public void HandlePlayPauseButton()
 	{
-		if (!isPlaying_)
+		if (isGameOver_)
 		{
-			PlayGame( );
+			SceneManager.Instance.ReloadScene( SceneManager.EScene.Game );
 		}
 		else
 		{
-			if (isPaused_)
+			if (!isPlaying_)
 			{
-				ResumeGame( );
+				PlayGame( );
 			}
 			else
 			{
-				PauseGame( );
+				if (isPaused_)
+				{
+					ResumeGame( );
+				}
+				else
+				{
+					PauseGame( );
+				}
 			}
 		}
 	}
@@ -349,6 +385,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		{
 			Debug.Log( "Blob " + b.gameObject.name + " in killzone" );
 		}
+		EndGame( );
 	}
 
 	public void HandleBlobHitInKillZone(Blob b0, Blob b1)
@@ -357,6 +394,36 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		{
 			Debug.Log( "Blob " + b0.gameObject.name + " hit "+b1.gameObject.name+ " in killzone" );
 		}
-		// Game over
+		EndGame( );
+	}
+
+	public void EndGame()
+	{
+		if (isPlaying_)
+		{
+			if (!isGameOver_)
+			{
+				isGameOver_ = true;
+				playPauseButtonText.text = "Restart";
+				if (controller_ != null)
+				{
+					controller_.gameObject.SetActive( false );
+				}
+				ShowEndGamePanel( );
+			}
+			else
+			{
+//				Debug.LogError( "EndGame when game already over!" );
+			}
+		}
+		else
+		{
+			Debug.LogError( "EndGame when not playing!" );
+		}
+	}
+
+	private void ShowEndGamePanel()
+	{
+		endGamePanel.Init( );
 	}
 }
