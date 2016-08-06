@@ -14,5 +14,17 @@ abstract public class BlobType_Base :RJWard.Core.IDebugDescribable
 	abstract public void SetBlobAppearance( Blob_SimpleCylinder blob);
 	abstract public void SetCannonAppearance( Cannon c );
 
-	abstract public void DebugDescribe( System.Text.StringBuilder sb);
+	abstract protected void DebugDescribeSub( System.Text.StringBuilder sb);
+	public void DebugDescribe( System.Text.StringBuilder sb )
+	{
+		sb.Append( "[" ).Append( typeName( ) ).Append( ": " );
+		DebugDescribeSub( sb );
+		sb.Append( "]" );
+	}
+
+	abstract protected string GetSubDefnString( );
+	public string GetDefnString( )
+	{
+		return typeName( ) + ":" + name + ":" + GetSubDefnString( );
+	}
 }

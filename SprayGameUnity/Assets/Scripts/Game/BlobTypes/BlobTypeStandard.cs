@@ -8,6 +8,8 @@ public class BlobTypeStandard: BlobType_Base
 	public Color colour;
 	public string prefabName;
 
+	private static readonly string defaultPrefabName_ = "Blob_Standard";
+
 	override public GameObject Instantiate()
 	{
 		GameObject prefab = GetPrefab( prefabName );
@@ -20,6 +22,10 @@ public class BlobTypeStandard: BlobType_Base
 	private static GameObject GetPrefab( string n)
 	{
 		GameObject result = null;
+		if (n.Length == 0)
+		{
+			n = defaultPrefabName_;
+		}
 		if (false == s_prefabDB_.TryGetValue(n, out result))
 		{
 			result = Resources.Load<GameObject>( "Prefabs/Blobs/" + n );
@@ -49,9 +55,23 @@ public class BlobTypeStandard: BlobType_Base
 		c.SetColour( colour );
     }
 
-	override public void DebugDescribe( System.Text.StringBuilder sb )
+	override protected void DebugDescribeSub( System.Text.StringBuilder sb )
 	{
-		sb.Append( "[BT_STD: " + colour +"]");
+		sb.Append( colour);
+		sb.Append( ", prefab=" );
+		if (prefabName.Length > 0)
+		{
+			sb.Append( prefabName );
+		}
+		else
+		{
+			sb.Append( "default" );
+		}
 	}
+
+	override protected string GetSubDefnString( )
+	{
+		return prefabName + ":" + colour.ToString( );
+	} 
 
 }
