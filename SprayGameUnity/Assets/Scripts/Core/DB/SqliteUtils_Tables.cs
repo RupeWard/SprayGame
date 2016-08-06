@@ -15,7 +15,8 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 		Float,
 		Bool,
 		Vector2,
-		Vector3
+		Vector3,
+		Colour
 	}
 
 	public static readonly Dictionary<ColumnType, string> dbTypeNames = new Dictionary<ColumnType, string>
@@ -26,6 +27,7 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 		{ ColumnType.Bool, "INTEGER" },
         { ColumnType.Vector2, "TEXT" },
 		{ ColumnType.Vector3, "TEXT" },
+		{ ColumnType.Colour, "TEXT" },
 	};
 
 	public abstract class Column
@@ -158,6 +160,68 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 			return result;
 		}
 
+	}
+
+	public class ColourColumn : Column
+	{
+		public ColourColumn( string n) : base (n, ColumnType.Colour)
+		{ }
+
+		public Color Read (SqliteDataReader reader, int col)
+		{
+			string s = reader.GetString( col );
+
+			Vector4 v4 = Vector4.zero;
+
+			if (DataHelpers.extractOptionalVector4( ref s, ref v4 ))
+			{
+				if (v4.x > 255f || v4.x < 0f)
+				{
+					v4.x = Mathf.Clamp( v4.x, 0f, 255f );
+					Debug.LogWarning( "Color.x out of range" );
+				}
+				if (v4.y > 255f || v4.y < 0f)
+				{
+					v4.y = Mathf.Clamp( v4.y, 0f, 255f );
+					Debug.LogWarning( "Color.y out of range" );
+				}
+				if (v4.z > 255f || v4.z < 0f)
+				{
+					v4.z = Mathf.Clamp( v4.z, 0f, 255f );
+					Debug.LogWarning( "Color.z out of range" );
+				}
+				if (v4.w > 255f || v4.w < 0f)
+				{
+					v4.w = Mathf.Clamp( v4.w, 0f, 255f );
+					Debug.LogWarning( "Color.w out of range" );
+				}
+				v4 = v4 / 255f;
+				return new Color( v4.x, v4.y, v4.z, v4.w );
+			}
+			else
+			{
+				Vector3 v3 = Vector3.zero;
+				s = reader.GetString( col );
+				DataHelpers.extractRequiredVector3( ref s, ref v3 );
+				if (v3.x > 255f || v3.x < 0f)
+				{
+					v3.x = Mathf.Clamp( v3.x, 0f, 255f );
+					Debug.LogWarning( "Color.x out of range" );
+				}
+				if (v3.y > 255f || v3.y < 0f)
+				{
+					v3.y = Mathf.Clamp( v3.y, 0f, 255f );
+					Debug.LogWarning( "Color.y out of range" );
+				}
+				if (v3.z > 255f || v3.z < 0f)
+				{
+					v3.z = Mathf.Clamp( v3.z, 0f, 255f );
+					Debug.LogWarning( "Color.z out of range" );
+				}
+				v3 = v3 / 255f;
+				return new Color( v3.x, v3.y, v3.z );
+			}
+		}
 	}
 
 	public class Table
