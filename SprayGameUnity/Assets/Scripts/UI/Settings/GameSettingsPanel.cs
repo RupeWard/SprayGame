@@ -32,7 +32,7 @@ public class GameSettingsPanel : MonoBehaviour
 
 	private void SetNumBlobsText( )
 	{
-		numBlobsButtonText.text = "NumBlobs: " + GameManager.Instance.numBlobs.ToString( );
+		numBlobsButtonText.text = "NumBlobs: " + GameManager.Instance.levelSettings.numBlobs.ToString( );
 	}
 
 	private void SetSpeedText()
@@ -42,12 +42,12 @@ public class GameSettingsPanel : MonoBehaviour
 
 	private void SetBlobSlowDistanceText( )
 	{
-		blobSlowDistanceButtonText.text = "Dist: " + GameManager.Instance.blobSlowDistance.ToString( );
+		blobSlowDistanceButtonText.text = "Dist: " + GameManager.Instance.gameWorldSettings.blobSlowDistance.ToString( );
 	}
 
 	private void SetBlobSlowFactorText( )
 	{
-		blobSlowFactorButtonText.text = "Fact: " + GameManager.Instance.blobSlowFactor.ToString( );
+		blobSlowFactorButtonText.text = "Fact: " + GameManager.Instance.gameWorldSettings.blobSlowFactor.ToString( );
 	}
 
 	public void HandleDoneButton()
@@ -57,7 +57,7 @@ public class GameSettingsPanel : MonoBehaviour
 
 	public void HandleNumBlobsButton( )
 	{
-		intSettingPanel.Init( "Num Blobs", GameManager.Instance.numBlobs, new int[] { 0, 10 }, OnNumBlobsChanged );
+		intSettingPanel.Init( "Num Blobs", GameManager.Instance.levelSettings.numBlobs, new int[] { 0, 10 }, OnNumBlobsChanged );
 	}
 
 	public void HandleSpeedButton()
@@ -67,19 +67,19 @@ public class GameSettingsPanel : MonoBehaviour
 
 	public void HandleBlobSlowDistanceButton( )
 	{
-		floatSettingPanel.Init( "Blob Slow Distance", GameManager.Instance.blobSlowDistance, new Vector2( 0f, 10f ), OnBlobSlowDistanceChanged );
+		floatSettingPanel.Init( "Blob Slow Distance", GameManager.Instance.gameWorldSettings.blobSlowDistance, new Vector2( 0f, 10f ), OnBlobSlowDistanceChanged );
 	}
 
 	public void HandleBlobSlowFactorButton( )
 	{
-		floatSettingPanel.Init( "Blob Slow Factor", GameManager.Instance.blobSlowFactor, new Vector2( 0f, 10f ), OnBlobSlowFactorChanged );
+		floatSettingPanel.Init( "Blob Slow Factor", GameManager.Instance.gameWorldSettings.blobSlowFactor, new Vector2( 0f, 10f ), OnBlobSlowFactorChanged );
 	}
 
 	public void OnNumBlobsChanged( int i)
 	{
 		{
 			SettingsStore.storeSetting( SettingsIds.numBlobs, i );
-			GameManager.Instance.numBlobs = i;
+			GameManager.Instance.levelSettings.numBlobs = i;
 			SetNumBlobsText( );
 		}
 	}
@@ -97,7 +97,7 @@ public class GameSettingsPanel : MonoBehaviour
 	{
 		{
 			SettingsStore.storeSetting( SettingsIds.blobSlowDistance, f );
-			GameManager.Instance.blobSlowDistance = f;
+			GameManager.Instance.gameWorldSettings.blobSlowDistance = f;
 			SetBlobSlowDistanceText( );
 		}
 	}
@@ -106,7 +106,7 @@ public class GameSettingsPanel : MonoBehaviour
 	{
 		{
 			SettingsStore.storeSetting( SettingsIds.blobSlowFactor, f );
-			GameManager.Instance.blobSlowFactor = f;
+			GameManager.Instance.gameWorldSettings.blobSlowFactor = f;
 			SetBlobSlowFactorText( );
 		}
 	}

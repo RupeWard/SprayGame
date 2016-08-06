@@ -209,14 +209,14 @@ abstract public class Blob : MonoBehaviour
 			{
 				Ray ray = new Ray( cachedTransform_.position, velocity.normalized );
 				RaycastHit hitInfo;
-				bool hit = Physics.Raycast( ray, out hitInfo, speed * Time.fixedDeltaTime * GameManager.Instance.blobSlowDistance );
+				bool hit = Physics.Raycast( ray, out hitInfo, speed * Time.fixedDeltaTime * GameManager.Instance.gameWorldSettings.blobSlowDistance );
 				if (hit)
 				{
 					BlobSlower blobSlower = hitInfo.collider.gameObject.GetComponent<BlobSlower>( );
 					if (blobSlower != null)
 					{
 //						Debug.Log( "Blob Encountering " + blobSlower.gameObject.name + "... Slowing" );
-						cachedRB_.velocity = velocity * GameManager.Instance.blobSlowFactor * blobSlower.slowFactor;
+						cachedRB_.velocity = velocity * GameManager.Instance.gameWorldSettings.blobSlowFactor * blobSlower.slowFactor;
 					}
 				}
 				else
@@ -227,7 +227,7 @@ abstract public class Blob : MonoBehaviour
 			else if (directlyConnectedToWall_)
 			{
 //				Debug.Log( "Applying drag" );
-				cachedRB_.AddForce( cachedRB_.velocity * -1f * GameManager.Instance.wallDrag, ForceMode.VelocityChange );
+				cachedRB_.AddForce( cachedRB_.velocity * -1f * GameManager.Instance.gameWorldSettings.wallDrag, ForceMode.VelocityChange );
 			}
 		}
 	}

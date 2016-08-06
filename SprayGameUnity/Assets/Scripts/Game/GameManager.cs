@@ -35,16 +35,10 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public AudioClip deleteClip;
 
-	public float blobSlowDistance = 5f;
-	public float blobSlowFactor = 0.5f;
-	public float minPending = 4;
-	public int numBlobs = 4;
-	public float wallDrag = 0.3f;
-	public float groupDeleteCountdown = 6f;
-	public float topWallAnimSpeed = 1f;
-	public float topWallDistPerBlob = 0.005f;
+	public GameWorldSettings gameWorldSettings = new GameWorldSettings();
+	public LevelSettings levelSettings = new LevelSettings( );
 
-	public Blob.EType blobType = Blob.EType.SimpleSphere;
+	public Blob.EType blobType = Blob.EType.SimpleCylinder;
 
 	public enum ELayer
 	{
@@ -98,9 +92,9 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 		cachedAudioSource_ = GetComponent<AudioSource>( );
 
-		blobSlowDistance = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowDistance);
-		blobSlowFactor = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowFactor);
-		numBlobs = SettingsStore.retrieveSetting<int>( SettingsIds.numBlobs );
+		gameWorldSettings.blobSlowDistance = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowDistance);
+		gameWorldSettings.blobSlowFactor = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowFactor);
+		levelSettings.numBlobs = SettingsStore.retrieveSetting<int>( SettingsIds.numBlobs );
 
 		if (cannon == null)
 		{
@@ -272,7 +266,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		{ }
 		else if (isPlaying_)
 		{
-			if (pendingBlobs_.Count < minPending)
+			if (pendingBlobs_.Count < levelSettings.minPending)
 			{
 				Blob newBlob = GetNewBlob( );
 				pendingBlobs_.Enqueue( newBlob );
@@ -454,7 +448,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 					float oldTopWallHeight = currentTopWallHeight;
 					if (topWallTargetHeight_ > currentTopWallHeight)
 					{
-						currentTopWallHeight = currentTopWallHeight + Time.fixedDeltaTime * topWallAnimSpeed;
+						currentTopWallHeight = currentTopWallHeight + Time.fixedDeltaTime * levelSettings.topWallAnimSpeed;
 						if (currentTopWallHeight > topWallTargetHeight_)
 						{
 							currentTopWallHeight = topWallTargetHeight_;
@@ -467,7 +461,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 					}
 					else if (topWallTargetHeight_ < currentTopWallHeight)
 					{
-						currentTopWallHeight = currentTopWallHeight - Time.fixedDeltaTime * topWallAnimSpeed;
+						currentTopWallHeight = currentTopWallHeight - Time.fixedDeltaTime * levelSettings.topWallAnimSpeed;
 						if (currentTopWallHeight < topWallTargetHeight_)
 						{
 							currentTopWallHeight = topWallTargetHeight_;
@@ -493,7 +487,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public void HandleBlobFired(Blob b)
 	{
-		topWallTargetHeight_ -= topWallDistPerBlob;
+		topWallTargetHeight_ -= levelSettings.topWallDistPerBlob;
 		if (DEBUG_WALLS)
 		{
 			Debug.Log( "Target height now " + topWallTargetHeight_ );

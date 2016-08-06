@@ -133,7 +133,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		int num = 0;
 		foreach (BlobGroupSameType bg in typeGroupsToCheck_)
 		{
-			if (bg.blobs.Count >= GameManager.Instance.numBlobs)
+			if (bg.blobs.Count >= GameManager.Instance.levelSettings.numBlobs)
 			{
 				AddGroupCountdownToDelete( bg );
 				num++;
@@ -179,7 +179,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			{
 				Debug.Log( "Adding countdown for group " + bg.name );
 			}
-			groupCountdowns_.Add( new GroupCountdownInfo( bg, GameManager.Instance.groupDeleteCountdown, HandleCountdownToDeleteFinished ) );
+			groupCountdowns_.Add( new GroupCountdownInfo( bg, GameManager.Instance.levelSettings.groupDeleteCountdown, HandleCountdownToDeleteFinished ) );
 		}
 	}
 
