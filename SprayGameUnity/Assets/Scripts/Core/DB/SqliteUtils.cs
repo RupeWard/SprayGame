@@ -53,11 +53,16 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 
 	protected override void PostOnDestroy( )
 	{
+		if (DEBUG_SQL)
+		{
+			Debug.Log( "SqlUtils closing " + storedConnections_.Count + " connections onDestroy" );
+		}
 		foreach (KeyValuePair<string, SqliteConnection> pair in storedConnections_)
 		{
 			pair.Value.Close();
 			pair.Value.Dispose();
 		}
+		storedConnections_.Clear( );
 	}
 
 
@@ -200,6 +205,10 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 		string progressPath = getDatabasePath("Progress");
 		if (File.Exists( progressPath ))
 		{
+			if (DEBUG_SQL)
+			{
+				Debug.Log( "SQL: Progress exists" );
+			}
 			SqliteConnection connection = new SqliteConnection( "URI=file:" + progressPath );
 			connection.Open( );
 			SqliteCommand query = connection.CreateCommand( );
@@ -228,7 +237,7 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 		}
 		else
 		{
-			Debug.LogWarning( "No settings table in getOriginalSettings" );
+			Debug.LogWarning( "No settings table in getOriginalSettings, creating progess table" );
 			prepareProgressTable( );
 		}
 		if (previousVersionNumber_ == null)
@@ -278,9 +287,12 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 
 	private void onOpenConnections( )
 	{
-		// Debug.Log ("onOpenConnections");
+		if (DEBUG_SQL)
+		{
+			Debug.Log( "onOpenConnections" );
+		}
 
-//		SqliteUtils.Instance.getConnection( language );
+		//		SqliteUtils.Instance.getConnection( language );
 		SqliteUtils.Instance.getConnection( "CoreData" );
 		SqliteUtils.Instance.getConnection( "Progress" );
 
@@ -294,6 +306,10 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 
 	protected override void PostOnApplicationQuit( )
 	{
+		if (DEBUG_SQL)
+		{
+			Debug.Log( "SqlUtils closing " + storedConnections_.Count + " connections onApplicationQuit" );
+		}
 		foreach (SqliteConnection connection in storedConnections_.Values)
 		{
 			connection.Close( );
