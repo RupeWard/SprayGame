@@ -80,6 +80,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	protected override void PostAwake( )
 	{
+		endGamePanel.Close( );
 		topWallStartingHeight_ = topWall.position.y;
 		topWallTargetHeight_ = topWallStartingHeight_;
 
@@ -135,23 +136,37 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public UnityEngine.UI.Text playPauseButtonText;
 
+	private BlobType_Base GetBlobType(string n)
+	{
+		BlobType_Base result = null;
+		foreach (BlobType_Base b in blobTypes)
+		{
+			if (b.name == n)
+			{
+				result = b;
+				break;
+			}
+		}
+		if (result == null)
+		{
+			Debug.LogError( "Failed to find blobtype '" + n + "'" );
+		}
+		return result;
+	}
+
 	private float savedTimeScale_ = 0f;
 	private Blob GetNewBlob()
 	{
-		Blob blob = null;
+		if (levelSettings.blobTypes.Length == 0)
+		{
+			throw new System.Exception( "No blob types defined in level" );
+		}
 
-		GameObject prefab = simplecylinderBlobPrefab;
-		blob = (GameObject.Instantiate<GameObject>( prefab ) as GameObject).GetComponent<Blob>( );
+		string btn = levelSettings.blobTypes[UnityEngine.Random.Range( 0, levelSettings.blobTypes.Length)];
+		BlobType_Base btb = GetBlobType( btn );
+
+		Blob blob = btb.Instantiate( ).GetComponent<Blob>();
 		blob.cachedTransform.parent = gameWorld;
-		if (blobTypes.Length == 0)
-		{
-			Debug.LogWarning( "No blobTyoes defined, using default" );
-		}
-		else
-		{
-			BlobType_Base t = blobTypes[ UnityEngine.Random.Range(0, blobTypes.Length) ];
-			blob.SetType( t );
-		}
 		return blob;
 	}
 

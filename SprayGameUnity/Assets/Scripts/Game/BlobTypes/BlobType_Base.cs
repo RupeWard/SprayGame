@@ -4,6 +4,12 @@ using System.Collections;
 [System.Serializable]
 abstract public class BlobType_Base :RJWard.Core.IDebugDescribable
 {
+	abstract public string typeName();
+
+	public string name;
+
+	abstract public GameObject Instantiate( );
+
 	abstract public void SetConnectorAppearance( BlobConnector_SimpleCylinder connector );
 	abstract public void SetBlobAppearance( Blob_SimpleCylinder blob);
 	abstract public void SetCannonAppearance( Cannon c );

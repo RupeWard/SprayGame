@@ -33,13 +33,9 @@ public class EndGamePanel : MonoBehaviour
 		gameObject.SetActive( true );
 	}
 
-	private void Close( )
+	public void Close( )
 	{
 		gameObject.SetActive( false );
 	}
 
-	private void Awake()
-	{
-		Close( );
-	}
 }

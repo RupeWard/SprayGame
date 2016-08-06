@@ -20,7 +20,7 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 		{
 			if (cachedPrefab_ == null)
 			{
-				cachedPrefab_ = Resources.Load<GameObject>( "Prefabs/BlobConnector_SimpleCylinder" );
+				cachedPrefab_ = Resources.Load<GameObject>( "Prefabs/BlobConnectors/BlobConnector_SimpleCylinder" );
 				if (cachedPrefab_ == null)
 				{
 					Debug.LogError( "Failed to load src prefab for blob connectors" );

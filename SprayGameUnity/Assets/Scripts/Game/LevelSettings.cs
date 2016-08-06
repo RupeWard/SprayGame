@@ -10,4 +10,5 @@ public class LevelSettings
 	public float topWallAnimSpeed = 1f;
 	public float topWallDistPerBlob = 0.005f;
 
+	public string[] blobTypes = new string[0];
 }
