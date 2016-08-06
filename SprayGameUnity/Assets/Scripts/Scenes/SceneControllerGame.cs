@@ -8,6 +8,8 @@ public class SceneControllerGame : SceneController_Base
 	#region inspector hooks
 
 	public GameSettingsPanel gameSettingsPanel;
+	public GameObject settingsButton;
+	public UnityEngine.UI.Button playButton;
 
 	#endregion inspector hooks
 
@@ -25,13 +27,32 @@ public class SceneControllerGame : SceneController_Base
 	override protected void PostStart()
 	{
 		gameSettingsPanel.gameObject.SetActive( false );
+		settingsButton.SetActive( false );
+		playButton.interactable = false;
 	}
 
 	override protected void PostAwake()
 	{
 	}
 
-#endregion SceneController_Base
+	protected override void OnDatabasesLoaded( )
+	{
+		StartCoroutine( OnDBSLoadedCR( ) );
+	}
+
+	private IEnumerator OnDBSLoadedCR()
+	{
+		while (false == GameManager.IsInitialised())
+		{
+			Debug.Log( "Waiting for GM" );
+			yield return new WaitForSeconds( 0.2f );
+		}
+		GameManager.Instance.Init( );
+		settingsButton.SetActive( true );
+		playButton.interactable = true;
+	}
+
+	#endregion SceneController_Base
 
 	public void HandleBackButton()
 	{

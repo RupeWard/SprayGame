@@ -15,9 +15,15 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	#region inspector hooks
 
-	public Cannon cannon;
+	private Cannon cannon_ = null;
+	public Cannon cannon
+	{
+		get { return cannon_; }
+	}
 	public Transform gameWorld;
-	
+
+	public GameObject cannonPrefab;
+
 	public EndGamePanel endGamePanel;
 
 	public Transform topWall;
@@ -26,8 +32,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	#region inspector prefabs
 
-	public GameObject simplesphereBlobPrefab;
-	public GameObject simplecylinderBlobPrefab;
+	public GameObject standardBlobPrefab;
 
 	#endregion inspector prefabs
 
@@ -80,6 +85,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	protected override void PostAwake( )
 	{
+		Debug.Log( "GameManager.PostAwake()" );
 		endGamePanel.Close( );
 		topWallStartingHeight_ = topWall.position.y;
 		topWallTargetHeight_ = topWallStartingHeight_;
@@ -90,14 +96,25 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		}
 
 		cachedAudioSource_ = GetComponent<AudioSource>( );
+	}
 
-		gameWorldSettings.blobSlowDistance = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowDistance);
-		gameWorldSettings.blobSlowFactor = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowFactor);
+	public void Init()
+	{
+		gameWorldSettings.blobSlowDistance = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowDistance );
+		gameWorldSettings.blobSlowFactor = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowFactor );
 		levelSettings.numBlobs = SettingsStore.retrieveSetting<int>( SettingsIds.numBlobs );
 
-		if (cannon == null)
+		if (cannon_ == null)
 		{
-			Debug.LogError( "No cannon" );
+			if (DEBUG_GAME)
+			{
+				Debug.Log( "Creating cannon" );
+			}
+			cannon_ = (GameObject.Instantiate( cannonPrefab ) as GameObject).GetComponent<Cannon>( );
+			cannon_.cachedTransform.parent = gameWorld;
+			cannon_.cachedTransform.rotation = Quaternion.identity;
+			cannon_.cachedTransform.localScale = 0.6f * Vector3.one;
+			cannon_.cachedTransform.localPosition = new Vector3( 0f, -2.768f, 0f );
 		}
 
 		if (Application.platform == RuntimePlatform.Android)
@@ -106,7 +123,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 			{
 				Debug.Log( "Creating touch controller" );
 			}
-			controller_ = Controller_Touch.Create( cannon );
+			controller_ = Controller_Touch.Create( cannon_ );
 		}
 		else
 		{
@@ -114,9 +131,12 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 			{
 				Debug.Log( "Creating mouse controller" );
 			}
-			controller_ = Controller_Mouse.Create( cannon );
+			controller_ = Controller_Mouse.Create( cannon_ );
 		}
 		controller_.gameObject.SetActive( false );
+		playPauseButtonText.text = "Play";
+		registerHandlers( );
+
 	}
 
 	private void registerHandlers()
@@ -128,8 +148,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public void Start( )
 	{
-		playPauseButtonText.text = "Play";
-		registerHandlers( );
+		playPauseButtonText.text = "Wait...";
 	}
 
 	#endregion flow
