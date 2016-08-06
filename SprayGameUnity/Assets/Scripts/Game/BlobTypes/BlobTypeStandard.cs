@@ -34,7 +34,7 @@ public class BlobTypeStandard: BlobType_Base
 		return result;
 	}
 
-	static private readonly string s_typeName_ = "STD";
+	static public readonly string s_typeName_ = "STD";
 	override public string typeName( )
 	{
 		return s_typeName_;
