@@ -9,8 +9,6 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	#region inspector data
 
-	public BlobTypeStandard[] blobTypes = new BlobTypeStandard[0];
-
 	#endregion inspector data
 
 	#region inspector hooks
@@ -100,6 +98,12 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public void Init()
 	{
+		if (DEBUG_GAME)
+		{
+			Debug.Log( "GM: Init" );
+		}
+		BlobTypesStore.CreateInstance( );
+
 		gameWorldSettings.blobSlowDistance = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowDistance );
 		gameWorldSettings.blobSlowFactor = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowFactor );
 		levelSettings.numBlobs = SettingsStore.retrieveSetting<int>( SettingsIds.numBlobs );
@@ -157,18 +161,10 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	private BlobType_Base GetBlobType(string n)
 	{
-		BlobType_Base result = null;
-		foreach (BlobType_Base b in blobTypes)
-		{
-			if (b.name == n)
-			{
-				result = b;
-				break;
-			}
-		}
+		BlobType_Base result = BlobTypesStore.Instance.GetBlobType( n );
 		if (result == null)
 		{
-			Debug.LogError( "Failed to find blobtype '" + n + "'" );
+			Debug.LogError( "Couldn't find blob type '" + n + " in store" );
 		}
 		return result;
 	}

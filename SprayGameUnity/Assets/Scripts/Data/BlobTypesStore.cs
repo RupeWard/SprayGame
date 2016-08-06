@@ -8,7 +8,7 @@ public class BlobTypesStore : RJWard.Core.Singleton.SingletonApplicationLifetime
 {
 	private static readonly bool DEBUG_BLOBTYPES = true;
 
-	private SqliteUtils.TextColumn idCol_ = new SqliteUtils.TextColumn( "id" );
+	private SqliteUtils.TextColumn nameCol_ = new SqliteUtils.TextColumn( "name" );
 	private SqliteUtils.ColourColumn colourCol_ = new SqliteUtils.ColourColumn( "colour" );
 	private SqliteUtils.TextColumn prefabCol_ = new SqliteUtils.TextColumn( "prefabName" );
 
@@ -41,7 +41,7 @@ public class BlobTypesStore : RJWard.Core.Singleton.SingletonApplicationLifetime
 		standardBlobsTable_ = new SqliteUtils.Table( "BlobTypeStandard",
 			new List<SqliteUtils.Column>( )
 			{
-				idCol_,
+				nameCol_,
 				colourCol_,
 				prefabCol_
 			}
@@ -66,7 +66,7 @@ public class BlobTypesStore : RJWard.Core.Singleton.SingletonApplicationLifetime
 		while (reader.Read( ))
 		{
 			BlobTypeStandard defn = new BlobTypeStandard( );
-			defn.name = idCol_.Read( reader, 0 );
+			defn.name = nameCol_.Read( reader, 0 );
 			defn.colour = colourCol_.Read( reader, 1 );
 			defn.prefabName = prefabCol_.Read( reader, 2 );
 
