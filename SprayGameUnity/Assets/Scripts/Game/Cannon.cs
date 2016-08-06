@@ -78,12 +78,12 @@ public class Cannon : MonoBehaviour
 		trace1.gameObject.SetActive( false );
     }
 
-	private void SetColour( )
+	public void SetColour( )
 	{
 		SetColour( defaultColour_ );
 	}
 
-	private void SetColour(Color c)
+	public void SetColour(Color c)
 	{
 		cachedMaterial_.color = c;
 	}
@@ -334,7 +334,7 @@ public class Cannon : MonoBehaviour
 			loadedBlob_ = b;
 			loadedBlob_.Load( );
 			loadedBlob_.Init( this );
-			SetColour( loadedBlob_.blobType.colour );
+			loadedBlob_.blobType.SetCannonAppearance( this );
 
 			cachedAudioSource_.clip = loadClip;
 			cachedAudioSource_.Play( );

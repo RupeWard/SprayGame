@@ -5,7 +5,6 @@ public class Blob_SimpleCylinder : Blob
 {
 	#region private hooks
 
-	private Material cachedMaterial_ = null;
 	public MeshRenderer myRenderer = null;
 
 	public Transform top;
@@ -23,9 +22,9 @@ public class Blob_SimpleCylinder : Blob
 		top.gameObject.SetActive( false );
 	}
 
-	protected override void SetAppearanceByType(BlobType t)
+	protected override void SetAppearanceByType(BlobType_Base t)
 	{
-		cachedMaterial_.color = t.colour;
+		t.SetBlobAppearance( this );
 	}
 
 	override public void Init( Cannon cannon )
@@ -34,12 +33,6 @@ public class Blob_SimpleCylinder : Blob
 		cachedTransform.rotation = cannon.cachedTransform.rotation;
 
 		top.gameObject.SetActive( false );
-	}
-
-	override public void SetFlashState( float f )
-	{
-        //cachedMaterial_.SetColor( "_EmissionColor", Color.Lerp( Color.black, blobType.colour, f ) );
-		cachedMaterial_.color = Color.Lerp( blobType.colour, Color.black, f ) ;
 	}
 
 	override public void SetCountdownState( float fraction01 )

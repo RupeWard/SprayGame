@@ -181,6 +181,16 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 			return sb.ToString( );
 		}
 
+		public string GetSelectWhereCommand< T >( Column c, T t)
+		{
+			System.Text.StringBuilder sb = new System.Text.StringBuilder( );
+			sb.Append( "SELECT " );
+			AddAllColsList( sb );
+			sb.Append( " FROM " ).Append( name_ );
+			sb.Append( " WHERE " ).Append( c.name ).Append( " = '" ).Append( t.ToString( ) ).Append( "'" );
+			return sb.ToString( );
+		}
+
 		public string GetInsertCommand(bool force)
 		{
 			System.Text.StringBuilder sb = new System.Text.StringBuilder( );

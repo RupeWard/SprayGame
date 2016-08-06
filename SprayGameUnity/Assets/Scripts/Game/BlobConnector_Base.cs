@@ -42,13 +42,6 @@ abstract public class BlobConnector_Base : MonoBehaviour
 	static public BlobConnector_Base CreateConnection(Transform t, Blob b0, Blob b1)
 	{
 		BlobConnector_Base result = null;
-		Blob_SimpleSphere bs0 = b0 as Blob_SimpleSphere;
-		Blob_SimpleSphere bs1 = b1 as Blob_SimpleSphere;
-		if (bs0 != null && bs1 != null)
-		{
-			result = BlobConnector_SimpleSphere.CreateConnection(t, bs0, bs1 );
-		}
-		else
 		{
 			Blob_SimpleCylinder bc0 = b0 as Blob_SimpleCylinder;
 			Blob_SimpleCylinder bc1 = b1 as Blob_SimpleCylinder;
@@ -74,7 +67,7 @@ abstract public class BlobConnector_Base : MonoBehaviour
 		}
 		else
 		{
-			Debug.LogWarning( "No joint on destroying connection " + gameObject.name );
+//			Debug.LogWarning( "No joint on destroying connection " + gameObject.name );
 		}
 		if (parentBlob_ != null)
 		{

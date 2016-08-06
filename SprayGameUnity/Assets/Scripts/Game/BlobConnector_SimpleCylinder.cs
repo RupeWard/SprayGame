@@ -8,6 +8,10 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 
 	private MeshRenderer cachedRenderer_ = null;
 	private Material cachedMaterial_ = null;
+	public Material cachedMaterial
+	{
+		get { return cachedMaterial_;  }
+	}
 
 	static private GameObject cachedPrefab_ = null;
 	static private GameObject cachedPrefab
@@ -61,7 +65,7 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 
 		if (parentBlob_.blobType == childBlob_.blobType)
 		{
-			cachedMaterial_.color = parentBlob_.blobType.colour;
+			parentBlob_.blobType.SetConnectorAppearance( this );
 		}
 		else
 		{

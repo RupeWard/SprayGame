@@ -3,13 +3,13 @@ using System.Collections;
 
 public class BlobGroupSameType: BlobGroup
 {
-	private BlobType blobType_ = null;
-	public BlobType blobType
+	private BlobType_Base blobType_ = null;
+	public BlobType_Base blobType
 	{
 		get { return blobType_;  }
 	}
 
-	public BlobGroupSameType( Blob b): base("Col="+b.blobType.colour.ToString(), b)
+	public BlobGroupSameType( Blob b): base(b.blobType.DebugDescribe(), b)
 	{
 		blobType_ = b.blobType;
 		SeedFrom( b );

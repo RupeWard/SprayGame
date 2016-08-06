@@ -9,7 +9,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	#region inspector data
 
-	public BlobType[] blobTypes = new BlobType[0];
+	public BlobTypeStandard[] blobTypes = new BlobTypeStandard[0];
 
 	#endregion inspector data
 
@@ -37,8 +37,6 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public GameWorldSettings gameWorldSettings = new GameWorldSettings();
 	public LevelSettings levelSettings = new LevelSettings( );
-
-	public Blob.EType blobType = Blob.EType.SimpleCylinder;
 
 	public enum ELayer
 	{
@@ -142,16 +140,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	{
 		Blob blob = null;
 
-		GameObject prefab = null;
-		switch (blobType)
-		{
-			case Blob.EType.SimpleSphere:
-				prefab = simplesphereBlobPrefab;
-				break;
-			case Blob.EType.SimpleCylinder:
-				prefab = simplecylinderBlobPrefab;
-				break;
-		}
+		GameObject prefab = simplecylinderBlobPrefab;
 		blob = (GameObject.Instantiate<GameObject>( prefab ) as GameObject).GetComponent<Blob>( );
 		blob.cachedTransform.parent = gameWorld;
 		if (blobTypes.Length == 0)
@@ -160,7 +149,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		}
 		else
 		{
-			BlobType t = blobTypes[ UnityEngine.Random.Range(0, blobTypes.Length) ];
+			BlobType_Base t = blobTypes[ UnityEngine.Random.Range(0, blobTypes.Length) ];
 			blob.SetType( t );
 		}
 		return blob;
@@ -273,14 +262,6 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 				PositionPendingBlobs( );
 			}
 
-			if (pendingFlashGroups.Count > 0)
-			{
-				if (isFlashingGroup_ == false)
-				{
-					BlobGroup bg = pendingFlashGroups.Dequeue( );
-					StartCoroutine( FlashBlobGroupCR( bg, 0.6f ) );
-				}
-			}
 		}
 	}
 
@@ -306,41 +287,6 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		return result;
 	}
 
-	private bool isFlashingGroup_ = false;
-
-	public IEnumerator FlashBlobGroupCR(BlobGroup blobs, float duration)
-	{
-		Debug.LogWarning( "START Flashing blob group " + blobs.name + " " + blobs.blobs.Count );
-		isFlashingGroup_ = true;
-		float elapsed = 0f;
-		while (elapsed < duration)
-		{
-			float tFraction = elapsed / duration;
-			float sFraction = Mathf.Sin( tFraction * Mathf.PI );
-			foreach (Blob b in blobs.blobs)
-			{
-				b.SetFlashState( sFraction );
-			}
-			elapsed += Time.deltaTime;
-			yield return null;
-		}
-		foreach (Blob b in blobs.blobs)
-		{
-			b.SetFlashState( 0f );
-		}
-		isFlashingGroup_ = false;
-		Debug.LogWarning( "END Flashing blob group " + blobs.name );
-	}
-
-	private Queue<BlobGroup> pendingFlashGroups = new Queue<BlobGroup>( );
-	public void FlashBlobGroup(BlobGroup b)
-	{
-		if (!pendingFlashGroups.Contains( b ))
-		{
-			Debug.LogWarning( "QUEUE Flashing blob group " + b.name );
-			pendingFlashGroups.Enqueue( b );
-		}
-	}
 
 	public void HandlePlayPauseButton()
 	{

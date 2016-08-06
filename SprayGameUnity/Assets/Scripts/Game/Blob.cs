@@ -5,12 +5,6 @@ using RJWard.Core;
 
 abstract public class Blob : MonoBehaviour
 {
-	public enum EType
-	{
-		SimpleSphere,
-		SimpleCylinder
-	}
-
 	static private readonly bool DEBUG_BLOB = true;
 	static private readonly bool DEBUG_COLLISIONS = true;
 	static private int nextNum_ = 0;
@@ -40,6 +34,11 @@ abstract public class Blob : MonoBehaviour
 		get { return cachedRB_; }
 	}
 
+	protected Material cachedMaterial_ = null;
+	public Material cachedMaterial
+	{
+		get { return cachedMaterial_; }
+	}
 
 	#endregion private hooks
 
@@ -91,8 +90,6 @@ abstract public class Blob : MonoBehaviour
 
 	private EState state_ = EState.Pending;
 
-	abstract public void SetFlashState(float f);
-
 	public void Fire()
 	{
 		if (state_ != EState.Loaded)
@@ -137,8 +134,8 @@ abstract public class Blob : MonoBehaviour
 		get { return connectedBlobs_;  }
 	}
 
-	private BlobType blobType_ = null;
-	public BlobType blobType
+	private BlobType_Base blobType_ = null;
+	public BlobType_Base blobType
 	{
 		get { return blobType_; }
 	}
@@ -168,9 +165,9 @@ abstract public class Blob : MonoBehaviour
 
 	abstract public void Init( Cannon cannon );
 
-	protected abstract void SetAppearanceByType( BlobType t );
+	protected abstract void SetAppearanceByType( BlobType_Base t );
 
-	public void SetType(BlobType t)
+	public void SetType(BlobType_Base t)
 	{
 		blobType_ = t;
 		SetAppearanceByType( blobType_ );
