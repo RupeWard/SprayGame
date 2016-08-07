@@ -15,7 +15,7 @@ public static class SettingsIds
 	public static readonly Dictionary<string, string> defaults = new Dictionary<string, string>( )
 	{
         {  showFPS, "0" },
-		{  cannonSpeed, "6" },
+		{  cannonSpeed, "16" },
 		{  blobSlowDistance, "4" },
 		{  blobSlowFactor, "0.5" },
 		{ numBlobs, "4" },

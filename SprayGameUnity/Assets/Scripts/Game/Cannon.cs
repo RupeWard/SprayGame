@@ -162,8 +162,8 @@ public class Cannon : MonoBehaviour
 	{
 		if (isControlled_)
 		{
-			cachedAudioSource_.clip = abortClip;
-			cachedAudioSource_.Play( );
+//			cachedAudioSource_.clip = abortClip;
+//			cachedAudioSource_.Play( );
 
 			if (DEBUG_CANNON_PTR)
 			{
@@ -211,8 +211,8 @@ public class Cannon : MonoBehaviour
 			}
 			else
 			{
-				cachedAudioSource_.clip = abortClip;
-				cachedAudioSource_.Play( );
+//				cachedAudioSource_.clip = abortClip;
+//				cachedAudioSource_.Play( );
 			}
 
 			PointAtIFAngleOk( v );
@@ -300,14 +300,14 @@ public class Cannon : MonoBehaviour
 			}
 			else
 			{
-				cachedAudioSource_.clip = abortClip;
-				cachedAudioSource_.Play( );
-				Debug.LogWarning( "No blob loaded" );
+//				cachedAudioSource_.clip = abortClip;
+//				cachedAudioSource_.Play( );
+//				Debug.LogWarning( "No blob loaded" );
 			}
 		}
 	}
 
-	public float blobLoadDelay = 2f;
+	public float blobLoadDelay = 1f;
 
 	private IEnumerator LoadBlobCR()
 	{
