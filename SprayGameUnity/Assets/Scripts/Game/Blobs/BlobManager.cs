@@ -75,7 +75,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			float distance = 0.5f * (b0.radius + b1.radius);
 			joint.minDistance = distance;
 			joint.maxDistance = distance;
-			joint.tolerance = 0.01f;// FIXME magic
+			joint.tolerance = GameManager.Instance.levelSettings.jointTolerance;
 			joint.spring = 40000f;// FIXME magic
 			joint.damper = 10000f;// FIXME magic
 			joint.autoConfigureConnectedAnchor = false;

@@ -227,6 +227,10 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 	public class Table
 	{
 		private string name_;
+		public string name
+		{
+			get { return name_;  }
+		}
 
 		private List<Column> columns_ = new List<Column>();
 		
@@ -243,6 +247,18 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 			AddAllColsList( sb );
 			sb.Append( " FROM " ).Append(name_);
 			return sb.ToString( );
+		}
+
+		public bool ExistsInDB( string db )
+		{
+			SqliteConnection connection = SqliteUtils.Instance.getConnection( db );
+
+			SqliteCommand existsCommand = connection.CreateCommand( );
+			existsCommand.CommandText = "SELECT * FROM sqlite_master WHERE type = 'table' AND name = '" + name_ + "'";
+			bool exists = (existsCommand.ExecuteScalar( ) != null);
+			existsCommand.Dispose( );
+
+			return exists;
 		}
 
 		public string GetSelectWhereCommand< T >( Column c, T t)

@@ -13,7 +13,7 @@ public class BlobTypesStore : RJWard.Core.Singleton.SingletonApplicationLifetime
 	private SqliteUtils.TextColumn prefabCol_ = new SqliteUtils.TextColumn( "prefabName" );
 
 	private SqliteUtils.Table standardBlobsTable_ = null;
-	private Dictionary<string, BlobTypeStandard> standardBlobDefns_ = new Dictionary<string, BlobTypeStandard>( );
+	private Dictionary<string, BlobTypeStandard> standardBlobDefnsCore_ = new Dictionary<string, BlobTypeStandard>( );
 
 	public BlobType_Base GetBlobType(string n)
 	{
@@ -23,15 +23,19 @@ public class BlobTypesStore : RJWard.Core.Singleton.SingletonApplicationLifetime
 			n = n.Replace( BlobTypeStandard.s_typeName_ + "_", "" );
 			result = GetBlobTypeStandard( n );
 		}
+		else
+		{
+			Debug.LogError( "Unrecognised blobType identifier in '" + n + "'" );
+		}
 		return result;
 	}
 
 	public BlobTypeStandard GetBlobTypeStandard(string n)
 	{
 		BlobTypeStandard result = null;
-		if (standardBlobDefns_.ContainsKey( n ))
+		if (standardBlobDefnsCore_.ContainsKey( n ))
 		{
-			result = standardBlobDefns_[n];
+			result = standardBlobDefnsCore_[n];
 		}
 		return result;
 	}
@@ -46,7 +50,7 @@ public class BlobTypesStore : RJWard.Core.Singleton.SingletonApplicationLifetime
 				prefabCol_
 			}
 			);
-		standardBlobDefns_ = GetAllStandardBlobDefns( );
+		standardBlobDefnsCore_ = GetAllStandardBlobDefns("CoreData" );
 
 		if (DEBUG_BLOBTYPES)
 		{
@@ -54,10 +58,15 @@ public class BlobTypesStore : RJWard.Core.Singleton.SingletonApplicationLifetime
 		}
 	}
 
-	private Dictionary< string, BlobTypeStandard> GetAllStandardBlobDefns()
+	private Dictionary< string, BlobTypeStandard> GetAllStandardBlobDefns(string db)
 	{
+		if (!standardBlobsTable_.ExistsInDB( db ))
+		{
+			Debug.LogWarning( "Table '" + standardBlobsTable_.name + "' doesn't exist in DB '" + db + "'" );
+			return null;
+		}
 		Dictionary<string, BlobTypeStandard> result = new Dictionary<string, BlobTypeStandard>( );
-		SqliteConnection connection = SqliteUtils.Instance.getConnection( "CoreData" );
+		SqliteConnection connection = SqliteUtils.Instance.getConnection( db );
 
 		SqliteCommand selectCommand = connection.CreateCommand( );
 		selectCommand.CommandText = standardBlobsTable_.GetSelectCommand( );
@@ -78,8 +87,8 @@ public class BlobTypesStore : RJWard.Core.Singleton.SingletonApplicationLifetime
 	public void DebugDescribe(System.Text.StringBuilder sb)
 	{
 		sb.Append( "BlobTypesStore:" );
-		sb.Append( "\n " + standardBlobDefns_.Count + " standard..." );
-		foreach (KeyValuePair < string, BlobTypeStandard  > kvp in standardBlobDefns_)
+		sb.Append( "\n " + standardBlobDefnsCore_.Count + " standard..." );
+		foreach (KeyValuePair < string, BlobTypeStandard  > kvp in standardBlobDefnsCore_)
 		{
 			sb.Append( "\n  " ).Append( kvp.Key ).Append( " = " );
 			kvp.Value.DebugDescribe( sb );
