@@ -284,6 +284,8 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		}
 	}
 
+	private float timeOfLastWallMove = 0f;
+
 	public void Update()
 	{
 		if (isGameOver_)
@@ -296,7 +298,12 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 				pendingBlobs_.Enqueue( newBlob );
 				PositionPendingBlobs( );
 			}
-
+			float elapsed = Time.time - timeOfLastWallMove;
+            if (elapsed >= 1f)
+			{
+				timeOfLastWallMove = Time.time;
+				topWallTargetHeight_ -= levelSettings.topWallDistPerSecond;
+			}
 		}
 	}
 
