@@ -11,6 +11,7 @@ public class GameSettingsPanel : MonoBehaviour
 	public UnityEngine.UI.Text blobSlowDistanceButtonText;
 	public UnityEngine.UI.Text blobSlowFactorButtonText;
 	public UnityEngine.UI.Text numBlobsButtonText;
+	public UnityEngine.UI.Text showConnectorsButtonText;
 
 	public UnityEngine.UI.Text modeButtonText;
 
@@ -39,7 +40,6 @@ public class GameSettingsPanel : MonoBehaviour
 			{ EMode.Env, environmentPanel },
 			{ EMode.Level, levelPanel },
 		};
-		SetUpForMode( );
 	}
 
 	private void SetUpForMode()
@@ -71,6 +71,8 @@ public class GameSettingsPanel : MonoBehaviour
 
 	public void Init()
 	{
+		SetUpForMode( );
+		SetupShowConnectorsButton( );
 		SetSpeedText( );
 		SetBlobSlowDistanceText( );
 		SetBlobSlowFactorText( );
@@ -166,6 +168,23 @@ public class GameSettingsPanel : MonoBehaviour
 		}
 	}
 
+	public void HandleShowConnectorsButton()
+	{
+		GameManager.Instance.ToggleShowConnectors( );
+		SetupShowConnectorsButton( );
+	}
+
+	private void SetupShowConnectorsButton()
+	{
+		if (GameManager.Instance.showConnectors)
+		{
+			showConnectorsButtonText.text = "Hide connectors";
+		}
+		else
+		{
+			showConnectorsButtonText.text = "Show connectors";
+		}
+	}
 
 }
 

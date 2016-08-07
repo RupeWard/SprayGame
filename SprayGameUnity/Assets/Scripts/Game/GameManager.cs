@@ -77,6 +77,8 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	private float topWallTargetHeight_ = 0f;
 	private float topWallStartingHeight_ = 0f;
 
+	public bool showConnectors = true;
+
 	#endregion private objects
 
 	#region flow
@@ -107,6 +109,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		gameWorldSettings.blobSlowDistance = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowDistance );
 		gameWorldSettings.blobSlowFactor = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowFactor );
 		levelSettings.numBlobs = SettingsStore.retrieveSetting<int>( SettingsIds.numBlobs );
+		showConnectors = SettingsStore.retrieveBoolSetting( SettingsIds.showConnectors );
 
 		if (cannon_ == null)
 		{
@@ -468,5 +471,11 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		{
 			Debug.Log( "Target height now " + topWallTargetHeight_ );
 		}
+	}
+
+	public void ToggleShowConnectors()
+	{
+		showConnectors = !showConnectors;
+		SettingsStore.storeSetting( SettingsIds.showConnectors, showConnectors );
 	}
 }

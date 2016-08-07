@@ -31,6 +31,8 @@ abstract public class BlobConnector_Base : MonoBehaviour
 	protected abstract void PostAwake( );
 	protected abstract void Reposition( );
 
+	public  abstract void Show( bool b );
+
 	private void FixedUpdate( )
 	{
 		if (parentBlob_ != null && childBlob_ != null)

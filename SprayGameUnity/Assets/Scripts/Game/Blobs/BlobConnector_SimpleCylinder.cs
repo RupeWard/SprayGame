@@ -78,7 +78,19 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 		cachedRenderer_ = GetComponent<MeshRenderer>( );
 		cachedMaterial_ = new Material( srcMaterial );
 		cachedRenderer_.material = cachedMaterial_;
+
+		Show( GameManager.Instance.showConnectors );
     }
+
+#if UNITY_EDITOR
+	private void Update()
+	{
+		if (cachedRenderer_.enabled != GameManager.Instance.showConnectors)
+		{
+			Show( GameManager.Instance.showConnectors );
+		}
+	}
+#endif
 
 	private readonly Vector3 heightOffset = new Vector3( 0f, 0f, 1f );
 
@@ -105,4 +117,10 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 		result.Init( b0, b1 );
 		return result;
 	}
+
+	public override void Show( bool b )
+	{
+		cachedRenderer_.enabled = b;
+	}
+
 }

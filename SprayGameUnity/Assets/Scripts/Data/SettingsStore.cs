@@ -43,6 +43,11 @@ public class SettingsStore
 		insert.Dispose();
 	}
 
+	public static bool retrieveBoolSetting(string id)
+	{
+		return (retrieveSetting<int>( id ) == 1);
+	}
+
 	public static T retrieveSetting<T>( string id )
 	{
 		SqliteConnection connection = SqliteUtils.Instance.getConnection("Progress");
