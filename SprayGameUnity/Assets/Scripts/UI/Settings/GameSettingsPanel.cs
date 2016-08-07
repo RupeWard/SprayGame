@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameSettingsPanel : MonoBehaviour
 {
@@ -11,8 +12,62 @@ public class GameSettingsPanel : MonoBehaviour
 	public UnityEngine.UI.Text blobSlowFactorButtonText;
 	public UnityEngine.UI.Text numBlobsButtonText;
 
+	public UnityEngine.UI.Text modeButtonText;
+
 	public FloatSettingPanel floatSettingPanel;
 	public IntSettingPanel intSettingPanel;
+
+	public GameObject debugPanel;
+	public GameObject environmentPanel;
+	public GameObject levelPanel;
+
+	private Dictionary<EMode, GameObject> modePanels = null;
+
+	private enum EMode
+	{
+		Env,
+		Debug,
+		Level
+	}
+	private EMode mode_ = EMode.Debug;
+
+	private void Awake()
+	{
+		modePanels = new Dictionary<EMode, GameObject>( )
+		{
+			{ EMode.Debug, debugPanel },
+			{ EMode.Env, environmentPanel },
+			{ EMode.Level, levelPanel },
+		};
+		SetUpForMode( );
+	}
+
+	private void SetUpForMode()
+	{
+		titleText.text = mode_.ToString( ) + " Settings";
+		foreach (KeyValuePair<EMode, GameObject> kvp in modePanels)
+		{
+			kvp.Value.SetActive( kvp.Key == mode_ );
+		}
+		modeButtonText.text = mode_.ToString( );
+	}
+
+	public void HandleModeButton()
+	{
+		switch (mode_)
+		{
+			case EMode.Debug:
+				mode_ = EMode.Env;
+				break;
+			case EMode.Env:
+				mode_ = EMode.Level;
+				break;
+			case EMode.Level:
+				mode_ = EMode.Debug;
+				break;
+		}
+		SetUpForMode( );
+	}
 
 	public void Init()
 	{
