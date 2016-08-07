@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameManager>
 {
 	static public readonly bool DEBUG_GAME = true;
-	static public readonly bool DEBUG_WALLS = true;
+	static public readonly bool DEBUG_WALLS = false;
 
 	#region inspector data
 
@@ -444,7 +444,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 						topWall.position = new Vector3( topWall.position.x, currentTopWallHeight, topWall.position.z );
 						if (DEBUG_WALLS)
 						{
-							Debug.Log( "Walls moved up to " + topWall.position );
+//							Debug.Log( "Walls moved up to " + topWall.position );
 						}
 					}
 					else if (topWallTargetHeight_ < currentTopWallHeight)
@@ -457,14 +457,14 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 						topWall.position = new Vector3( topWall.position.x, currentTopWallHeight, topWall.position.z );
 						if (DEBUG_WALLS)
 						{
-							Debug.Log( "Walls moved down to " + topWall.position );
+//							Debug.Log( "Walls moved down to " + topWall.position );
 						}
 					}
 					if (oldTopWallHeight != currentTopWallHeight)
 					{
 						if (DEBUG_WALLS)
 						{
-							Debug.Log( "Sending WallMove" );
+//							Debug.Log( "Sending WallMove" );
 						}
 						MessageBus.instance.sendWallMoveAction( currentTopWallHeight - oldTopWallHeight );
 					}
