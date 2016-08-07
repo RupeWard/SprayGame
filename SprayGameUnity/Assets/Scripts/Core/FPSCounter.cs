@@ -5,6 +5,8 @@ namespace RJWard.Core.Unity
 {
 	public class FPSCounter : MonoBehaviour
 	{
+		public static readonly bool DEBUG_FPS = true;
+
 		public UnityEngine.UI.Text fpsText;
 		public UnityEngine.UI.Text minMaxText;
 
@@ -40,14 +42,29 @@ namespace RJWard.Core.Unity
 		{
 			if (active_ != b)
 			{
+				if (DEBUG_FPS)
+				{
+					Debug.Log( "FPS: SetActive " + b );
+				}
 				active_ = b;
 				if (!active_)
 				{
 					intervals_.Clear( );
 					if (fpsText != null)
 					{
-						fpsText.text = "FPS";
+						fpsText.text = string.Empty;
 					}
+					if (minMaxText != null)
+					{
+						minMaxText.text = string.Empty;
+					}
+				}
+			}
+			else
+			{
+				if (DEBUG_FPS)
+				{
+					Debug.Log( "FPS: SetActive when already " + b );
 				}
 			}
 		}

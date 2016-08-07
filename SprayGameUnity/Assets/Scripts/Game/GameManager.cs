@@ -78,6 +78,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	private float topWallStartingHeight_ = 0f;
 
 	public bool showConnectors = true;
+	public bool showFPS = true;
 
 	#endregion private objects
 
@@ -110,6 +111,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		gameWorldSettings.blobSlowFactor = SettingsStore.retrieveSetting<float>( SettingsIds.blobSlowFactor );
 		levelSettings.numBlobs = SettingsStore.retrieveSetting<int>( SettingsIds.numBlobs );
 		showConnectors = SettingsStore.retrieveBoolSetting( SettingsIds.showConnectors );
+		showFPS = SettingsStore.retrieveBoolSetting( SettingsIds.showFPS);
 
 		if (cannon_ == null)
 		{
@@ -477,5 +479,12 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	{
 		showConnectors = !showConnectors;
 		SettingsStore.storeSetting( SettingsIds.showConnectors, showConnectors );
+	}
+
+	public void ToggleShowFPS()
+	{
+		showFPS = !showFPS;
+		SettingsStore.storeSetting( SettingsIds.showFPS, showFPS );
+		MessageBus.instance.dispatchOnShowFPSChanged( showFPS );
 	}
 }

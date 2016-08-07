@@ -12,6 +12,7 @@ public class GameSettingsPanel : MonoBehaviour
 	public UnityEngine.UI.Text blobSlowFactorButtonText;
 	public UnityEngine.UI.Text numBlobsButtonText;
 	public UnityEngine.UI.Text showConnectorsButtonText;
+	public UnityEngine.UI.Text showFPSButtonText;
 
 	public UnityEngine.UI.Text modeButtonText;
 
@@ -73,10 +74,12 @@ public class GameSettingsPanel : MonoBehaviour
 	{
 		SetUpForMode( );
 		SetupShowConnectorsButton( );
+		SetupShowFPSButton( );
 		SetSpeedText( );
 		SetBlobSlowDistanceText( );
 		SetBlobSlowFactorText( );
 		SetNumBlobsText( );
+	
 		titleText.text = "Game Options";
 		floatSettingPanel.gameObject.SetActive( false );
 		intSettingPanel.gameObject.SetActive( false );
@@ -183,6 +186,24 @@ public class GameSettingsPanel : MonoBehaviour
 		else
 		{
 			showConnectorsButtonText.text = "Show connectors";
+		}
+	}
+
+	public void HandleShowFPSButton( )
+	{
+		GameManager.Instance.ToggleShowFPS( );
+		SetupShowFPSButton( );
+	}
+
+	private void SetupShowFPSButton( )
+	{
+		if (GameManager.Instance.showFPS)
+		{
+			showFPSButtonText.text = "Hide FPS";
+		}
+		else
+		{
+			showFPSButtonText.text = "Show FPS";
 		}
 	}
 
