@@ -37,6 +37,7 @@ public class SceneControllerGame : SceneController_Base
 
 	protected override void OnDatabasesLoaded( )
 	{
+		SqliteUtils.Instance.databaseLoadComplete -= OnDatabasesLoaded;
 		StartCoroutine( OnDBSLoadedCR( ) );
 	}
 

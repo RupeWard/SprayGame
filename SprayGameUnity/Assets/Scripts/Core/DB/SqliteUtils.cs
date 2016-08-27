@@ -109,6 +109,8 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 
 	public void initialiseDatabases( string language )
 	{
+		isPreparing = true;
+
 		if (DEBUG_SQL)
 		{
 			Debug.Log( "SQL: initialiseDatabases( " + language + " ): Language not implemented" );
@@ -302,7 +304,10 @@ public partial class SqliteUtils : RJWard.Core.Singleton.SingletonApplicationLif
 		{
 			databaseLoadComplete( );
 		}
+		isPreparing = false;
 	}
+
+	public bool isPreparing = false;
 
 	protected override void PostOnApplicationQuit( )
 	{

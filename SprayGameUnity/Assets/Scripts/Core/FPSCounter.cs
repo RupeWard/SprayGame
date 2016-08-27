@@ -71,8 +71,21 @@ namespace RJWard.Core.Unity
 
 		public System.Action<float> SendFPS;
 
-		private void Awake()
+		private void Start()
 		{
+			if (SqliteUtils.Instance.isPreparing)
+			{
+				SqliteUtils.Instance.databaseLoadComplete += OnDatabaseLoadComplete;
+			}
+			else
+			{
+				OnDatabaseLoadComplete( );
+			}
+		}
+
+		private void OnDatabaseLoadComplete()
+		{
+			SqliteUtils.Instance.databaseLoadComplete -= OnDatabaseLoadComplete;
 			SetActive( SettingsStore.retrieveSetting<bool>( SettingsIds.showFPS ) );
 			MessageBus.instance.onShowFPSChanged += SetActive;
 			MessageBus.instance.onResetFPS += Reset;
