@@ -27,4 +27,6 @@ abstract public class BlobType_Base :RJWard.Core.IDebugDescribable
 	{
 		return typeName( ) + ":" + name + ":" + GetSubDefnString( );
 	}
+
+	abstract public bool ShouldDeleteGroupOfNum( int n );
 }

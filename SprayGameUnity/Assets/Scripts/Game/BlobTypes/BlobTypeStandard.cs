@@ -34,11 +34,20 @@ public class BlobTypeStandard: BlobType_Base
 		return result;
 	}
 
+
 	static public readonly string s_typeName_ = "STD";
 	override public string typeName( )
 	{
 		return s_typeName_;
 	}
+
+	override public bool ShouldDeleteGroupOfNum( int n )
+	{
+		if (name == "BLACK")
+			return false; // TODO more sphistication!
+
+		return (n >= GameManager.Instance.levelSettings.numBlobs);
+    }
 
 	override public void SetConnectorAppearance( BlobConnector_SimpleCylinder connector )
 	{

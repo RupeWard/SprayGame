@@ -75,11 +75,21 @@ public class BlobTypesStore : RJWard.Core.Singleton.SingletonApplicationLifetime
 		while (reader.Read( ))
 		{
 			BlobTypeStandard defn = new BlobTypeStandard( );
-			defn.name = nameCol_.Read( reader, 0 );
-			defn.colour = colourCol_.Read( reader, 1 );
-			defn.prefabName = prefabCol_.Read( reader, 2 );
+			try
+			{
+				defn.name = nameCol_.Read( reader, 0 );
+				defn.colour = colourCol_.Read( reader, 1 );
+				defn.prefabName = prefabCol_.Read( reader, 2 );
 
-			result.Add( defn.name, defn );
+				result.Add( defn.name, defn );
+			}
+			catch (System.InvalidCastException /* e */)
+			{
+				if (DEBUG_BLOBTYPES)
+				{
+					Debug.LogWarning( "BlobTypeStandard read error: '" + defn.name + "' '" +defn.colour+"' '"+defn.prefabName+"'" );
+				}
+			}
 		}
 		return result;
     }

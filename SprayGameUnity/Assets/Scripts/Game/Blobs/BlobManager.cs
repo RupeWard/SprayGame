@@ -133,7 +133,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		int num = 0;
 		foreach (BlobGroupSameType bg in typeGroupsToCheck_)
 		{
-			if (bg.blobs.Count >= GameManager.Instance.levelSettings.numBlobs)
+			if (bg.blobType.ShouldDeleteGroupOfNum( bg.blobs.Count))
 			{
 				AddGroupCountdownToDelete( bg );
 				num++;
