@@ -89,6 +89,15 @@ abstract public class Blob : MonoBehaviour
 	private bool directlyConnectedToWall_ = false;
 
 	private EState state_ = EState.Pending;
+	public EState state
+	{
+		get { return state_; }
+	}
+
+	public void SetHitState()
+	{
+		state_ = EState.Hit;
+	}
 
 	public void Fire()
 	{
@@ -226,6 +235,11 @@ abstract public class Blob : MonoBehaviour
 //				Debug.Log( "Applying drag" );
 				cachedRB_.AddForce( cachedRB_.velocity * -1f * GameManager.Instance.gameWorldSettings.wallDrag, ForceMode.VelocityChange );
 			}
+			if (directlyConnectedToWall_)
+			{
+				cachedRB_.velocity = new Vector3( velocity.x, 0f, 0f );
+			}
+
 		}
 	}
 
@@ -264,10 +278,10 @@ abstract public class Blob : MonoBehaviour
 					state_ = EState.Hit;
 					directlyConnectedToWall_ = true;
 
-					cachedRB_.velocity = Vector3.zero;
+//					cachedRB_.velocity = Vector3.zero;
 					//					cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionY;
 					
-					cachedRB_.isKinematic = true;
+//					cachedRB_.isKinematic = true;
 
 					MessageBus.instance.onWallMoveAction += HandleWallMove;
 					MessageBus.instance.sendBlobHitWallAction( this, wall.gameObject.GetComponent<Wall>( ) );
@@ -288,9 +302,13 @@ abstract public class Blob : MonoBehaviour
 				{
 					Debug.Log( "Blob " + gameObject.name + " Collision with new blob " + c.gameObject.name );
 				}
-				state_ = EState.Hit;
+//				state_ = EState.Hit;
 				MessageBus.instance.sendBlobHitBlobAction( this, blob );
 				MessageBus.instance.sendBlobFinishedAction( this );
+				if (this.directlyConnectedToWall_ )
+				{
+					Debug.Log( "Blob " + gameObject.name + " hit by " + blob.gameObject.name + " while connected to wall. v="+cachedRB_.velocity );
+				}
 			}
 			else // NOT BLOB
 			{

@@ -64,7 +64,9 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			return;
 		}
 
-		bool bKillZone = (b0.IsInKillZone || b1.IsInKillZone);
+		bool bEitherAlreadyHitAndInKillZone = ( (b0.IsInKillZone && b0.state == Blob.EState.Hit) || (b1.IsInKillZone && b1.state == Blob.EState.Hit));
+		b0.SetHitState();
+		b1.SetHitState( );
 
 		if (!b01 )
 		{
@@ -108,7 +110,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 				}
 				else
 				{
-					if (!bKillZone)
+					if (!bEitherAlreadyHitAndInKillZone)
 					{
 						typeGroupsToCheck_.Add( bgt );
 					}
@@ -120,7 +122,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 				Debug.Log( this.DebugDescribe( ) );
 			}
 		}
-		if (bKillZone)
+		if (bEitherAlreadyHitAndInKillZone)
 		{
 			MessageBus.instance.sendBlobHitInKillZoneAction( b0, b1 );
 		}
