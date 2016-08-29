@@ -43,7 +43,7 @@ public class BlobTypeStandard: BlobType_Base
 
 	override public bool ShouldDeleteGroupOfNum( int n )
 	{
-		if (name == "BLACK")
+		if (name == "FIXED")
 			return false; // TODO more sphistication!
 
 		return (n >= GameManager.Instance.levelSettings.numBlobs);

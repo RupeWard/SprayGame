@@ -81,6 +81,9 @@ public class Blob_SimpleCylinder : Blob
 	override public void SetCountdownState( float fraction01 )
 	{
 		fraction01 = Mathf.Clamp01( fraction01 );
+		cachedMaterial_.SetFloat( "_UPhase", 1f - fraction01 );
+//		top.gameObject.SetActive( false );
+		/*
 		if (fraction01 == 0f)
 		{
 			top.gameObject.SetActive( false );
@@ -90,7 +93,7 @@ public class Blob_SimpleCylinder : Blob
 			top.gameObject.SetActive( true );
 			top.localScale = new Vector3( fraction01, fraction01, 1f );
 			top.rotation = Quaternion.identity;
-		}
+		}*/
 	}
 
 }
