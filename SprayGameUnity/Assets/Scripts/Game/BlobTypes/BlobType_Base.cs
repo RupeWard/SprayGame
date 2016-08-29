@@ -29,4 +29,30 @@ abstract public class BlobType_Base :RJWard.Core.IDebugDescribable
 	}
 
 	abstract public bool ShouldDeleteGroupOfNum( int n );
+
+	static public void SetConnectorAppearance( BlobType_Base bb0, BlobType_Base bb1, BlobConnector_SimpleCylinder connector )
+	{
+		Color c0 = Color.white;
+		Color c1 = Color.white;
+		if (bb0 as BlobTypeStandard != null)
+		{
+			c0 = (bb0 as BlobTypeStandard).colour;
+		}
+		else
+		{
+			Debug.LogWarning( "c0 is of type " + c0.GetType( ) );
+		}
+		if (bb1 as BlobTypeStandard != null)
+		{
+			c1 = (bb1 as BlobTypeStandard).colour;
+		}
+		else
+		{
+			Debug.LogWarning( "c1 is of type " + c0.GetType( ) );
+		}
+		connector.cachedMaterial.SetColor( "_Color1", c0 );
+		connector.cachedMaterial.SetColor( "_Color2", c1 );
+		connector.cachedMaterial.SetFloat( "_Alpha", 0.25f );
+	}
+
 }

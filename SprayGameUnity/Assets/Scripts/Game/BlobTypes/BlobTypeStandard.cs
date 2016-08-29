@@ -51,7 +51,9 @@ public class BlobTypeStandard: BlobType_Base
 
 	override public void SetConnectorAppearance( BlobConnector_SimpleCylinder connector )
 	{
-		connector.cachedMaterial.color = colour;
+		connector.cachedMaterial.SetColor("_Color1",colour);
+		connector.cachedMaterial.SetColor( "_Color2", colour );
+		connector.cachedMaterial.SetFloat( "_Alpha", 1f );
 	}
 
 	override public void SetBlobAppearance( Blob_SimpleCylinder blob )

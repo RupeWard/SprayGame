@@ -69,7 +69,7 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 		}
 		else
 		{
-			cachedMaterial_.color = defaultColor_;
+			BlobType_Base.SetConnectorAppearance( parentBlob_.blobType, childBlob_.blobType, this );
 		}
 	}
 
