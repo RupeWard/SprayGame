@@ -136,6 +136,14 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		}
 		if (bEitherAlreadyHitAndInKillZone)
 		{
+			if (b0.IsInKillZone)
+			{
+				b0.HandleDeath( );
+			}
+			if (b1.IsInKillZone)
+			{
+				b1.HandleDeath( );
+			}
 			MessageBus.instance.sendBlobHitInKillZoneAction( b0, b1 );
 		}
 	}

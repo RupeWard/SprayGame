@@ -44,6 +44,12 @@ abstract public class Blob : MonoBehaviour
 
 	#region private data
 
+	private bool isDead_ = false;
+	public virtual void HandleDeath()
+	{
+		isDead_ = true;
+	}
+
 	private bool inKillZone_ = false;
 	public bool IsInKillZone
 	{

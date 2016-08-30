@@ -91,10 +91,23 @@ public class Blob_SimpleCylinder : Blob
 		top.gameObject.SetActive( false );
 	}
 
+	public override void HandleDeath( )
+	{
+		base.HandleDeath( );
+		cachedMaterial_.SetColor( "_Color2", Color.white);
+//		cachedMaterial_.SetColor( "_Color", Color.black );
+	}
+
 	override public void SetCountdownState( float fraction01 )
 	{
 		fraction01 = Mathf.Clamp01( fraction01 );
 		cachedMaterial_.SetFloat( "_UPhase", 1f - fraction01 );
+		/*
+		if (fraction01 > Mathf.Epsilon)
+		{
+			cachedMaterial_.SetColor( "_Color2", Color.white );
+		}
+		*/
 //		top.gameObject.SetActive( false );
 		/*
 		if (fraction01 == 0f)

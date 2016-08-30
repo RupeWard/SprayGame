@@ -1,9 +1,10 @@
 ﻿Shader "Custom/CylinderBlobShader"
 {
 	Properties
-   	{
-//      	_MainTex ("Texture", 2D) = "white" {}
-      	_Color ("Main Color", Color) = (1, 1, 1, 1)
+	{
+		//      	_MainTex ("Texture", 2D) = "white" {}
+				_Color("Main Color", Color) = (1, 1, 1, 1)
+				_Color2("Second Color", Color) = (0, 0, 0, 1)
 		_UPhase("UPhase", Float) = 0.0
 //      	_Alpha ("Alpha", Float) = 0.25
 //     	_Phase ("Phase",Float) = 0.0
@@ -28,7 +29,8 @@
 			//Textures
 //	        sampler2D _MainTex;
 			uniform float4 _Color; 
-	float _UPhase;
+		uniform float4 _Color2;
+		float _UPhase;
 //			float _Alpha;
 //			float _Phase;
 //			float _Repeats;
@@ -57,8 +59,8 @@
 //	            fixed4 texColor = tex2D(_MainTex, i.uv.xy);
 				float x = (i.uv.x + _UPhase ) % 1.0;
 				float invx = 1 - x;
-
-				fixed4 texColor = _Color * (1 - invx * invx * invx);
+				float fraction = invx * invx * invx;
+				fixed4 texColor = _Color2 * fraction + _Color * (1 - fraction);
 //				fixed4 texColor = _Color;
 				
 	            texColor.a = 1;
