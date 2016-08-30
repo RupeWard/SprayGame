@@ -67,6 +67,7 @@ abstract public class Blob : MonoBehaviour
 			inKillZone_ = true;
 			if (state_ == EState.Hit )
 			{
+				this.HandleDeath( );
 				MessageBus.instance.sendHitBlobHitKillZoneAction( this );
 			}
 		}
