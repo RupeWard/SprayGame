@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 {
-	private static readonly bool DEBUG_BLOBMANAGER = true;
+	private static readonly bool DEBUG_BLOBMANAGER = false;
 
 	private List<BlobGroupConnected> connectedGroups_ = new List<BlobGroupConnected>( );
 	private List<BlobGroupSameType> typeGroups_ = new List<BlobGroupSameType>( );
@@ -94,7 +94,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 
 			if (b0.connectedGroup == b1.connectedGroup)
 			{
-				Debug.LogWarning( "Blobs " + b0.gameObject.name + " and " + b1.gameObject.name + " are both already in connected group " + b0.connectedGroup.name );
+//				Debug.LogWarning( "Blobs " + b0.gameObject.name + " and " + b1.gameObject.name + " are both already in connected group " + b0.connectedGroup.name );
 			}
 			else
 			{
@@ -332,7 +332,10 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		}
 		foreach (KeyValuePair< Blob, Blob> kvp in connectionsToRemove)
 		{
-			sb.Append( "\n Removing connection " + kvp.Key.name + " to " + kvp.Value.name );
+			if (sb!= null)
+			{
+				sb.Append( "\n Removing connection " + kvp.Key.name + " to " + kvp.Value.name );
+			}
 			RemoveConnection( kvp.Key, kvp.Value );
 		}
 		if (sb!= null)

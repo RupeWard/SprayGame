@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 {
-	private static readonly bool DEBUG_GROUPS = true;
+	private static readonly bool DEBUG_GROUPS = false;
 
 	private HashSet<Blob> blobs_ = new HashSet<Blob>( );
 	public HashSet<Blob> blobs

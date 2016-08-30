@@ -290,7 +290,7 @@ abstract public class Blob : MonoBehaviour
 			}
 			else
 			{
-				Debug.Log( "Blob " + gameObject.name + " already connected to wall" );
+//				Debug.Log( "Blob " + gameObject.name + " already connected to wall" );
 			}
 		}
 		else // NOT WALL
@@ -307,7 +307,10 @@ abstract public class Blob : MonoBehaviour
 				MessageBus.instance.sendBlobFinishedAction( this );
 				if (this.directlyConnectedToWall_ )
 				{
-					Debug.Log( "Blob " + gameObject.name + " hit by " + blob.gameObject.name + " while connected to wall. v="+cachedRB_.velocity );
+					if (DEBUG_COLLISIONS)
+					{
+						Debug.Log( "Blob " + gameObject.name + " hit by " + blob.gameObject.name + " while connected to wall. v=" + cachedRB_.velocity );
+					}
 				}
 			}
 			else // NOT BLOB

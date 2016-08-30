@@ -6,7 +6,7 @@ public class Cannon : MonoBehaviour
 {
 //	static private readonly bool DEBUG_CANNON = true;
 	static private readonly bool DEBUG_CANNON_PTR = false;
-	static private readonly bool DEBUG_CANNON_FORCE = true;
+	static private readonly bool DEBUG_CANNON_FORCE = false;
 
 	#region inspector hooks
 
