@@ -168,6 +168,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			{
 				gci = i;
 				gci.Restart( );
+				GameManager.Instance.PlayRestartCountdownClip( );
 				if (DEBUG_BLOBMANAGER)
 				{
 					Debug.Log( "Restarting countdown for group " + bg.name );

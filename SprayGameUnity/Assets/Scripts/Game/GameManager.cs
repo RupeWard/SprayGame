@@ -37,6 +37,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	#region gameSettings
 
 	public AudioClip deleteClip;
+	public AudioClip restartCountdownClip;
 
 	public GameWorldSettings gameWorldSettings = new GameWorldSettings();
 	public LevelSettings levelSettings = new LevelSettings( );
@@ -373,8 +374,17 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	public void PlayDeleteClip()
 	{
 		cachedAudioSource_.clip = deleteClip;
+		cachedAudioSource_.spread = 1f;
 		cachedAudioSource_.Play( );
 	}
+
+	public void PlayRestartCountdownClip( )
+	{
+		cachedAudioSource_.clip = restartCountdownClip;
+		cachedAudioSource_.spread = 4f;
+		cachedAudioSource_.Play( );
+	}
+
 
 	public void HandleHitBlobInKillZone(Blob b)
 	{
