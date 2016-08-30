@@ -18,6 +18,8 @@ public class Blob_SimpleCylinder : Blob
 
 	#endregion private hooks
 
+	private static readonly bool DEBUG_MESH = false;
+
 	protected override void PostAwake( )
 	{
 		radius_ = cachedTransform.localScale.x;
@@ -31,13 +33,21 @@ public class Blob_SimpleCylinder : Blob
 			sharedMesh_ = cylinderMeshFilter.sharedMesh;
 			int nV = sharedMesh_.vertices.Length;
 			int nUV = sharedMesh_.uv.Length;
-			System.Text.StringBuilder sb = new System.Text.StringBuilder( );
-			sb.Append( "Found mesh: nV=" + nV + ", nUV=" + nUV );
+			System.Text.StringBuilder sb = null;
+			if (DEBUG_MESH)
+			{
+				sb = new System.Text.StringBuilder( );
+				sb.Append( "Found mesh: nV=" + nV + ", nUV=" + nUV );
+			}
+
 			if (nV == nUV)
 			{
-				for (int i = 0; i < nV; i++)
+				if (sb != null)
 				{
-					sb.Append( "\n " + sharedMesh_.vertices[i] + " " + sharedMesh_.uv[i] );
+					for (int i = 0; i < nV; i++)
+					{
+						sb.Append( "\n " + sharedMesh_.vertices[i] + " " + sharedMesh_.uv[i] );
+					}
 				}
 				Vector2[] newUV = new Vector2[nV];
 				for (int i = 0; i< nV; i++)
@@ -55,7 +65,10 @@ public class Blob_SimpleCylinder : Blob
 				sharedMesh_.uv = newUV;
 
 			}
-			Debug.LogError( sb.ToString( ) );
+			if (sb!= null)
+			{
+				Debug.LogError( sb.ToString( ) );
+			}
 
 		}
 		else

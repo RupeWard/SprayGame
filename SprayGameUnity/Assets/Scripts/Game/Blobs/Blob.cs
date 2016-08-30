@@ -5,8 +5,8 @@ using RJWard.Core;
 
 abstract public class Blob : MonoBehaviour
 {
-	static private readonly bool DEBUG_BLOB = true;
-	static private readonly bool DEBUG_COLLISIONS = true;
+	static private readonly bool DEBUG_BLOB = false;
+	static private readonly bool DEBUG_COLLISIONS = false;
 	static private int nextNum_ = 0;
 
 	public enum EState

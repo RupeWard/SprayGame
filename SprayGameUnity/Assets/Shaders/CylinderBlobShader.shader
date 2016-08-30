@@ -58,7 +58,7 @@
 				float x = (i.uv.x + _UPhase ) % 1.0;
 				float invx = 1 - x;
 
-	            fixed4 texColor = _Color * (1 - invx * invx);
+				fixed4 texColor = _Color * (1 - invx * invx * invx);
 //				fixed4 texColor = _Color;
 				
 	            texColor.a = 1;
