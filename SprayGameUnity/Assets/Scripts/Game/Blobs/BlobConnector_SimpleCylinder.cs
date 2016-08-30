@@ -63,7 +63,7 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 
 		Reposition( );
 
-		if (parentBlob_.blobType == childBlob_.blobType)
+		if (sameBlobType())
 		{
 			parentBlob_.blobType.SetConnectorAppearance( this );
 		}
@@ -71,6 +71,11 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 		{
 			BlobType_Base.SetConnectorAppearance( parentBlob_.blobType, childBlob_.blobType, this );
 		}
+	}
+
+	private bool sameBlobType()
+	{
+		return (parentBlob_ != null && parentBlob_.blobType == childBlob_.blobType);
 	}
 
 	protected override void PostAwake( )
@@ -94,7 +99,9 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 
 	private readonly Vector3 heightOffset = new Vector3( 0f, 0f, 1f );
 
-	private static readonly float s_defaultWidth = 0.15f;
+	private static readonly float s_defaultThickWidth = 0.15f;
+	private static readonly float s_defaultThinWidth = 0.05f;
+
 	protected override void Reposition()
 	{
 		Vector3 start = parentBlob_.cachedTransform.position - parentBlob_.radius * heightOffset;
@@ -103,7 +110,7 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 		Vector3 diff = end - start;
 		float length = 0.5f * diff.magnitude;
 		cachedTransform.position = 0.5f * sum;
-		cachedTransform.localScale = new Vector3( s_defaultWidth, length, 0.1f );
+		cachedTransform.localScale = new Vector3( (sameBlobType()?(s_defaultThickWidth):( s_defaultThinWidth)), length, 0.1f );
 		float angleDegs = Mathf.Rad2Deg * Mathf.Atan2( diff.y, diff.x ) - 90f;
 		cachedTransform.rotation = Quaternion.Euler( 0f, 0f, angleDegs );
 	}
