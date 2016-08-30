@@ -416,6 +416,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 				{
 					controller_.gameObject.SetActive( false );
 				}
+				MessageBus.instance.sendGameOver( );
 				ShowEndGamePanel( );
 			}
 			else

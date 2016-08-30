@@ -154,5 +154,12 @@ public partial class MessageBus
 			onWallMoveAction( f );
 		}
 	}
-
+	public System.Action gameOverAction;
+	public void sendGameOver()
+	{
+		if (gameOverAction != null)
+		{
+			gameOverAction( );
+		}
+	}
 }

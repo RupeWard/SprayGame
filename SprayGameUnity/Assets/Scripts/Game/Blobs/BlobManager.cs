@@ -36,6 +36,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		MessageBus.instance.blobHitBlobAction += HandleBlobHitBlob;
 		MessageBus.instance.blobHitWallAction += HandleBlobHitWall;
 		MessageBus.instance.firedBlobAction += HandleBlobFired;
+		MessageBus.instance.gameOverAction += HandleGameOver;
 	}
 
 	private void deregisterHandlers( )
@@ -44,7 +45,18 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		{
 			MessageBus.instance.blobHitBlobAction -= HandleBlobHitBlob;
 			MessageBus.instance.blobHitWallAction -= HandleBlobHitWall;
+			MessageBus.instance.firedBlobAction -= HandleBlobFired;
+			MessageBus.instance.gameOverAction -= HandleGameOver;
 		}
+	}
+
+	public void HandleGameOver()
+	{
+		foreach (GroupCountdownInfo gci in groupCountdowns_)
+		{
+			gci.Restart( );
+		}
+		groupCountdowns_.Clear( );
 	}
 
 	public void HandleBlobHitBlob(Blob b0, Blob b1)
@@ -222,6 +234,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			float durn = endTime - startTime;
 			startTime = Time.time;
 			endTime = startTime + durn;
+			group.SetCountdownState( 0f );
 		}
 
 		public void Update()
