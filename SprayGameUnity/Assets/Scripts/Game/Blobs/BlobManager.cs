@@ -50,6 +50,8 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		}
 	}
 
+	private bool gameOver_ = false;
+
 	public void HandleGameOver()
 	{
 		foreach (GroupCountdownInfo gci in groupCountdowns_)
@@ -57,6 +59,8 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			gci.Restart( );
 		}
 		groupCountdowns_.Clear( );
+		typeGroupsToCheck_.Clear( );
+		gameOver_ = true;
 	}
 
 	public void HandleBlobHitBlob(Blob b0, Blob b1)
@@ -152,6 +156,12 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 
 	private void LateUpdate()
 	{
+		if (gameOver_)
+		{
+			typeGroupsToCheck_.Clear( );
+			groupCountdowns_.Clear( );
+			return;
+		}
 		int num = 0;
 		foreach (BlobGroupSameType bg in typeGroupsToCheck_)
 		{
