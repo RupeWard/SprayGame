@@ -1166,6 +1166,10 @@ Prefab:
       propertyPath: m_Name
       value: TopWall
       objectReference: {fileID: 0}
+    - target: {fileID: 2323446, guid: 6d18f688d8685584087217b7ff1c40e5, type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: ae4225404afcf1a4fb299c43ee47df81, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6d18f688d8685584087217b7ff1c40e5, type: 2}
   m_IsPrefabParent: 0
