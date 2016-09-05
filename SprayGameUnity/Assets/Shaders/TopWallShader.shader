@@ -55,8 +55,8 @@
 			{
 //	            fixed4 texColor = _Color * i.uv.y;//
 //	            fixed4 texColor = tex2D(_MainTex, i.uv.xy);
-				
-				float invx = 1 - i.uv.y;
+				float invx = 2.0 * abs(0.5 - i.uv.y);
+
 				float fraction = invx * invx * invx;
 				fixed4 texColor = _Color2 * fraction + _Color * (1 - fraction);
 //				fixed4 texColor = _Color;
