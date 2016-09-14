@@ -18,6 +18,8 @@ public class Blob_SimpleCylinder : Blob
 
 	#endregion private hooks
 
+	public static readonly float s_thickness = 0.5f;
+
 	private static readonly bool DEBUG_MESH = false;
 
 	protected override void PostAwake( )
@@ -26,7 +28,7 @@ public class Blob_SimpleCylinder : Blob
 		 
 		cachedMaterial_ = new Material( cylinderRenderer.sharedMaterial );
 		cylinderRenderer.sharedMaterial = cachedMaterial_;
-		cachedTransform.localScale = new Vector3 ( radius, 0.5f, radius);
+		cachedTransform.localScale = new Vector3 ( radius, s_thickness, radius);
 
 		if (sharedMesh_ == null)
 		{

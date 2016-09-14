@@ -80,6 +80,8 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 
 	protected override void PostAwake( )
 	{
+		heightOffset = new Vector3( 0f, 0f, 0.5f * Blob_SimpleCylinder.s_thickness );
+
 		cachedRenderer_ = GetComponent<MeshRenderer>( );
 		cachedMaterial_ = new Material( srcMaterial );
 		cachedRenderer_.material = cachedMaterial_;
@@ -97,18 +99,18 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 	}
 #endif
 
-	private readonly Vector3 heightOffset = new Vector3( 0f, 0f, 1f );
+	private Vector3 heightOffset = new Vector3( 0f, 0f, 1f );
 
 	private static readonly float s_defaultThickWidth = 0.15f;
 	private static readonly float s_defaultThinWidth = 0.05f;
 
 	protected override void Reposition()
 	{
-		Vector3 start = parentBlob_.cachedTransform.position - parentBlob_.radius * heightOffset;
-		Vector3 end = childBlob_.cachedTransform.position - childBlob_.radius * heightOffset;
+		Vector3 start = parentBlob_.cachedTransform.position - heightOffset;
+		Vector3 end = childBlob_.cachedTransform.position - heightOffset;
 		Vector3 sum = start + end;
 		Vector3 diff = end - start;
-		float length = 0.5f * diff.magnitude;
+		float length = 0.9f * diff.magnitude;
 		cachedTransform.position = 0.5f * sum;
 		cachedTransform.localScale = new Vector3( (sameBlobType()?(s_defaultThickWidth):( s_defaultThinWidth)), length, 0.1f );
 		float angleDegs = Mathf.Rad2Deg * Mathf.Atan2( diff.y, diff.x ) - 90f;
