@@ -80,7 +80,7 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 
 	protected override void PostAwake( )
 	{
-		heightOffset = new Vector3( 0f, 0f, 0.5f * Blob_SimpleCylinder.s_thickness );
+		heightOffset = new Vector3( 0f, 0f, 0.5f * Blob_SimpleCylinder.s_bottomDiscThickness );
 
 		cachedRenderer_ = GetComponent<MeshRenderer>( );
 		cachedMaterial_ = new Material( srcMaterial );
@@ -112,7 +112,7 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 		Vector3 diff = end - start;
 		float length = 0.9f * diff.magnitude;
 		cachedTransform.position = 0.5f * sum;
-		cachedTransform.localScale = new Vector3( (sameBlobType()?(s_defaultThickWidth):( s_defaultThinWidth)), length, 0.1f );
+		cachedTransform.localScale = new Vector3( (sameBlobType()?(s_defaultThickWidth):( s_defaultThinWidth)), length, 0.01f );
 		float angleDegs = Mathf.Rad2Deg * Mathf.Atan2( diff.y, diff.x ) - 90f;
 		cachedTransform.rotation = Quaternion.Euler( 0f, 0f, angleDegs );
 	}

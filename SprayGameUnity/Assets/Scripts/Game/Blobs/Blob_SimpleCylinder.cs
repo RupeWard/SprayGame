@@ -11,28 +11,33 @@ public class Blob_SimpleCylinder : Blob
 
 	#region private hooks
 
-	public MeshRenderer cylinderRenderer;
-	public MeshFilter cylinderMeshFilter;
+	private MeshRenderer bottomDiscRenderer_;
+	private MeshFilter bottomDiscMeshFilter_;
+	public Transform bottomDiscTransform;
 
 	public Transform top;
 
 	#endregion private hooks
 
-	public static readonly float s_thickness = 0.5f;
+	public static readonly float s_bottomDiscThickness = 0.1f;
+	public static readonly float s_globalScale = 0.5f;
 
 	private static readonly bool DEBUG_MESH = false;
 
 	protected override void PostAwake( )
 	{
 		radius_ = cachedTransform.localScale.x;
-		 
-		cachedMaterial_ = new Material( cylinderRenderer.sharedMaterial );
-		cylinderRenderer.sharedMaterial = cachedMaterial_;
-		cachedTransform.localScale = new Vector3 ( radius, s_thickness, radius);
+
+		bottomDiscMeshFilter_ = bottomDiscTransform.gameObject.GetComponent<MeshFilter>( );
+		bottomDiscRenderer_ = bottomDiscTransform.gameObject.GetComponent<MeshRenderer>( );
+
+		cachedMaterial_ = new Material( bottomDiscRenderer_.sharedMaterial );
+		bottomDiscRenderer_.sharedMaterial = cachedMaterial_;
+		cachedTransform.localScale = new Vector3 ( radius, s_globalScale, radius);
 
 		if (sharedMesh_ == null)
 		{
-			sharedMesh_ = cylinderMeshFilter.sharedMesh;
+			sharedMesh_ = bottomDiscMeshFilter_.sharedMesh;
 			int nV = sharedMesh_.vertices.Length;
 			int nUV = sharedMesh_.uv.Length;
 			System.Text.StringBuilder sb = null;
@@ -75,7 +80,7 @@ public class Blob_SimpleCylinder : Blob
 		}
 		else
 		{
-			cylinderMeshFilter.sharedMesh = sharedMesh_;
+			bottomDiscMeshFilter_.sharedMesh = sharedMesh_;
 		}
 		top.gameObject.SetActive( false );
 	}
