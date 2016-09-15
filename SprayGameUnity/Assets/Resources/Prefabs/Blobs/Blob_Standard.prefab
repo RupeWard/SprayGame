@@ -67,7 +67,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &189258
 GameObject:
   m_ObjectHideFlags: 1
@@ -339,7 +339,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bottomDiscTransform: {fileID: 441484}
-  topDiscRenderer_: {fileID: 2363496}
+  topDiscTransform: {fileID: 430042}
   top: {fileID: 422216}
 --- !u!136 &13689150
 CapsuleCollider:

@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: BlobTopDiscMaterial
-  m_Shader: {fileID: 4800000, guid: d6e19622d12534c48b831f68065c7207, type: 3}
+  m_Shader: {fileID: 4800000, guid: e4f4bb531bab0ff4cb775e671782fa39, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
   m_CustomRenderQueue: 2000

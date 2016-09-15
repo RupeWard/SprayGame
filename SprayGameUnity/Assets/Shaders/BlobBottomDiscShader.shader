@@ -1,4 +1,4 @@
-﻿Shader "Custom/CylinderBlobShader"
+﻿Shader "Custom/BlobBottomDiscShader"
 {
 	Properties
 	{

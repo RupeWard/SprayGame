@@ -15,8 +15,10 @@ public class Blob_SimpleCylinder : Blob
 	private MeshFilter bottomDiscMeshFilter_;
 	public Transform bottomDiscTransform;
 
-	public MeshRenderer topDiscRenderer_;
-	
+	private MeshRenderer topDiscRenderer_;
+	private MeshFilter topDiscMeshFilter_;
+	public Transform topDiscTransform;
+
 	public Transform top;
 
 	#endregion private hooks
@@ -44,6 +46,9 @@ public class Blob_SimpleCylinder : Blob
 
 		bottomDiscMeshFilter_ = bottomDiscTransform.gameObject.GetComponent<MeshFilter>( );
 		bottomDiscRenderer_ = bottomDiscTransform.gameObject.GetComponent<MeshRenderer>( );
+
+		topDiscMeshFilter_ = topDiscTransform.gameObject.GetComponent<MeshFilter>( );
+		topDiscRenderer_ = topDiscTransform.gameObject.GetComponent<MeshRenderer>( );
 
 		cachedBottomDiscMaterial_ = new Material( bottomDiscRenderer_.sharedMaterial );
 		bottomDiscRenderer_.sharedMaterial = cachedBottomDiscMaterial_;
@@ -103,6 +108,7 @@ public class Blob_SimpleCylinder : Blob
 		{
 			bottomDiscMeshFilter_.sharedMesh = sharedMesh_;
 		}
+		topDiscMeshFilter_.sharedMesh = sharedMesh_;
 		top.gameObject.SetActive( false );
 	}
 
@@ -122,16 +128,16 @@ public class Blob_SimpleCylinder : Blob
 	public override void HandleDeath( )
 	{
 		base.HandleDeath( );
-//		cachedTopDiscMaterial_.SetColor( "_Color2", Color.white );
-		cachedBottomDiscMaterial_.SetColor( "_Color2", Color.white);
-//		cachedMaterial_.SetColor( "_Color", Color.black );
 
 	}
 
 	override public void SetCountdownState( float fraction01 )
 	{
 		fraction01 = Mathf.Clamp01( fraction01 );
-		cachedTopDiscMaterial_.SetFloat( "_UPhase", 1f - fraction01 );
+		cachedTopDiscMaterial_.SetFloat( "_UPhase", fraction01 );
+		cachedBottomDiscMaterial_.SetColor( "_Color", Color.black);
+
+		//	cachedBottomDiscMaterial_.SetFloat( "_UPhase", -1f );
 		// cachedBottomDiscMaterial_.SetFloat( "_UPhase", 1f - fraction01 );
 		/*
 		if (fraction01 > Mathf.Epsilon)

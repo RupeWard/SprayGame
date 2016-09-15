@@ -87,7 +87,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	protected override void PostAwake( )
 	{
-		Debug.Log( "GameManager.PostAwake()" );
+		Debug.Log( "GameManager.PostAwake() at "+System.DateTime.MinValue.ToLongDateString() );
 		endGamePanel.Close( );
 		topWallStartingHeight_ = topWall.position.y;
 		topWallTargetHeight_ = topWallStartingHeight_;

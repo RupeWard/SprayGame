@@ -262,7 +262,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		public void Update()
 		{
 			float fraction = (Time.time - startTime) / duration;
-			group.SetCountdownState( Mathf.Clamp01( fraction ) );
+			group.SetCountdownState( fraction );
 			if (fraction > 1f)
 			{
 				if (endAction != null)
