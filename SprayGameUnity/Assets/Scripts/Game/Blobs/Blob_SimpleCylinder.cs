@@ -15,6 +15,8 @@ public class Blob_SimpleCylinder : Blob
 	private MeshFilter bottomDiscMeshFilter_;
 	public Transform bottomDiscTransform;
 
+	public MeshRenderer topDiscRenderer_;
+	
 	public Transform top;
 
 	#endregion private hooks
@@ -24,6 +26,18 @@ public class Blob_SimpleCylinder : Blob
 
 	private static readonly bool DEBUG_MESH = false;
 
+	private Material cachedBottomDiscMaterial_ = null;
+	public Material cachedBottomDiscMaterial
+	{
+		get { return cachedBottomDiscMaterial_; }
+	}
+
+    private Material cachedTopDiscMaterial_ = null;
+	public Material cachedTopDiscMaterial
+	{
+		get { return cachedTopDiscMaterial_; }
+	}
+
 	protected override void PostAwake( )
 	{
 		radius_ = cachedTransform.localScale.x;
@@ -31,8 +45,15 @@ public class Blob_SimpleCylinder : Blob
 		bottomDiscMeshFilter_ = bottomDiscTransform.gameObject.GetComponent<MeshFilter>( );
 		bottomDiscRenderer_ = bottomDiscTransform.gameObject.GetComponent<MeshRenderer>( );
 
-		cachedMaterial_ = new Material( bottomDiscRenderer_.sharedMaterial );
-		bottomDiscRenderer_.sharedMaterial = cachedMaterial_;
+		cachedBottomDiscMaterial_ = new Material( bottomDiscRenderer_.sharedMaterial );
+		bottomDiscRenderer_.sharedMaterial = cachedBottomDiscMaterial_;
+
+		cachedTopDiscMaterial_ = new Material( topDiscRenderer_.sharedMaterial );
+		topDiscRenderer_.sharedMaterial = cachedTopDiscMaterial_;
+
+		cachedTopDiscMaterial_.SetFloat( "_UPhase", -1f );
+		cachedBottomDiscMaterial_.SetFloat( "_UPhase", 0f );
+
 		cachedTransform.localScale = new Vector3 ( radius, s_globalScale, radius);
 
 		if (sharedMesh_ == null)
@@ -101,21 +122,24 @@ public class Blob_SimpleCylinder : Blob
 	public override void HandleDeath( )
 	{
 		base.HandleDeath( );
-		cachedMaterial_.SetColor( "_Color2", Color.white);
+//		cachedTopDiscMaterial_.SetColor( "_Color2", Color.white );
+		cachedBottomDiscMaterial_.SetColor( "_Color2", Color.white);
 //		cachedMaterial_.SetColor( "_Color", Color.black );
+
 	}
 
 	override public void SetCountdownState( float fraction01 )
 	{
 		fraction01 = Mathf.Clamp01( fraction01 );
-		cachedMaterial_.SetFloat( "_UPhase", 1f - fraction01 );
+		cachedTopDiscMaterial_.SetFloat( "_UPhase", 1f - fraction01 );
+		// cachedBottomDiscMaterial_.SetFloat( "_UPhase", 1f - fraction01 );
 		/*
 		if (fraction01 > Mathf.Epsilon)
 		{
 			cachedMaterial_.SetColor( "_Color2", Color.white );
 		}
 		*/
-//		top.gameObject.SetActive( false );
+		//		top.gameObject.SetActive( false );
 		/*
 		if (fraction01 == 0f)
 		{

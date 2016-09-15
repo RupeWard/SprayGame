@@ -34,11 +34,13 @@ abstract public class Blob : MonoBehaviour
 		get { return cachedRB_; }
 	}
 
-	protected Material cachedMaterial_ = null;
+	/*
+	protected Material cachedBottomDiscMaterial_ = null;
 	public Material cachedMaterial
 	{
-		get { return cachedMaterial_; }
+		get { return cachedBottomDiscMaterial_; }
 	}
+	*/
 
 	#endregion private hooks
 

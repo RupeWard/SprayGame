@@ -57,11 +57,14 @@
 			{
 //	            fixed4 texColor = _Color * i.uv.y;//
 //	            fixed4 texColor = tex2D(_MainTex, i.uv.xy);
-				float x = (i.uv.x + _UPhase ) % 1.0;
-				float invx = 1 - x;
-				float fraction = invx * invx * invx;
-				fixed4 texColor = _Color2 * fraction + _Color * (1 - fraction);
-//				fixed4 texColor = _Color;
+				fixed4 texColor = _Color;
+				if (_UPhase >= 0.0)
+				{
+					float x = (i.uv.x + _UPhase) % 1.0;
+					float invx = 1 - x;
+					float fraction = invx * invx * invx;
+					texColor = _Color2 * fraction + _Color * (1 - fraction);
+				}
 				
 	            texColor.a = 1;
 	            

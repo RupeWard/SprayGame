@@ -58,7 +58,8 @@ public class BlobTypeStandard: BlobType_Base
 
 	override public void SetBlobAppearance( Blob_SimpleCylinder blob )
 	{
-		blob.cachedMaterial.color = colour;
+		blob.cachedBottomDiscMaterial.color = colour;
+		blob.cachedTopDiscMaterial.color = colour;
 	}
 
 	override public void SetCannonAppearance( Cannon c)
