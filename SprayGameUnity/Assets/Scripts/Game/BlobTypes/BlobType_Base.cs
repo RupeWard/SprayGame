@@ -52,7 +52,7 @@ abstract public class BlobType_Base :RJWard.Core.IDebugDescribable
 		}
 		connector.cachedMaterial.SetColor( "_Color1", c0 );
 		connector.cachedMaterial.SetColor( "_Color2", c1 );
-		connector.cachedMaterial.SetFloat( "_Alpha", 0.25f );
+		connector.cachedMaterial.SetFloat( "_Alpha", 1f );
 	}
 
 }
