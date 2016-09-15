@@ -135,6 +135,10 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 					}
 				}
 			}
+			else if (b0.typeGroup == b1.typeGroup)
+			{
+				b0.typeGroup.GetClosedPaths( );
+			}
 
 			if (DEBUG_BLOBMANAGER)
 			{
@@ -336,6 +340,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		{
 			typeGroupsToCheck_.Remove( loseGroup );
 		}
+		retainGroup.GetClosedPaths( );
 		return retainGroup;
 	}
 

@@ -78,6 +78,83 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 
 	}
 
+	static private readonly bool DEBUG_PATHS = true;
+
+	public List<List<Blob>> GetClosedPaths(  )
+	{
+		System.Text.StringBuilder sb = null;
+		if (DEBUG_PATHS)
+		{
+			sb = new System.Text.StringBuilder( );
+			sb.Append( "GetClosedPaths on group " + name_ +" with "+blobs_.Count+" blobs");
+		}
+		List<List<Blob>> result = null;
+		HashSet<Blob> candidateBlobs = new HashSet<Blob>( );
+		foreach (Blob b in blobs_)
+		{
+			if (b.connectedBlobs.Count > 1)
+			{
+				candidateBlobs.Add( b );
+			}
+		}
+		if (sb!= null)
+		{
+			sb.Append( "\n " + candidateBlobs.Count + " with >1 connections" );
+		}
+		int numCandidateBlobs = 0;
+		int pass = 0;
+		while (numCandidateBlobs != candidateBlobs.Count)
+		{
+			numCandidateBlobs = candidateBlobs.Count;
+			pass++;
+			HashSet<Blob> blobsToRemove = new HashSet<Blob>( );
+			foreach (Blob b in candidateBlobs)
+			{
+				List<Blob> connectedBlobs = b.connectedBlobs;
+				int numCandidates = 0;
+				foreach( Blob b2 in connectedBlobs)
+				{
+					if (candidateBlobs.Contains(b2))
+					{
+						numCandidates++;
+					}
+				}
+				if (numCandidates < 2)
+				{
+					blobsToRemove.Add( b );
+				}
+			}
+			if (sb != null)
+			{
+				sb.Append( "\n " + blobsToRemove.Count + " being removed in pass " + pass + " because not connected to >1 candidate" );
+			}
+			foreach (Blob b in blobsToRemove)
+			{
+				candidateBlobs.Remove( b );
+			}
+		}
+		if (sb != null)
+		{
+			if (pass > 0)
+			{
+				sb.Append( "\n Finished after pass " + pass + " with " + candidateBlobs.Count + " candidates" );
+			}
+			else
+			{
+				sb.Append( "\n No more to remove" );
+			}
+		}
+		if (candidateBlobs.Count > 5)
+		{
+
+		}
+		if (sb!= null)
+		{
+			Debug.LogError( sb.ToString( ) );
+		}
+		return result;
+    }
+
 	abstract protected bool shouldConnectedBlobBeAdded( Blob b );
 
 	public void DebugDescribe(System.Text.StringBuilder sb)
