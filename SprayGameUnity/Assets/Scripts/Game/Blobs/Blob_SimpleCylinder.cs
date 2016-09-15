@@ -128,7 +128,7 @@ public class Blob_SimpleCylinder : Blob
 	public override void HandleDeath( )
 	{
 		base.HandleDeath( );
-
+		cachedBottomDiscMaterial_.SetColor( "_Color2", Color.white);
 	}
 
 	override public void SetCountdownState( float fraction01 )
