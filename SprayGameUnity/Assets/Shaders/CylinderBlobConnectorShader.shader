@@ -63,10 +63,10 @@
 	            fixed4 texColor = _Color1 * i.uv.x + _Color2 * (1.0 - i.uv.x);
 //				fixed4 texColor = _Color;
 				
-//			float x = i.uv.x;
-//			float invx = 1 - x;
-//			float fraction = invx * invx * invx;
-//			texColor = _Edge * fraction + texColor * (1 - fraction);
+			float x = 2.0 * abs(0.5 - i.uv.x);
+			//float invx = 1 - x;
+			float fraction = x * x * x;
+			texColor = _Edge * fraction + texColor * (1 - fraction);
 
 	            texColor.a = _Alpha;
 	            

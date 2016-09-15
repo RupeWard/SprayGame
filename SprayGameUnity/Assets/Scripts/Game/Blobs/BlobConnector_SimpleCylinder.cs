@@ -101,13 +101,18 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 
 	private Vector3 heightOffset = new Vector3( 0f, 0f, 1f );
 
-	private static readonly float s_defaultThickWidth = 0.15f;
-	private static readonly float s_defaultThinWidth = 0.05f;
+	private static readonly float s_defaultThickWidth = 0.25f;
+	private static readonly float s_defaultThinWidth = 0.25f;
 
 	protected override void Reposition()
 	{
-		Vector3 start = parentBlob_.cachedTransform.position - heightOffset;
-		Vector3 end = childBlob_.cachedTransform.position - heightOffset;
+		Vector3 h = heightOffset;
+		if (!sameBlobType())
+		{
+			h *= -1f;
+		}
+		Vector3 start = parentBlob_.cachedTransform.position - h;
+		Vector3 end = childBlob_.cachedTransform.position - h;
 		Vector3 sum = start + end;
 		Vector3 diff = end - start;
 		float length = 0.9f * diff.magnitude;
