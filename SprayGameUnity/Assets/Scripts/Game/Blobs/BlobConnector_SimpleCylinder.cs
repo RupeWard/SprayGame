@@ -80,7 +80,7 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 
 	protected override void PostAwake( )
 	{
-		heightOffset = new Vector3( 0f, 0f, 0.5f * Blob_SimpleCylinder.s_bottomDiscThickness );
+		heightOffset = new Vector3( 0f, 0f, 0.5f * Blob_SimpleCylinder.s_bottomDiscThickness + 0.01f );
 
 		cachedRenderer_ = GetComponent<MeshRenderer>( );
 		cachedMaterial_ = new Material( srcMaterial );

@@ -23,8 +23,23 @@ public class GameSettingsPanel : MonoBehaviour
 	public GameObject environmentPanel;
 	public GameObject levelPanel;
 
-	private Dictionary<EMode, GameObject> modePanels = null;
-
+	private Dictionary<EMode, GameObject> modePanels_ = null;
+	private Dictionary< EMode, GameObject> modePanels
+	{
+		get
+		{
+			if (modePanels_ == null)
+			{
+				modePanels_ = new Dictionary<EMode, GameObject>( )
+				{
+					{ EMode.Debug, debugPanel },
+					{ EMode.Env, environmentPanel },
+					{ EMode.Level, levelPanel },
+				};
+			}
+			return modePanels_;
+		}
+	}
 	private enum EMode
 	{
 		Env,
@@ -35,12 +50,6 @@ public class GameSettingsPanel : MonoBehaviour
 
 	private void Awake()
 	{
-		modePanels = new Dictionary<EMode, GameObject>( )
-		{
-			{ EMode.Debug, debugPanel },
-			{ EMode.Env, environmentPanel },
-			{ EMode.Level, levelPanel },
-		};
 	}
 
 	private void SetUpForMode()
