@@ -5839,7 +5839,8 @@ MonoBehaviour:
     name: Default
     minPending: 4
     numBlobs: 4
-    groupDeleteCountdown: 7
+    groupDeleteCountdown: 8
+    groupTypeChangeCountdown: 1.5
     topWallAnimSpeed: 0.01
     topWallDistPerBlob: 0.02
     topWallDistPerSecond: 0.002

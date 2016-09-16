@@ -40,6 +40,44 @@ public class Blob_SimpleCylinder : Blob
 		get { return cachedTopDiscMaterial_; }
 	}
 
+	public override void SetNewTypeFraction( BlobType_Base newType, float fraction )
+	{
+		BlobTypeStandard blobTypeS = blobType as BlobTypeStandard;
+		BlobTypeStandard newTypeS = newType as BlobTypeStandard;
+		if (blobTypeS == null || newType == null)
+		{
+			Debug.LogError( "What to do?" );
+		}
+		else
+		{
+
+			if (fraction <= 0f)
+			{
+				cachedBottomDiscMaterial.SetColor( "_Color", blobTypeS.colour );
+				cachedTopDiscMaterial.SetColor( "_Color", blobTypeS.colour );
+				cachedTopDiscMaterial.SetColor( "_Color2", Color.black );
+				cachedTopDiscMaterial.SetFloat( "_UPhase", 0f );
+			}
+			else if (fraction >= 1f)
+			{
+				cachedBottomDiscMaterial.SetColor( "_Color", newTypeS.colour );
+				cachedTopDiscMaterial.SetColor( "_Color", newTypeS.colour );
+				cachedTopDiscMaterial.SetColor( "_Color2", Color.black );
+				cachedTopDiscMaterial.SetFloat( "_UPhase", 0f );
+			}
+			else
+			{
+				cachedBottomDiscMaterial.SetColor( "_Color", blobTypeS.colour );
+				cachedTopDiscMaterial.SetColor( "_Color", blobTypeS.colour );
+				cachedTopDiscMaterial.SetColor( "_Color2", newTypeS.colour );
+				cachedTopDiscMaterial.SetFloat( "_UPhase", Mathf.Clamp01( fraction ) );
+			}
+
+
+		}
+	}
+
+
 	protected override void PostAwake( )
 	{
 		radius_ = cachedTransform.localScale.x;

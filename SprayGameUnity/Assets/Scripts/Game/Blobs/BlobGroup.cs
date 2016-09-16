@@ -42,6 +42,15 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		return blobs_.Contains( b );
 	}
 
+	public void SetTypeTransitionState( BlobType_Base newType, float fraction )
+	{
+		foreach (Blob b in blobs_)
+		{
+			b.SetNewTypeFraction( newType, fraction );
+		}
+	}
+	
+
 	public void SetCountdownState( float fraction01 )
 	{
 		foreach (Blob b in blobs_)

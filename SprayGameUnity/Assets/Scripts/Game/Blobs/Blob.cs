@@ -201,6 +201,7 @@ abstract public class Blob : MonoBehaviour
 	abstract public void Init( Cannon cannon );
 
 	protected abstract void SetAppearanceByType( BlobType_Base t );
+	public abstract void SetNewTypeFraction( BlobType_Base newType, float fraction01 );
 
 	public void SetType(BlobType_Base t)
 	{
