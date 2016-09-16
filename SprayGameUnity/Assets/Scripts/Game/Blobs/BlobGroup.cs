@@ -411,7 +411,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 						numCandidates++;
 					}
 				}
-				if (numCandidates < 2)
+				if (numCandidates < 2 || numCandidates >= MinToSurround)
 				{
 					blobsToRemove.Add( b );
 				}
