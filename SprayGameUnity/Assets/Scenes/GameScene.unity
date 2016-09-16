@@ -5844,15 +5844,23 @@ MonoBehaviour:
     topWallDistPerBlob: 0.02
     topWallDistPerSecond: 0.002
     jointTolerance: 0.005
-    blobTypes:
-    - STD_RED
-    - STD_CYAN
-    - STD_ORANGE
-    - STD_MAGENTA
-    - STD_YELLOW
-    - STD_BLUE
-    - STD_GREEN
-    - STD_FIXED
+    blobTypeFrequencies:
+    - blobType: STD_FIXED
+      frequency: 2
+    - blobType: STD_RED
+      frequency: 1
+    - blobType: STD_CYAN
+      frequency: 1
+    - blobType: STD_ORANGE
+      frequency: 1
+    - blobType: STD_MAGENTA
+      frequency: 0
+    - blobType: STD_YELLOW
+      frequency: 0
+    - blobType: STD_BLUE
+      frequency: 0
+    - blobType: STD_GREEN
+      frequency: 0
   showConnectors: 1
   showFPS: 1
   playPauseButtonText: {fileID: 426773713}

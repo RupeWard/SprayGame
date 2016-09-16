@@ -69,7 +69,6 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	private Controller_Base controller_ = null;
 
-	private List<Blob> activeBlobs_ = new List<Blob>( );
 	private Queue<Blob> pendingBlobs_ = new Queue<Blob>( );
 
 	private BlobManager blobManager_ = null;
@@ -178,12 +177,12 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	private float savedTimeScale_ = 0f;
 	private Blob GetNewBlob()
 	{
-		if (levelSettings.blobTypes.Length == 0)
+		if (levelSettings.blobTypeFrequencies.Length == 0)
 		{
 			throw new System.Exception( "No blob types defined in level" );
 		}
 
-		string btn = levelSettings.blobTypes[UnityEngine.Random.Range( 0, levelSettings.blobTypes.Length)];
+		string btn = levelSettings.GetRandomBlobTypeString( );
 		BlobType_Base btb = GetBlobType( btn );
 
 		Blob blob = btb.Instantiate( ).GetComponent<Blob>();
@@ -380,8 +379,8 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public void PlayRestartCountdownClip( )
 	{
+		cachedAudioSource_.Stop( );
 		cachedAudioSource_.clip = restartCountdownClip;
-		cachedAudioSource_.spread = 4f;
 		cachedAudioSource_.Play( );
 	}
 
@@ -493,6 +492,11 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	public List<Blob> GetBlobsInBox( Vector2 min, Vector2 max, ICollection <Blob> excluding )
 	{
 		return blobManager_.GetBlobsInBox( min, max, excluding );
+	}
+
+	public List<Blob> GetBlobsInBox( Rect rect, ICollection<Blob> excluding )
+	{
+		return blobManager_.GetBlobsInBox( rect, excluding );
 	}
 
 	public void HandleBlobFired(Blob b)

@@ -163,6 +163,18 @@ abstract public class Blob : MonoBehaviour
 		get { return blobType_; }
 	}
 
+	public void ChangeType(BlobType_Base newType)
+	{
+		if (blobType_ == newType)
+		{
+			Debug.LogError( "Rwquest to change blobtype of blob " + gameObject.name + " when it's already " + blobType_.DebugDescribe( ) );
+		}
+		else
+		{
+			blobType_ = newType;
+			SetAppearanceByType( blobType_ );
+		}
+	}
 	#endregion private data
 
 	private void Awake()

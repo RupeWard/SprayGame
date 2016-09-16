@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 {
-	private static readonly bool DEBUG_BLOBMANAGER = false;
+	private static readonly bool DEBUG_BLOBMANAGER = true;
 
 	private List<BlobGroupConnected> connectedGroups_ = new List<BlobGroupConnected>( );
 	private List<BlobGroupSameType> typeGroups_ = new List<BlobGroupSameType>( );
@@ -317,8 +317,18 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		connectedGroups_.Remove( loseGroup );
 		return retainGroup;
 	}
+	
+	private BlobGroupSameType MergeTypeGroupsWithoutCheckingForEnclosures( BlobGroupSameType retainGroup, BlobGroupSameType loseGroup)
+	{
+		return MergeTypeGroups( retainGroup, loseGroup, false );
+    }
 
 	private BlobGroupSameType MergeTypeGroups( BlobGroupSameType retainGroup, BlobGroupSameType loseGroup )
+	{
+		return MergeTypeGroups( retainGroup, loseGroup, true );
+	}
+
+	private BlobGroupSameType MergeTypeGroups( BlobGroupSameType retainGroup, BlobGroupSameType loseGroup, bool checkForEnclosures )
 	{
 		if (retainGroup == loseGroup)
 		{
@@ -340,7 +350,10 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		{
 			typeGroupsToCheck_.Remove( loseGroup );
 		}
-		CheckForEnclosedGroups( retainGroup );
+		if (checkForEnclosures)
+		{
+			CheckForEnclosedGroups( retainGroup );
+		}
 		return retainGroup;
 	}
 
@@ -350,15 +363,70 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		if (enclosedGroups != null && enclosedGroups.Count > 0)
 		{
 			BlobGroupSameType bgst = group as BlobGroupSameType;
-			if (bgst.blobType.name == "FIXED") 
+			if (bgst == null)
 			{
-				
-				// if only one enclosed type, change to that type, then merge with it, and add to groups to check for number
-            }
+				Debug.LogError( "enclosing group isn't a type group!" );
+			}
 			else
 			{
-				// change all enclosed groups and merge into group, then add to groups to check for number
+				if (bgst.blobType.name == "FIXED")
+				{
+					// if only one enclosed type, change to that type, then merge with it, and add to groups to check for number
+					if (enclosedGroups.Count == 1)
+					{
+						BlobGroupSameType bgst_e = enclosedGroups[0] as BlobGroupSameType;
+						if (bgst == null)
+						{
+							Debug.LogError( "Enclosed group isn't a type group!" );
+						}
+						else
+						{
+							Debug.Log( "Changing type of enclosing group " + bgst.name + " to " + bgst_e.blobType.name );
+							bgst.ChangeType( bgst_e.blobType );
+							MergeIntoIfConnected( bgst_e, bgst );
+						}
+					}
+				}
+				else
+				{
+					// change all enclosed groups and merge into group, then add to groups to check for number
+					foreach (BlobGroup bg in enclosedGroups)
+					{
+						BlobGroupSameType bgst_e = bg as BlobGroupSameType;
+						if (bgst_e == null)
+						{
+							Debug.LogError( "Enclosed group isn't a type group!" );
+						}
+						else
+						{
+							Debug.Log( "Changing type of enclosed group " + bgst_e.name + " to " + bgst.blobType.name );
+							bgst_e.ChangeType( bgst.blobType );
+							MergeIntoIfConnected( bgst, bgst_e );
+						}
+					}
+				}
 			}
+		}
+	}
+
+	private void MergeIntoIfConnected(BlobGroupSameType retain, BlobGroupSameType lose)
+	{
+		if (retain.IsDIrectlyConnectedTo( lose ))
+		{
+			Debug.Log( "Merging groups " + retain.DebugDescribe( ) + " and " + lose.DebugDescribe( ));
+			BlobGroupSameType bgt = MergeTypeGroupsWithoutCheckingForEnclosures( retain, lose );
+			if (typeGroupsToCheck_.Contains( bgt ))
+			{
+				Debug.LogWarning( "Already checking " + bgt.DebugDescribe( ) );
+			}
+			else
+			{
+				typeGroupsToCheck_.Add( bgt );
+			}
+		}
+		else
+		{
+			Debug.Log( "Not merging groups "+retain.DebugDescribe()+" and "+lose.DebugDescribe()+" because not directly connected" );
 		}
 	}
 
@@ -490,8 +558,18 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			Debug.LogError( "Blob " + b.gameObject.name + " not in list on destroy" );
 		}
 	}
-	
-	public List<Blob> GetBlobsInBox(Vector2 min, Vector2 max, ICollection<Blob> excluding )
+
+	public List<Blob> GetBlobsInBox( Rect rect, ICollection<Blob> excluding )
+	{
+		return GetBlobsInBox( rect.xMin, rect.yMin, rect.xMax, rect.yMax, excluding );
+	}
+
+	public List<Blob> GetBlobsInBox( Vector2 min, Vector2 max, ICollection<Blob> excluding )
+	{
+		return GetBlobsInBox( min.x, min.y, max.x, max.y, excluding );
+	}
+
+	public List<Blob> GetBlobsInBox(float minx, float miny, float maxx, float maxy, ICollection<Blob> excluding )
 	{
 		List<Blob> result = new List<Blob>( );
 		for (int i = 0;  i < currentBlobs.Count; i++)
@@ -499,7 +577,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			if (!excluding.Contains(currentBlobs[i]))
 			{
 				Vector3 pos = currentBlobs[i].cachedTransform.position;
-				if (pos.x >= min.x && pos.y >= min.y && pos.x <= max.x && pos.y <= max.y)
+				if (pos.x >= minx && pos.y >= miny && pos.x <= maxx && pos.y <= maxy)
 				{
 					result.Add( currentBlobs[i] );
 				}
