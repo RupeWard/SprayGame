@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 {
-	private static readonly bool DEBUG_BLOBMANAGER = true;
+	private static readonly bool DEBUG_BLOBMANAGER = false;
 
 	private List<BlobGroupConnected> connectedGroups_ = new List<BlobGroupConnected>( );
 	private List<BlobGroupSameType> typeGroups_ = new List<BlobGroupSameType>( );
@@ -383,7 +383,8 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 						{
 							Debug.Log( "Changing type of enclosing group " + bgst.name + " to " + bgst_e.blobType.name );
 							bgst.ChangeType( bgst_e.blobType );
-							MergeIntoIfConnected( bgst_e, bgst );
+							BlobGroupSameType newGroup = MergeIntoIfConnected( bgst_e, bgst );
+							CheckForConnectionsToSameTypeGroups( newGroup );
 						}
 					}
 				}
@@ -409,12 +410,50 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		}
 	}
 
-	private void MergeIntoIfConnected(BlobGroupSameType retain, BlobGroupSameType lose)
+	private static bool PathsHasMoreBlobs( List<Blob> a, List<Blob> b)
 	{
-		if (retain.IsDIrectlyConnectedTo( lose ))
+		return a.Count > b.Count;
+	}
+
+	private void CheckForConnectionsToSameTypeGroups(BlobGroupSameType seedGroup)
+	{
+		HashSet<BlobGroupSameType> groupsFound = new HashSet<BlobGroupSameType>( );
+		foreach (Blob b in seedGroup.blobs)
+		{
+			foreach (Blob cb in b.connectedBlobs)
+			{
+				if (cb.typeGroup != seedGroup && cb.blobType == seedGroup.blobType && !groupsFound.Contains(cb.typeGroup))
+				{
+					groupsFound.Add( cb.typeGroup );
+				}
+			}
+		}
+		if (groupsFound.Count > 0)
+		{
+			Debug.Log( "Found " + groupsFound.Count + " connected groups of same type, merging" );
+			foreach( BlobGroupSameType group in groupsFound)
+			{
+				BlobGroupSameType bgt = MergeTypeGroupsWithoutCheckingForEnclosures( seedGroup, group );
+				if (typeGroupsToCheck_.Contains( bgt ))
+				{
+					Debug.LogWarning( "Already checking " + bgt.DebugDescribe( ) );
+				}
+				else
+				{
+					typeGroupsToCheck_.Add( bgt );
+				}
+			}
+
+		}
+	}
+
+	private BlobGroupSameType MergeIntoIfConnected( BlobGroupSameType retain, BlobGroupSameType lose)
+	{
+		BlobGroupSameType bgt = null;
+        if (retain.IsDIrectlyConnectedTo( lose ))
 		{
 			Debug.Log( "Merging groups " + retain.DebugDescribe( ) + " and " + lose.DebugDescribe( ));
-			BlobGroupSameType bgt = MergeTypeGroupsWithoutCheckingForEnclosures( retain, lose );
+			bgt = MergeTypeGroupsWithoutCheckingForEnclosures( retain, lose );
 			if (typeGroupsToCheck_.Contains( bgt ))
 			{
 				Debug.LogWarning( "Already checking " + bgt.DebugDescribe( ) );
@@ -423,11 +462,13 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			{
 				typeGroupsToCheck_.Add( bgt );
 			}
+			return bgt;
 		}
 		else
 		{
 			Debug.Log( "Not merging groups "+retain.DebugDescribe()+" and "+lose.DebugDescribe()+" because not directly connected" );
 		}
+		return bgt;
 	}
 
 	private void DeleteBlobTypeGroup(BlobGroupSameType bg)

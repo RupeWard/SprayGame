@@ -90,8 +90,8 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 
 	}
 
-	static private readonly bool DEBUG_PATHS = true;
-	static private readonly bool DEBUG_PATHS_VERBOSE = true;
+	static private readonly bool DEBUG_PATHS = false;
+	static private readonly bool DEBUG_PATHS_VERBOSE = false;
 
 	private bool IsSubPath( List<Blob> bigPath, List<Blob> littlePath)
 	{
@@ -184,7 +184,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		return false;
 	}
 
-	private bool AddPathPruningSubpaths(List<List<Blob>> paths, List<Blob> newOne, System.Text.StringBuilder debugsb, string debugstr )
+	private bool AddPathPruningSubpaths(List<List<Blob>> paths, List<Blob> newOne, System.Text.StringBuilder debugsb, string debugstr, int sortdirection )
 	{
 		List<List<Blob>> toRemove = new List<List<Blob>>( );
 		foreach (List<Blob> l in paths)
@@ -232,6 +232,14 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 			paths.Remove( l );
 		}
 		paths.Add( newOne );
+		if (sortdirection < 1)
+		{
+			paths.Sort( delegate ( List<Blob> a, List<Blob> b ) { return (b.Count - a.Count); } );
+		}
+		else if (sortdirection > 1)
+		{
+			paths.Sort( delegate ( List<Blob> a, List<Blob> b ) { return (a.Count - b.Count); } );
+		}
 		if (debugsb != null)
 		{
 			debugsb.Append( "\nAdded path to " + debugstr + ", list is now...\n" );
@@ -241,6 +249,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 				debugsb.Append( "\n" );
 			}
 		}
+		
 		if (DEBUG_PATHS_VERBOSE)
 		{
 			Debug.Log( "\nAdded path to " + debugstr + ", list is now...\n" );
@@ -302,16 +311,16 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		paths.Add( newOne );
 		if (debugsb != null)
 		{
-			debugsb.Append( "\nAdded path to " + debugstr + ", list is now...\n" );
+			debugsb.Append( "\n     Added path to " + debugstr + ", list is now...\n" );
 			foreach (List<Blob> l in paths)
 			{
+				debugsb.Append( "\n     " );
 				DebugDescribePath( l, debugsb );
-				debugsb.Append( "\n" );
 			}
 		}
 		if (DEBUG_PATHS_VERBOSE)
 		{
-			Debug.Log( "\nAdded path to " + debugstr + ", list is now...\n" );
+			Debug.Log( "\nAdded path to " + debugstr + ", list is now..." );
 			foreach (List<Blob> l in paths)
 			{
 				Debug.Log( "\n " + DebugDescribePathString( l ) );
@@ -339,8 +348,15 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		return sb.ToString( );
     }
 
+	static private readonly int MinToSurround = 6;
+
 	public List<List<Blob>> GetClosedPaths(  )
 	{
+		if (blobs_.Count < MinToSurround)
+		{
+			return null;
+		}
+
 		System.Text.StringBuilder sb = null;
 		if (DEBUG_PATHS)
 		{
@@ -426,7 +442,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 				Debug.Log( "\n No more to remove" );
 			}
 		}
-		if (candidateBlobs.Count > 2)
+		if (candidateBlobs.Count >= MinToSurround)
 		{
 			List<List<Blob>> candidatePaths = new List<List<Blob>>( );
 			Blob currentCandidate = candidateBlobs[0];
@@ -487,7 +503,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 					if (candidateBlobs.Contains( b2 ))
 					{
 						int indexInCurrentPath = currentCandidatePath.IndexOf( b2 );
-						if (indexInCurrentPath < currentCandidatePath.Count - 2)// don't go straight back
+						if (indexInCurrentPath == -1 || indexInCurrentPath < currentCandidatePath.Count - 5)// don't complete too soon
 						{
 							if (indexInCurrentPath >= 0)
 							{
@@ -501,12 +517,15 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 								{
 									if (sb != null)
 									{
-										sb.Append( "\n  Last blob connects to " + b2.gameObject.name + ", making a closed path: " );
+										sb.Append( "\n  Last blob of " );
+										DebugDescribePath( currentCandidatePath, sb );
+										sb.Append(" connects to " + b2.gameObject.name + ", making a closed path: " );
 										DebugDescribePath( newClosedPath, sb );
 									}
 									if (DEBUG_PATHS_VERBOSE)
 									{
-										Debug.Log( "\n  Last blob connects to " + b2.gameObject.name + ", making a closed path: " + DebugDescribePathString( newClosedPath ) );
+										Debug.Log( "\n  Last blob of "+DebugDescribePathString(currentCandidatePath)
+											+" connects to " + b2.gameObject.name + ", making a closed path: " + DebugDescribePathString( newClosedPath ) );
 									}
 									AddPathPruningSubsets( closedPaths, newClosedPath, sb, "Closed" );
 								}
@@ -529,7 +548,8 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 								List<Blob> newExtensionPath = new List<Blob>( );
 								newExtensionPath.AddRange( currentCandidatePath );
 								newExtensionPath.Add( b2 );
-								AddPathPruningSubpaths( candidatePaths, newExtensionPath, sb, "Candidates" );
+								AddPathPruningSubpaths( candidatePaths, newExtensionPath, sb, "Candidates", -1 );
+								
 								if (sb != null)
 								{
 									sb.Append( "\n Last blob connects to " + b2.gameObject.name + ", making an extended candidate path: " );
