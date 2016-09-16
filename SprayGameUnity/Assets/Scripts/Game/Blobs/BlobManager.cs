@@ -137,7 +137,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			}
 			else if (b0.typeGroup == b1.typeGroup)
 			{
-				b0.typeGroup.GetEnclosedGroups( );
+				CheckForEnclosedGroups(b0.typeGroup);
 			}
 
 			if (DEBUG_BLOBMANAGER)
@@ -340,8 +340,26 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		{
 			typeGroupsToCheck_.Remove( loseGroup );
 		}
-		retainGroup.GetEnclosedGroups ( );
+		CheckForEnclosedGroups( retainGroup );
 		return retainGroup;
+	}
+
+	public void CheckForEnclosedGroups( BlobGroup group )
+	{
+		List<BlobGroup> enclosedGroups = group.GetEnclosedGroups( );
+		if (enclosedGroups != null && enclosedGroups.Count > 0)
+		{
+			BlobGroupSameType bgst = group as BlobGroupSameType;
+			if (bgst.blobType.name == "FIXED") 
+			{
+				
+				// if only one enclosed type, change to that type, then merge with it, and add to groups to check for number
+            }
+			else
+			{
+				// change all enclosed groups and merge into group, then add to groups to check for number
+			}
+		}
 	}
 
 	private void DeleteBlobTypeGroup(BlobGroupSameType bg)

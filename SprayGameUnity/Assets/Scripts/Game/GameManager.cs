@@ -484,6 +484,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		}
 	}
 
+
 	public void HandleBlobDestroyed(Blob b)
 	{
 		blobManager_.HandleBlobDestroyed( b );
