@@ -137,7 +137,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			}
 			else if (b0.typeGroup == b1.typeGroup)
 			{
-				b0.typeGroup.GetClosedPaths( );
+				b0.typeGroup.GetEnclosedGroups( );
 			}
 
 			if (DEBUG_BLOBMANAGER)
@@ -340,7 +340,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		{
 			typeGroupsToCheck_.Remove( loseGroup );
 		}
-		retainGroup.GetClosedPaths( );
+		retainGroup.GetEnclosedGroups ( );
 		return retainGroup;
 	}
 
@@ -459,8 +459,41 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		b.typeGroup.isConnectedToWall = true;
 	}
 
+	private List<Blob> currentBlobs = new List<Blob>( );
+
+	public void HandleBlobDestroyed(Blob b)
+	{
+		if (currentBlobs.Contains(b))
+		{
+			currentBlobs.Remove( b );
+		}
+		else
+		{
+			Debug.LogError( "Blob " + b.gameObject.name + " not in list on destroy" );
+		}
+	}
+	
+	public List<Blob> GetBlobsInBox(Vector2 min, Vector2 max, ICollection<Blob> excluding )
+	{
+		List<Blob> result = new List<Blob>( );
+		for (int i = 0;  i < currentBlobs.Count; i++)
+		{
+			if (!excluding.Contains(currentBlobs[i]))
+			{
+				Vector3 pos = currentBlobs[i].cachedTransform.position;
+				if (pos.x >= min.x && pos.y >= min.y && pos.x <= max.x && pos.y <= max.y)
+				{
+					result.Add( currentBlobs[i] );
+				}
+			}
+		}
+		return result;
+	}
+
 	public void HandleBlobFired( Blob b )
 	{
+		currentBlobs.Add( b );
+
 		BlobGroupConnected cGroup = new BlobGroupConnected( b );
 		BlobGroupSameType tGroup = new BlobGroupSameType( b );
 

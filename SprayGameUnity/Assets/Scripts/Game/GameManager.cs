@@ -484,6 +484,16 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		}
 	}
 
+	public void HandleBlobDestroyed(Blob b)
+	{
+		blobManager_.HandleBlobDestroyed( b );
+	}
+
+	public List<Blob> GetBlobsInBox( Vector2 min, Vector2 max, ICollection <Blob> excluding )
+	{
+		return blobManager_.GetBlobsInBox( min, max, excluding );
+	}
+
 	public void HandleBlobFired(Blob b)
 	{
 		topWallTargetHeight_ -= levelSettings.topWallDistPerBlob;

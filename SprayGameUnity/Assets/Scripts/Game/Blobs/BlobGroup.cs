@@ -404,6 +404,190 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		return closedPaths;
     }
 
+	public List<BlobGroup> GetEnclosedGroups()
+	{
+		List<BlobGroup> result = null;
+
+        List<List<Blob>> closedPaths = GetClosedPaths( );
+		if (closedPaths != null && closedPaths.Count > 0)
+		{
+			foreach (List<Blob > l in closedPaths)
+			{
+				List<BlobGroup> groups = GetEnclosedGroups( l );
+				if (groups != null && groups.Count >0)
+				{
+					foreach (BlobGroup group in groups)
+					{
+						if (result == null)
+						{
+							result = new List<BlobGroup>( );
+						}
+						if (!result.Contains( group ))
+						{
+							result.Add( group );
+						}
+					}
+				}
+			}
+		}
+		if (result != null)
+		{
+			Debug.LogError( "Found " + result.Count + " enclosed groups" );
+		}
+		return result;
+	}
+
+	private List< BlobGroup > GetEnclosedGroups(List<Blob> closedPath)
+	{
+		List<BlobGroup> result = null;
+		Vector2 minExtent = new Vector2( closedPath[0].cachedTransform.position.x, closedPath[0].cachedTransform.position.y );
+		Vector2 maxExtent = minExtent;
+		for (int i = 1; i < closedPath.Count; i++)
+		{
+			if (closedPath[i].cachedTransform.position.x > maxExtent.x)
+			{
+				maxExtent.x = closedPath[i].cachedTransform.position.x;
+            }
+			else if (closedPath[i].cachedTransform.position.x < minExtent.x)
+			{
+				minExtent.x = closedPath[i].cachedTransform.position.x;
+			}
+			if (closedPath[i].cachedTransform.position.y > maxExtent.y)
+			{
+				maxExtent.y = closedPath[i].cachedTransform.position.y;
+			}
+			else if (closedPath[i].cachedTransform.position.y < minExtent.y)
+			{
+				minExtent.y = closedPath[i].cachedTransform.position.y;
+			}
+		}
+
+		List<Blob> blobsInBox = GameManager.Instance.GetBlobsInBox( minExtent, maxExtent, closedPath[0].typeGroup.blobs );
+		if (blobsInBox.Count > 0)
+		{
+			System.Text.StringBuilder sb = new System.Text.StringBuilder( );
+			sb.Append( "Found " + blobsInBox.Count + " blobs in box: " + DebugDescribePathString( blobsInBox ) );
+			Debug.LogError( sb.ToString( ) );
+
+			List<Blob> enclosedBlobs = new List<Blob>( );
+
+			Vector2 e = 0.01f * (maxExtent - minExtent); 
+			for( int i = 0; i < blobsInBox.Count; i++)
+			{
+				Blob blobToCheck = blobsInBox[i]; //v1_1
+				Vector2 rayStart = minExtent - e; //v1_2
+
+				int intersections = 0;
+				for (int i2 = 0; i2 < closedPath.Count; i2++)
+				{
+					Blob firstBlob = closedPath[i2];
+					Blob secondBlob = (i2 == closedPath.Count - 1) ? (closedPath[0]) : (closedPath[i2 + 1]);
+
+					if (areIntersecting( 
+						blobToCheck.cachedTransform.position,
+						rayStart,
+						firstBlob.cachedTransform.position,
+						secondBlob.cachedTransform.position))
+					{
+						intersections++;
+					}
+				}
+				if ((intersections & 1 )==1)
+				{
+					Debug.Log( "Blob "+blobToCheck+" has "+intersections+" intersections so is inside" );
+					enclosedBlobs.Add( blobToCheck );
+				}
+				else
+				{
+					Debug.Log( "Blob " + blobToCheck + " has " + intersections + " intersections so is outside" );
+				}
+			}
+			if (enclosedBlobs.Count > 0)
+			{
+				result = new List<BlobGroup>( );
+				for (int i = 0; i < enclosedBlobs.Count; i++)
+				{
+					if (!result.Contains( enclosedBlobs[i].typeGroup ))
+					{
+						result.Add( enclosedBlobs[i].typeGroup );
+					}
+				}
+			}
+		}
+
+		
+		return result;
+	}
+
+	private bool areIntersecting(
+		Vector2 v1_1,
+		Vector2 v1_2,
+		Vector2 v2_1,
+		Vector2 v2_2)
+
+	{
+		float v1x1 = v1_1.x;
+		float v1y1 = v1_1.y;
+		float v1x2 = v1_2.x;
+		float v1y2 = v1_2.y;
+		float v2x1 = v2_1.x;
+		float v2y1 = v2_1.y;
+		float v2x2 = v2_2.x;
+        float v2y2 = v2_2.y;
+	
+		float d1, d2;
+		float a1, a2, b1, b2, c1, c2;
+
+		// Convert vector 1 to a line (line 1) of infinite length.
+		// We want the line in linear equation standard form: A*x + B*y + C = 0
+		// See: http://en.wikipedia.org/wiki/Linear_equation
+		a1 = v1y2 - v1y1;
+		b1 = v1x1 - v1x2;
+		c1 = (v1x2 * v1y1) - (v1x1 * v1y2);
+
+		// Every point (x,y), that solves the equation above, is on the line,
+		// every point that does not solve it, is not. The equation will have a
+		// positive result if it is on one side of the line and a negative one 
+		// if is on the other side of it. We insert (x1,y1) and (x2,y2) of vector
+		// 2 into the equation above.
+		d1 = (a1 * v2x1) + (b1 * v2y1) + c1;
+		d2 = (a1 * v2x2) + (b1 * v2y2) + c1;
+
+		// If d1 and d2 both have the same sign, they are both on the same side
+		// of our line 1 and in that case no intersection is possible. Careful, 
+		// 0 is a special case, that's why we don't test ">=" and "<=", 
+		// but "<" and ">".
+		if (d1 > 0 && d2 > 0) return false;
+		if (d1 < 0 && d2 < 0) return false;
+
+		// The fact that vector 2 intersected the infinite line 1 above doesn't 
+		// mean it also intersects the vector 1. Vector 1 is only a subset of that
+		// infinite line 1, so it may have intersected that line before the vector
+		// started or after it ended. To know for sure, we have to repeat the
+		// the same test the other way round. We start by calculating the 
+		// infinite line 2 in linear equation standard form.
+		a2 = v2y2 - v2y1;
+		b2 = v2x1 - v2x2;
+		c2 = (v2x2 * v2y1) - (v2x1 * v2y2);
+
+		// Calculate d1 and d2 again, this time using points of vector 1.
+		d1 = (a2 * v1x1) + (b2 * v1y1) + c2;
+		d2 = (a2 * v1x2) + (b2 * v1y2) + c2;
+
+		// Again, if both have the same sign (and neither one is 0),
+		// no intersection is possible.
+		if (d1 > 0 && d2 > 0) return false;
+		if (d1 < 0 && d2 < 0) return false;
+
+		// If we get here, only two possibilities are left. Either the two
+		// vectors intersect in exactly one point or they are collinear, which
+		// means they intersect in any number of points from zero to infinite.
+		if ((a1 * b2) - (a2 * b1) == 0.0f) return false; // FIXME (shoudl be colinear)
+
+		// If they are not collinear, they must intersect in exactly one point.
+		return true;
+	}
+
 	abstract protected bool shouldConnectedBlobBeAdded( Blob b );
 
 	public void DebugDescribe(System.Text.StringBuilder sb)

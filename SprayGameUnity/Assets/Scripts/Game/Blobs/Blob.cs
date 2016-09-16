@@ -16,6 +16,11 @@ abstract public class Blob : MonoBehaviour
 		Fired,
 		Hit
 	}
+	
+	public bool HasBeenFired()
+	{
+		return state_ == EState.Fired || state_ == EState.Hit;
+	}
 
 	public BlobGroupConnected connectedGroup = null;
 	public BlobGroupSameType typeGroup = null;
@@ -205,11 +210,6 @@ abstract public class Blob : MonoBehaviour
 	//	isFired_ = true;
 	//}
 
-	private bool HasBeenFired()
-	{
-		return (state_ == EState.Fired || state_ == EState.Hit);
-
-	}
 	private void FixedUpdate()
 	{
 		if (!HasBeenFired())
@@ -373,6 +373,10 @@ abstract public class Blob : MonoBehaviour
 			{
 				MessageBus.instance.onWallMoveAction -= HandleWallMove;
 			}
+		}
+		if (GameManager.IsInitialised() && HasBeenFired())
+		{
+			GameManager.Instance.HandleBlobDestroyed( this );
 		}
 	}
 
