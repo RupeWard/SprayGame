@@ -307,6 +307,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			// change group type, looks for mergers
 			info2.group.ChangeType( info2.newType);
 			CheckForConnectionsToSameTypeGroups( info2.group );
+//			CheckForEnclosedGroups( info2.group ); // TODO remove countdowns
 		}
 	}
 
@@ -523,18 +524,22 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 						// change all enclosed groups and merge into group, then add to groups to check for number
 						for (int i = 0; i < enclosedGroups.Count; i++)
 						{
-							BlobGroup bg = enclosedGroup[i];
-							BlobGroupSameType bgst_e = bg as BlobGroupSameType;
-							if (bgst_e == null)
+							List <BlobGroup> bgList = enclosedGroups[i];
+							for (int j = 0; j < bgList.Count; j++)
 							{
-								Debug.LogError( "Enclosed group isn't a type group!" );
-							}
-							else
-							{
-								Debug.Log( "Changing type of enclosed group " + bgst_e.name + " to " + bgst.blobType.name );
-								AddGroupCountdownToChangeType( bgst_e, bgst.blobType );
-								//							bgst_e.ChangeType( bgst.blobType );
-								//							MergeIntoIfConnected( bgst, bgst_e );
+								BlobGroup bg = bgList[j];
+								BlobGroupSameType bgst_e = bg as BlobGroupSameType;
+								if (bgst_e == null)
+								{
+									Debug.LogError( "Enclosed group isn't a type group!" );
+								}
+								else
+								{
+									Debug.Log( "Changing type of enclosed group " + bgst_e.name + " to " + bgst.blobType.name );
+									AddGroupCountdownToChangeType( bgst_e, bgst.blobType );
+									//							bgst_e.ChangeType( bgst.blobType );
+									//							MergeIntoIfConnected( bgst, bgst_e );
+								}
 							}
 						}
 					}

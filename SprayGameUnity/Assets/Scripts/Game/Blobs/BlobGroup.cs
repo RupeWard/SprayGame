@@ -98,7 +98,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 
 	}
 
-	static private readonly bool DEBUG_PATHS = true;
+	static private readonly bool DEBUG_PATHS = false;
 	static private readonly bool DEBUG_PATHS_VERBOSE = false;
 
 	private bool IsSubPath( List<Blob> bigPath, List<Blob> littlePath)
@@ -784,7 +784,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		return rect;
 	}
 
-	static public readonly bool DEBUG_ENCLOSURE = true;
+	static public readonly bool DEBUG_ENCLOSURE = false;
 	private List< BlobGroup > GetEnclosedGroups(List<Blob> closedPath)
 	{
 		List<BlobGroup> result = null;
