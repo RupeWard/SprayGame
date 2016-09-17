@@ -694,6 +694,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		return rect;
 	}
 
+	static private readonly bool DEBUG_ENCLOSURE = false;
 	private List< BlobGroup > GetEnclosedGroups(List<Blob> closedPath)
 	{
 		List<BlobGroup> result = null;
@@ -701,9 +702,12 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		List<Blob> blobsInBox = GameManager.Instance.GetBlobsInBox( boundingRect, closedPath[0].typeGroup.blobs );
 		if (blobsInBox.Count > 0)
 		{
-			System.Text.StringBuilder sb = new System.Text.StringBuilder( );
-			sb.Append( "Found " + blobsInBox.Count + " blobs in box: " + DebugDescribePathString( blobsInBox ) );
-			Debug.LogError( sb.ToString( ) );
+			if (DEBUG_ENCLOSURE)
+			{
+				System.Text.StringBuilder sb = new System.Text.StringBuilder( );
+				sb.Append( "Found " + blobsInBox.Count + " blobs in box: " + DebugDescribePathString( blobsInBox ) );
+				Debug.LogError( sb.ToString( ) );
+			}
 
 			List<Blob> enclosedBlobs = new List<Blob>( );
 
@@ -730,12 +734,18 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 				}
 				if ((intersections & 1 )==1)
 				{
-					Debug.Log( "Blob "+blobToCheck+" has "+intersections+" intersections so is inside" );
+					if (DEBUG_ENCLOSURE)
+					{
+						Debug.Log( "Blob " + blobToCheck + " has " + intersections + " intersections so is inside" );
+					}
 					enclosedBlobs.Add( blobToCheck );
 				}
 				else
 				{
-					Debug.Log( "Blob " + blobToCheck + " has " + intersections + " intersections so is outside" );
+					if (DEBUG_ENCLOSURE)
+					{
+						Debug.Log( "Blob " + blobToCheck + " has " + intersections + " intersections so is outside" );
+					}
 				}
 			}
 			if (enclosedBlobs.Count > 0)
