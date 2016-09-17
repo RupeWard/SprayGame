@@ -174,27 +174,6 @@ public class Blob_SimpleCylinder : Blob
 		fraction01 = Mathf.Clamp01( fraction01 );
 		cachedTopDiscMaterial_.SetFloat( "_UPhase", fraction01 );
 		cachedBottomDiscMaterial_.SetColor( "_Color", Color.black);
-
-		//	cachedBottomDiscMaterial_.SetFloat( "_UPhase", -1f );
-		// cachedBottomDiscMaterial_.SetFloat( "_UPhase", 1f - fraction01 );
-		/*
-		if (fraction01 > Mathf.Epsilon)
-		{
-			cachedMaterial_.SetColor( "_Color2", Color.white );
-		}
-		*/
-		//		top.gameObject.SetActive( false );
-		/*
-		if (fraction01 == 0f)
-		{
-			top.gameObject.SetActive( false );
-		}
-		else
-		{
-			top.gameObject.SetActive( true );
-			top.localScale = new Vector3( fraction01, fraction01, 1f );
-			top.rotation = Quaternion.identity;
-		}*/
 	}
 
 }

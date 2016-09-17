@@ -35,9 +35,9 @@ public class BlobGroupSameType: BlobGroup
 		}
 		blobType_ = newType;
 		SetTypeName( );
-		foreach (Blob b in blobs)
+		for (int i = 0; i < blobs.Count; i++)
 		{
-			b.ChangeType( newType );
+			blobs[i].ChangeType( newType);
 		}
 	}
 }

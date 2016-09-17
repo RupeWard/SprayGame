@@ -39,14 +39,6 @@ abstract public class Blob : MonoBehaviour
 		get { return cachedRB_; }
 	}
 
-	/*
-	protected Material cachedBottomDiscMaterial_ = null;
-	public Material cachedMaterial
-	{
-		get { return cachedBottomDiscMaterial_; }
-	}
-	*/
-
 	#endregion private hooks
 
 	#region private data
@@ -72,7 +64,7 @@ abstract public class Blob : MonoBehaviour
 				Debug.Log( "Blob " + gameObject.name + " enter killzone with state "+state_ );
 			}
 			inKillZone_ = true;
-			/*
+			/* old death condition
 			if (state_ == EState.Hit )
 			{
 				this.HandleDeath( );
@@ -123,8 +115,6 @@ abstract public class Blob : MonoBehaviour
 		else
 		{
 			state_ = EState.Fired;
-//			isFired_ = true;
-			
 		}
 	}
 
@@ -217,12 +207,6 @@ abstract public class Blob : MonoBehaviour
 			connectedBlobs_.Add( b );
 		}
 	}
-
-	//private bool isFired_ = false;
-	//public void SetFired()
-	//{
-	//	isFired_ = true;
-	//}
 
 	private void FixedUpdate()
 	{
@@ -325,7 +309,6 @@ abstract public class Blob : MonoBehaviour
 				{
 					Debug.Log( "Blob " + gameObject.name + " Collision with new blob " + c.gameObject.name );
 				}
-//				state_ = EState.Hit;
 				MessageBus.instance.sendBlobHitBlobAction( this, blob );
 				MessageBus.instance.sendBlobFinishedAction( this );
 				if (this.directlyConnectedToWall_ )
@@ -338,6 +321,7 @@ abstract public class Blob : MonoBehaviour
 			}
 			else // NOT BLOB
 			{
+				/*
 				if (c.gameObject.name == "BlobKillZone")
 				{
 					if (DEBUG_BLOB)
@@ -354,7 +338,7 @@ abstract public class Blob : MonoBehaviour
 					{
 						Debug.Log( "Blob " + gameObject.name + "Collision with unhandled " + c.gameObject.name );
 					}
-				}
+				}*/
 			}
 		}
 	}
@@ -370,9 +354,7 @@ abstract public class Blob : MonoBehaviour
 				Debug.Log( gameObject.name + " receiving wall move by " + f );
 			}
 
-//			cachedRB_.constraints = defaultConstraints_;
 			cachedTransform_.position = new Vector3( cachedTransform_.position.x, cachedTransform_.position.y + f, cachedTransform_.position.z );
-//			cachedRB_.constraints = cachedRB_.constraints | RigidbodyConstraints.FreezePositionY;
 		}
 		else
 		{

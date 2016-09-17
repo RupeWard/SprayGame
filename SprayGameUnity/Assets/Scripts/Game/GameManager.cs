@@ -320,7 +320,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	{
 		Vector3 basePosition = cannon.cachedTransform.position - 0.25f * Vector3.up;
 		foreach (Blob b in pendingBlobs_)
-		{
+		{ 
 			basePosition += 0.5f * b.radius * Vector3.left;
 			b.cachedTransform.position = basePosition - b.radius * Vector3.up;
 			basePosition += 0.5f * b.radius * Vector3.left;
