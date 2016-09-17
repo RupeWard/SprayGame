@@ -662,7 +662,10 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		}
 		if (result != null)
 		{
-			Debug.LogError( "Found " + result.Count + " enclosed groups" );
+			if (DEBUG_ENCLOSURE)
+			{
+				Debug.LogError( "Found " + result.Count + " enclosed groups" );
+			}
 		}
 		return result;
 	}
@@ -694,7 +697,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		return rect;
 	}
 
-	static private readonly bool DEBUG_ENCLOSURE = false;
+	static public readonly bool DEBUG_ENCLOSURE = false;
 	private List< BlobGroup > GetEnclosedGroups(List<Blob> closedPath)
 	{
 		List<BlobGroup> result = null;

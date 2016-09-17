@@ -501,7 +501,10 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 						}
 						else
 						{
-							Debug.Log( "Changing type of enclosing group " + bgst.name + " to " + bgst_e.blobType.name );
+							if (BlobGroup.DEBUG_ENCLOSURE)
+							{
+								Debug.Log( "Changing type of enclosing group " + bgst.name + " to " + bgst_e.blobType.name );
+							}
 							AddGroupCountdownToChangeType( bgst, bgst_e.blobType );
 //							bgst.ChangeType( bgst_e.blobType );
 //							BlobGroupSameType newGroup = MergeIntoIfConnected( bgst_e, bgst );
@@ -554,14 +557,20 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		}
 		if (groupsFound.Count > 0)
 		{
-			Debug.Log( "Found " + groupsFound.Count + " connected groups of same type, merging" );
+			if (BlobGroup.DEBUG_ENCLOSURE)
+			{
+				Debug.Log( "Found " + groupsFound.Count + " connected groups of same type, merging" );
+			}
 			for (int i=0; i < groupsFound.Count; i++)
 			{
 				BlobGroupSameType group = groupsFound[i];
 				BlobGroupSameType bgt = MergeTypeGroupsWithoutCheckingForEnclosures( seedGroup, group );
 				if (typeGroupsToCheck_.Contains( bgt ))
 				{
-					Debug.LogWarning( "Already checking " + bgt.DebugDescribe( ) );
+					if (BlobGroup.DEBUG_ENCLOSURE)
+					{
+						Debug.LogWarning( "Already checking " + bgt.DebugDescribe( ) );
+					}
 				}
 				else
 				{

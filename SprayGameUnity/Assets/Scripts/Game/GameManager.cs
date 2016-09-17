@@ -306,6 +306,13 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 				timeOfLastWallMove = Time.time;
 				topWallTargetHeight_ -= levelSettings.topWallDistPerSecond;
 			}
+			if (lastBlobFiredTime_ != float.MinValue)
+			{
+				if (Time.time - lastBlobFiredTime_ > deleteGroupSpeedUpDelay)
+				{
+					blobGroupDeleteSpeed = deleteGroupSpeedMultiplier;
+				}
+			}
 		}
 	}
 
@@ -501,8 +508,14 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 		return blobManager_.GetBlobsInBox( rect, excluding );
 	}
 
+	private float lastBlobFiredTime_ = float.MinValue;
+	private float deleteGroupSpeedUpDelay = 1.5f;
+	private float deleteGroupSpeedMultiplier = 4f;
+	 
 	public void HandleBlobFired(Blob b)
 	{
+		blobGroupDeleteSpeed = 1f;
+		lastBlobFiredTime_ = Time.time;
 		topWallTargetHeight_ -= levelSettings.topWallDistPerBlob;
 		if (DEBUG_WALLS)
 		{
