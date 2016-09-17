@@ -482,7 +482,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 
 	public void CheckForEnclosedGroups( BlobGroup group )
 	{
-		List<BlobGroup> enclosedGroups = group.GetEnclosedGroups( );
+		List<List<BlobGroup>> enclosedGroups = group.GetEnclosedGroups( );
 		if (enclosedGroups != null && enclosedGroups.Count > 0)
 		{
 			BlobGroupSameType bgst = group as BlobGroupSameType;
@@ -492,49 +492,54 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			}
 			else
 			{
-				if (bgst.blobType.name == "FIXED")
+				for (int enclosedSetIndex = 0; enclosedSetIndex < enclosedGroups.Count; enclosedSetIndex++)
 				{
-					// if only one enclosed type, change to that type, then merge with it, and add to groups to check for number
-					if (enclosedGroups.Count == 1)
+					List<BlobGroup> enclosedGroup = enclosedGroups[enclosedSetIndex];
+					if (bgst.blobType.name == "FIXED")
 					{
-						BlobGroupSameType bgst_e = enclosedGroups[0] as BlobGroupSameType;
-						if (bgst == null)
+						// if only one enclosed type, change to that type, then merge with it, and add to groups to check for number
+						if (enclosedGroup.Count == 1)
 						{
-							Debug.LogError( "Enclosed group isn't a type group!" );
-						}
-						else
-						{
-							if (BlobGroup.DEBUG_ENCLOSURE)
+							BlobGroupSameType bgst_e = enclosedGroup[0] as BlobGroupSameType;
+							if (bgst == null)
 							{
-								Debug.Log( "Changing type of enclosing group " + bgst.name + " to " + bgst_e.blobType.name );
+								Debug.LogError( "Enclosed group isn't a type group!" );
 							}
-							AddGroupCountdownToChangeType( bgst, bgst_e.blobType );
-//							bgst.ChangeType( bgst_e.blobType );
-//							BlobGroupSameType newGroup = MergeIntoIfConnected( bgst_e, bgst );
-//							CheckForConnectionsToSameTypeGroups( newGroup );
+							else
+							{
+								if (BlobGroup.DEBUG_ENCLOSURE)
+								{
+									Debug.Log( "Changing type of enclosing group " + bgst.name + " to " + bgst_e.blobType.name );
+								}
+								AddGroupCountdownToChangeType( bgst, bgst_e.blobType );
+								//							bgst.ChangeType( bgst_e.blobType );
+								//							BlobGroupSameType newGroup = MergeIntoIfConnected( bgst_e, bgst );
+								//							CheckForConnectionsToSameTypeGroups( newGroup );
+							}
 						}
 					}
-				}
-				else
-				{
-					// change all enclosed groups and merge into group, then add to groups to check for number
-					for (int i=0; i<enclosedGroups.Count; i++)
+					else
 					{
-						BlobGroup bg = enclosedGroups[i];
-						BlobGroupSameType bgst_e = bg as BlobGroupSameType;
-						if (bgst_e == null)
+						// change all enclosed groups and merge into group, then add to groups to check for number
+						for (int i = 0; i < enclosedGroups.Count; i++)
 						{
-							Debug.LogError( "Enclosed group isn't a type group!" );
-						}
-						else
-						{
-							Debug.Log( "Changing type of enclosed group " + bgst_e.name + " to " + bgst.blobType.name );
-							AddGroupCountdownToChangeType( bgst_e, bgst.blobType );
-//							bgst_e.ChangeType( bgst.blobType );
-//							MergeIntoIfConnected( bgst, bgst_e );
+							BlobGroup bg = enclosedGroup[i];
+							BlobGroupSameType bgst_e = bg as BlobGroupSameType;
+							if (bgst_e == null)
+							{
+								Debug.LogError( "Enclosed group isn't a type group!" );
+							}
+							else
+							{
+								Debug.Log( "Changing type of enclosed group " + bgst_e.name + " to " + bgst.blobType.name );
+								AddGroupCountdownToChangeType( bgst_e, bgst.blobType );
+								//							bgst_e.ChangeType( bgst.blobType );
+								//							MergeIntoIfConnected( bgst, bgst_e );
+							}
 						}
 					}
 				}
+
 			}
 		}
 	}

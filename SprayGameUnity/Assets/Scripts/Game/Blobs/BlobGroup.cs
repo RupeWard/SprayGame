@@ -98,7 +98,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 
 	}
 
-	static private readonly bool DEBUG_PATHS = false;
+	static private readonly bool DEBUG_PATHS = true;
 	static private readonly bool DEBUG_PATHS_VERBOSE = false;
 
 	private bool IsSubPath( List<Blob> bigPath, List<Blob> littlePath)
@@ -341,6 +341,75 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		return true;
 	}
 
+	private bool AddPathPruningSupersets( List<List<Blob>> paths, List<Blob> newOne, System.Text.StringBuilder debugsb, string debugstr )
+	{
+		toRemoveListListBlob.Clear( );
+		for (int i = 0; i < paths.Count; i++)
+		{
+			List<Blob> l = paths[i];
+			if (IsSubSet( l, newOne ))
+			{
+				if (debugsb != null)
+				{
+					debugsb.Append( "\n     List " + debugstr + " already contains superset of path " );
+					DebugDescribePath( newOne, debugsb );
+					debugsb.Append( " superset = " );
+					DebugDescribePath( l, debugsb );
+
+				}
+				if (DEBUG_PATHS_VERBOSE)
+				{
+					Debug.Log( "\n     List " + debugstr + " already contains superset of path " + DebugDescribePathString( newOne ) );
+					Debug.Log( " superset = " + DebugDescribePathString( l ) );
+				}
+				// already have a list which is a subset of the new one
+				toRemoveListListBlob.Add( l );
+			}
+			else
+			{
+				if (IsSubSet( newOne, l ))
+				{
+					if (debugsb != null)
+					{
+						debugsb.Append( "\n     List " + debugstr + " contains subset of path " );
+						DebugDescribePath( newOne, debugsb );
+						debugsb.Append( " subset = " );
+						DebugDescribePath( l, debugsb );
+					}
+					if (DEBUG_PATHS_VERBOSE)
+					{
+						Debug.Log( "\n     List " + debugstr + " contains subset of path " + DebugDescribePathString( newOne ) );
+						Debug.Log( " subset = " + DebugDescribePathString( l ) );
+					}
+					return false;
+				}
+			}
+		}
+		for (int i = 0; i < toRemoveListListBlob.Count; i++)
+		{
+			paths.Remove( toRemoveListListBlob[i] );
+		}
+		paths.Add( newOne );
+		if (debugsb != null)
+		{
+			debugsb.Append( "\n     Added path to " + debugstr + ", list is now...\n" );
+			for (int i = 0; i < paths.Count; i++)
+			{
+				debugsb.Append( "\n     " );
+				DebugDescribePath( paths[i], debugsb );
+			}
+		}
+		if (DEBUG_PATHS_VERBOSE)
+		{
+			Debug.Log( "\nAdded path to " + debugstr + ", list is now..." );
+			for (int i = 0; i < paths.Count; i++)
+			{
+				Debug.Log( "\n " + DebugDescribePathString( paths[i] ) );
+			}
+		}
+		return true;
+	}
+
 
 	private void DebugDescribePath(List<Blob> l, System.Text.StringBuilder sb)
 	{
@@ -546,7 +615,8 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 										Debug.Log( "\n  Last blob of "+DebugDescribePathString(currentCandidatePath)
 											+" connects to " + b2.gameObject.name + ", making a closed path: " + DebugDescribePathString( newClosedPath ) );
 									}
-									AddPathPruningSubsets( closedPaths, newClosedPath, sb, "Closed" );
+									AddPathPruningSupersets( closedPaths, newClosedPath, sb, "Closed" );
+//									AddPathPruningSubsets( closedPaths, newClosedPath, sb, "Closed" );
 								}
 								else
 								{
@@ -627,20 +697,35 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		}
 		if (sb != null)
 		{
-			Debug.LogError( sb.ToString( ) );
-		}
+			string output = sb.ToString( );
+			do
+			{
+				int maxLength = 18000; // 15000 safe, 20000 not
+				if (output.Length > maxLength)
+				{
+					Debug.LogError( output.Substring( 0, maxLength) );
+					output = output.Substring( maxLength );
+				}
+				else
+				{
+					Debug.LogError( output);
+					output = string.Empty;
+				}
+			} while (output.Length > 0);
+        }
 		return closedPaths;
     }
 
-	public List<BlobGroup> GetEnclosedGroups()
+	public List<List<BlobGroup>> GetEnclosedGroups()
 	{
-		List<BlobGroup> result = null;
+		List<List<BlobGroup>> result = null;
 
         List<List<Blob>> closedPaths = GetClosedPaths( );
 		if (closedPaths != null && closedPaths.Count > 0)
 		{
 			for (int i = 0; i<closedPaths.Count; i++)
 			{
+				List<BlobGroup> enclosed = new List<BlobGroup>( );
 				List<Blob> l = closedPaths[i];
 				List<BlobGroup> groups = GetEnclosedGroups( l );
 				if (groups != null && groups.Count >0)
@@ -648,16 +733,18 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 					for (int i2 = 0; i2 < groups.Count; i2++)
 					{
 						BlobGroup group = groups[i2];
-						if (result == null)
-						{
-							result = new List<BlobGroup>( );
-						}
-						if (!result.Contains( group ))
-						{
-							result.Add( group );
-						}
+						enclosed.Add( group );
 					}
 				}
+				if (enclosed.Count > 0)
+				{
+					if (result == null)
+					{
+						result = new List<List<BlobGroup>>( );
+					}
+					result.Add( enclosed );
+				}
+
 			}
 		}
 		if (result != null)
@@ -697,7 +784,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		return rect;
 	}
 
-	static public readonly bool DEBUG_ENCLOSURE = false;
+	static public readonly bool DEBUG_ENCLOSURE = true;
 	private List< BlobGroup > GetEnclosedGroups(List<Blob> closedPath)
 	{
 		List<BlobGroup> result = null;
