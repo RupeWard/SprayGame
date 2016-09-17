@@ -72,11 +72,12 @@ abstract public class Blob : MonoBehaviour
 				Debug.Log( "Blob " + gameObject.name + " enter killzone with state "+state_ );
 			}
 			inKillZone_ = true;
+			/*
 			if (state_ == EState.Hit )
 			{
 				this.HandleDeath( );
 				MessageBus.instance.sendHitBlobHitKillZoneAction( this );
-			}
+			}*/
 		}
 		else
 		{

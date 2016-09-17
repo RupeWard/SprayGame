@@ -59,6 +59,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			gci.Restart( );
 		}
 		groupCountdownToDeletes_.Clear( );
+		groupCountdownToChangeTypes_.Clear( );
 		typeGroupsToCheck_.Clear( );
 		gameOver_ = true;
 	}
@@ -171,8 +172,9 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			return;
 		}
 		int num = 0;
-		foreach (BlobGroupSameType bg in typeGroupsToCheck_)
+		for (int i = 0; i < typeGroupsToCheck_.Count; i++)
 		{
+			BlobGroupSameType bg = typeGroupsToCheck_[i];
 			if (bg.blobType.ShouldDeleteGroupOfNum( bg.blobs.Count))
 			{
 				AddGroupCountdownToDelete( bg );
@@ -182,9 +184,10 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		typeGroupsToCheck_.Clear( );
 
 		List<GroupCountdownInfo> toRemove = new List<GroupCountdownInfo>( );
-		foreach (GroupCountdownToChangeTypeInfo gci in groupCountdownToChangeTypes_)
+		for (int i = 0; i < groupCountdownToChangeTypes_.Count; i++)
 		{
-			gci.Update( );
+			GroupCountdownToChangeTypeInfo gci = groupCountdownToChangeTypes_[i];
+            gci.Update( );
 			if (gci.finished)
 			{
 				toRemove.Add( gci );
@@ -196,9 +199,10 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		}
 
 		toRemove.Clear( );
-		foreach (GroupCountdownInfo gci in groupCountdownToDeletes_)
+		for(int i = 0; i < groupCountdownToDeletes_.Count; i++)
 		{
-			gci.Update( );
+			GroupCountdownInfo gci = groupCountdownToDeletes_[i];
+            gci.Update( );
 			if (gci.finished)
 			{
 				toRemove.Add( gci );
@@ -209,8 +213,9 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			groupCountdownToDeletes_.Remove( toRemove[i] );
 		}
 
-		foreach (BlobGroupSameType g in groupsToDelete_)
+		for (int i = 0; i <groupsToDelete_.Count; i++)
 		{
+			BlobGroupSameType g = groupsToDelete_[i];
 			if (g.blobs.Count > 0)
 			{
 				GameManager.Instance.PlayDeleteClip( );
@@ -223,11 +228,12 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 	private void AddGroupCountdownToChangeType(BlobGroupSameType bg, BlobType_Base newType)
 	{
 		GroupCountdownToChangeTypeInfo gci = null;
-		foreach (GroupCountdownToChangeTypeInfo i in groupCountdownToChangeTypes_)
+		for (int i = 0; i< groupCountdownToChangeTypes_.Count; i++)
 		{
-			if (i.group == bg)
+			GroupCountdownToChangeTypeInfo info = groupCountdownToChangeTypes_[i];
+            if (info.group == bg)
 			{
-				gci = i;
+				gci = info;
 				gci.newType = newType;
 				gci.Restart( );
 //				GameManager.Instance.PlayRestartCountdownClip( );
@@ -252,11 +258,12 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 	private void AddGroupCountdownToDelete( BlobGroupSameType bg)
 	{
 		GroupCountdownInfo gci = null;
-		foreach (GroupCountdownInfo i in groupCountdownToDeletes_)
+		for (int i=0; i<groupCountdownToDeletes_.Count; i++)
 		{
-			if (i.group == bg)
+			GroupCountdownInfo info = groupCountdownToDeletes_[i];
+            if (info.group == bg)
 			{
-				gci = i;
+				gci = info;
 				gci.Restart( );
 				GameManager.Instance.PlayRestartCountdownClip( );
 				if (DEBUG_BLOBMANAGER)
@@ -282,7 +289,10 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		{
 			Debug.Log( "Countdown to delete finished for group " + info.group.name );
 		}
-		groupsToDelete_.Add( info.group );
+		if (!groupsToDelete_.Contains( info.group ))
+		{
+			groupsToDelete_.Add( info.group );
+		}
 	}
 
 	private void HandleCountdownToTypeChangeFinished(GroupCountdownInfo info)
@@ -300,7 +310,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		}
 	}
 
-	private HashSet<BlobGroupSameType> groupsToDelete_ = new HashSet<BlobGroupSameType>( );
+	private List<BlobGroupSameType> groupsToDelete_ = new List<BlobGroupSameType>( );
 
 	private class GroupCountdownInfo
 	{
@@ -435,8 +445,9 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			Debug.LogError( "Identical params" );
 			return retainGroup;
 		}
-		foreach (Blob b in loseGroup.blobs)
+		for (int i = 0; i <loseGroup.blobs.Count; i++)
 		{
+			Blob b = loseGroup.blobs[i];
 			b.typeGroup = retainGroup;
 			retainGroup.blobs.Add( b );
 		}
@@ -492,8 +503,9 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 				else
 				{
 					// change all enclosed groups and merge into group, then add to groups to check for number
-					foreach (BlobGroup bg in enclosedGroups)
+					for (int i=0; i<enclosedGroups.Count; i++)
 					{
+						BlobGroup bg = enclosedGroups[i];
 						BlobGroupSameType bgst_e = bg as BlobGroupSameType;
 						if (bgst_e == null)
 						{
@@ -519,12 +531,13 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 
 	private void CheckForConnectionsToSameTypeGroups(BlobGroupSameType seedGroup)
 	{
-		HashSet<BlobGroupSameType> groupsFound = new HashSet<BlobGroupSameType>( );
-		foreach (Blob b in seedGroup.blobs)
+		List<BlobGroupSameType> groupsFound = new List<BlobGroupSameType>( );
+		for (int i=0; i<seedGroup.blobs.Count;i++)
 		{
-			foreach (Blob cb in b.connectedBlobs)
+			for (int j=0; j < seedGroup.blobs[i].connectedBlobs.Count; j++)
 			{
-				if (cb.typeGroup != seedGroup && cb.blobType == seedGroup.blobType && !groupsFound.Contains(cb.typeGroup))
+				Blob cb = seedGroup.blobs[i].connectedBlobs[j];
+                if (cb.typeGroup != seedGroup && cb.blobType == seedGroup.blobType && !groupsFound.Contains(cb.typeGroup))
 				{
 					groupsFound.Add( cb.typeGroup );
 				}
@@ -533,8 +546,9 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		if (groupsFound.Count > 0)
 		{
 			Debug.Log( "Found " + groupsFound.Count + " connected groups of same type, merging" );
-			foreach( BlobGroupSameType group in groupsFound)
+			for (int i=0; i < groupsFound.Count; i++)
 			{
+				BlobGroupSameType group = groupsFound[i];
 				BlobGroupSameType bgt = MergeTypeGroupsWithoutCheckingForEnclosures( seedGroup, group );
 				if (typeGroupsToCheck_.Contains( bgt ))
 				{
@@ -583,10 +597,12 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		}
 		List<KeyValuePair<Blob, Blob>> connectionsToRemove = new List<KeyValuePair<Blob, Blob>>( );
 		 
-		foreach ( Blob b in bg.blobs)
+		for (int i = 0; i<bg.blobs.Count; i++)
 		{
-			foreach (Blob otherB in b.connectedBlobs)
+			Blob b = bg.blobs[i];
+			for (int j =0; j<b.connectedBlobs.Count; j++)
 			{
+				Blob otherB = b.connectedBlobs[j];
 //				if (! bg.blobs.Contains( otherB ))
 				{
 					if (!connectionsToRemove.Contains( new KeyValuePair<Blob, Blob>( b, otherB ) ) && !connectionsToRemove.Contains( new KeyValuePair<Blob, Blob>( otherB, b ) ))
@@ -600,9 +616,10 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		{
 			sb.Append( "\n Found " + connectionsToRemove.Count + " connections to remove" );
 		}
-		foreach (KeyValuePair< Blob, Blob> kvp in connectionsToRemove)
+		for (int i =0; i < connectionsToRemove.Count; i++)
 		{
-			if (sb!= null)
+			KeyValuePair<Blob, Blob> kvp = connectionsToRemove[i];
+            if (sb!= null)
 			{
 				sb.Append( "\n Removing connection " + kvp.Key.name + " to " + kvp.Value.name );
 			}
@@ -612,8 +629,9 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		{
 			sb.Append( "\n " + bg.blobs.Count + " blobs to delete" );
 		}
-		foreach (Blob b in bg.blobs)
+		for (int i = 0; i < bg.blobs.Count; i++)
 		{
+			Blob b = bg.blobs[i];
 			if (sb != null)
 			{
 				sb.Append( "\n  Deleting" + b.name );
@@ -636,16 +654,17 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		typeGroups_.Remove( bg );
 
 		List<GroupCountdownInfo> toRemove = new List<GroupCountdownInfo>( );
-		foreach (GroupCountdownInfo info in groupCountdownToDeletes_)
+		for (int i = 0; i < groupCountdownToDeletes_.Count; i++)
 		{
-			if (info.group == bg)
+			GroupCountdownInfo info = groupCountdownToDeletes_[i];
+            if (info.group == bg)
 			{
 				toRemove.Add( info );
 			}
 		}
-		foreach (GroupCountdownInfo info in toRemove)
+		for (int i = 0; i< toRemove.Count; i++)
 		{
-			groupCountdownToDeletes_.Remove( info );
+			groupCountdownToDeletes_.Remove( toRemove[i] );
 		}
 
 		if (sb!= null)

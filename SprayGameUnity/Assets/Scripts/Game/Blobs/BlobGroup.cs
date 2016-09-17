@@ -6,8 +6,8 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 {
 	private static readonly bool DEBUG_GROUPS = false;
 
-	private HashSet<Blob> blobs_ = new HashSet<Blob>( );
-	public HashSet<Blob> blobs
+	private List<Blob> blobs_ = new List<Blob>( );
+	public List<Blob> blobs
 	{
 		get { return blobs_; }
 	}
@@ -44,18 +44,17 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 
 	public void SetTypeTransitionState( BlobType_Base newType, float fraction )
 	{
-		foreach (Blob b in blobs_)
+		for(int i = 0; i< blobs_.Count; i++)
 		{
-			b.SetNewTypeFraction( newType, fraction );
+			blobs_[i].SetNewTypeFraction( newType, fraction );
 		}
 	}
 	
-
 	public void SetCountdownState( float fraction01 )
 	{
-		foreach (Blob b in blobs_)
+		for (int i = 0; i < blobs_.Count; i++)
 		{
-			b.SetCountdownState( fraction01 );
+			blobs_[i].SetCountdownState( fraction01 );
 		}
 	}
 
@@ -170,9 +169,9 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		if (big.Count >= little.Count)
 		{
 			result = true;
-			foreach (Blob b in little)
+			for(int i=0; i< little.Count;i++)
 			{
-				if (!big.Contains(b))
+				if (!big.Contains(little[i]))
 				{
 					return false;
 				}
@@ -183,9 +182,9 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 
 	private bool ListContainsPath(List<List<Blob>> list, List<Blob> path)
 	{
-		foreach (List<Blob> testPath in list)
+		for(int i= 0; i<list.Count;i++)
 		{
-			if (testPath.Count == path.Count && IsSubPath(testPath,path))
+			if (list[i].Count == path.Count && IsSubPath(list[i],path))
 			{
 				return true;
 			}
@@ -198,8 +197,9 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 	private bool AddPathPruningSubpaths(List<List<Blob>> paths, List<Blob> newOne, System.Text.StringBuilder debugsb, string debugstr, int sortdirection )
 	{
 		toRemoveListListBlob.Clear();
-		foreach (List<Blob> l in paths)
+		for (int i = 0; i< paths.Count; i++)
 		{
+			List<Blob> l = paths[i];
 			if (IsSubPath(l, newOne))
 			{
 				if (debugsb != null)
@@ -238,9 +238,9 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 				}
 			}
 		}
-		foreach (List<Blob> l in toRemoveListListBlob)
+		for (int i = 0; i< toRemoveListListBlob.Count; i++)
 		{
-			paths.Remove( l );
+			paths.Remove( toRemoveListListBlob[i] );
 		}
 		paths.Add( newOne );
 		if (sortdirection < 1)
@@ -254,9 +254,9 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		if (debugsb != null)
 		{
 			debugsb.Append( "\nAdded path to " + debugstr + ", list is now...\n" );
-			foreach( List<Blob> l in paths)
+			for(int i =0; i< paths.Count; i++)
 			{
-				DebugDescribePath( l, debugsb );
+				DebugDescribePath( paths[i], debugsb );
 				debugsb.Append( "\n" );
 			}
 		}
@@ -264,9 +264,9 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		if (DEBUG_PATHS_VERBOSE)
 		{
 			Debug.Log( "\nAdded path to " + debugstr + ", list is now...\n" );
-			foreach (List<Blob> l in paths)
+			for (int i =0; i< paths.Count; i++)
 			{
-				Debug.Log( "\n " + DebugDescribePathString( l ) );
+				Debug.Log( "\n " + DebugDescribePathString( paths[i] ) );
 			}
 		}
 		return true;
@@ -275,9 +275,10 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 	private bool AddPathPruningSubsets( List<List<Blob>> paths, List<Blob> newOne, System.Text.StringBuilder debugsb, string debugstr )
 	{
         toRemoveListListBlob.Clear( );
-		foreach (List<Blob> l in paths)
+		for(int i=0; i< paths.Count;i++)
 		{
-			if (IsSubSet( l, newOne ))
+			List<Blob> l = paths[i];
+            if (IsSubSet( l, newOne ))
 			{
 				if (debugsb != null)
 				{
@@ -315,26 +316,26 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 				}
 			}
 		}
-		foreach (List<Blob> l in toRemoveListListBlob)
+		for (int i = 0; i< toRemoveListListBlob.Count; i++)
 		{
-			paths.Remove( l );
+			paths.Remove( toRemoveListListBlob[i] );
 		}
 		paths.Add( newOne );
 		if (debugsb != null)
 		{
 			debugsb.Append( "\n     Added path to " + debugstr + ", list is now...\n" );
-			foreach (List<Blob> l in paths)
+			for (int i = 0; i<paths.Count;i++)
 			{
 				debugsb.Append( "\n     " );
-				DebugDescribePath( l, debugsb );
+				DebugDescribePath( paths[i], debugsb );
 			}
 		}
 		if (DEBUG_PATHS_VERBOSE)
 		{
 			Debug.Log( "\nAdded path to " + debugstr + ", list is now..." );
-			foreach (List<Blob> l in paths)
+			for (int i=0; i<paths.Count; i++)
 			{
-				Debug.Log( "\n " + DebugDescribePathString( l ) );
+				Debug.Log( "\n " + DebugDescribePathString( paths[i] ) );
 			}
 		}
 		return true;
@@ -384,11 +385,11 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		}
 		closedPaths.Clear();
 		candidateBlobs.Clear( );
-		foreach (Blob b in blobs_)
+		for (int i = 0; i<blobs_.Count; i++)
 		{
-			if (b.connectedBlobs.Count > 1)
+			if (blobs_[i].connectedBlobs.Count > 1)
 			{
-				candidateBlobs.Add( b );
+				candidateBlobs.Add( blobs_[i] );
 			}
 		}
 		if (sb!= null)
@@ -405,14 +406,15 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		{
 			numCandidateBlobs = candidateBlobs.Count;
 			pass++;
-			HashSet<Blob> blobsToRemove = new HashSet<Blob>( );
-			foreach (Blob b in candidateBlobs)
+			List<Blob> blobsToRemove = new List<Blob>( );
+			for(int i =0; i<candidateBlobs.Count;i++)
 			{
+				Blob b = candidateBlobs[i];
 				List<Blob> connectedBlobs = b.connectedBlobs;
 				int numCandidates = 0;
-				foreach( Blob b2 in connectedBlobs)
+				for (int i2 = 0; i2 < connectedBlobs.Count; i2++)
 				{
-					if (candidateBlobs.Contains(b2))
+					if (candidateBlobs.Contains(connectedBlobs[i2]))
 					{
 						numCandidates++;
 					}
@@ -430,9 +432,9 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 			{
 				Debug.Log( "\n " + blobsToRemove.Count + " being removed in pass " + pass + " because not connected to >1 candidate" );
 			}
-			foreach (Blob b in blobsToRemove)
+			for (int i3 = 0; i3 < blobsToRemove.Count; i3++)
 			{
-				candidateBlobs.Remove( b );
+				candidateBlobs.Remove( blobsToRemove[i3] );
 			}
 		}
 		if (sb != null)
@@ -461,8 +463,9 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		{
 			candidatePaths.Clear( );
 			Blob currentCandidate = candidateBlobs[0];
-			foreach (Blob b2 in currentCandidate.connectedBlobs)
+			for (int i4 =0; i4 <currentCandidate.connectedBlobs.Count; i4++)
 			{
+				Blob b2 = currentCandidate.connectedBlobs[i4];
 				if (candidateBlobs.Contains( b2 ))
 				{
 					List<Blob> newCandidatePath = new List<Blob>( );
@@ -495,10 +498,10 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 					DebugDescribePath( currentCandidatePath, sb );
 
 					sb.Append( "\nRemaining candidate paths: " );
-					foreach (List<Blob> l in candidatePaths)
+					for (int i5 =0; i5<candidatePaths.Count;i5++)
 					{
 						sb.Append( "\n  " );
-						DebugDescribePath( l, sb );
+						DebugDescribePath( candidatePaths[i5], sb );
 					}
 				}
 
@@ -507,14 +510,15 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 				{
 					Debug.Log( "\n Examining candidate path: " + DebugDescribePathString( currentCandidatePath ) );
 					Debug.Log( "\nRemaining candidate paths: " );
-					foreach (List<Blob> l in candidatePaths)
+					for (int i6=0; i6<candidatePaths.Count; i6++)
 					{
-						Debug.Log( "\n  " + DebugDescribePathString( l ) );
+						Debug.Log( "\n  " + DebugDescribePathString( candidatePaths[i6] ) );
 					}
 				}
 
-				foreach (Blob b2 in lastBlob.connectedBlobs)
+				for (int i7 = 0; i7 <lastBlob.connectedBlobs.Count; i7++)
 				{
+					Blob b2 = lastBlob.connectedBlobs[i7];
 					if (candidateBlobs.Contains( b2 ))
 					{
 						int indexInCurrentPath = currentCandidatePath.IndexOf( b2 );
@@ -524,9 +528,9 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 							{
 								// found a loop
 								List<Blob> newClosedPath = new List<Blob>( );
-								for (int i = indexInCurrentPath; i < currentCandidatePath.Count; i++)
+								for (int i8 = indexInCurrentPath; i8 < currentCandidatePath.Count; i8++)
 								{
-									newClosedPath.Add( currentCandidatePath[i] );
+									newClosedPath.Add( currentCandidatePath[i8] );
 								}
 								if (newClosedPath.Count > 5)
 								{
@@ -635,13 +639,15 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
         List<List<Blob>> closedPaths = GetClosedPaths( );
 		if (closedPaths != null && closedPaths.Count > 0)
 		{
-			foreach (List<Blob > l in closedPaths)
+			for (int i = 0; i<closedPaths.Count; i++)
 			{
+				List<Blob> l = closedPaths[i];
 				List<BlobGroup> groups = GetEnclosedGroups( l );
 				if (groups != null && groups.Count >0)
 				{
-					foreach (BlobGroup group in groups)
+					for (int i2 = 0; i2 < groups.Count; i2++)
 					{
+						BlobGroup group = groups[i2];
 						if (result == null)
 						{
 							result = new List<BlobGroup>( );
