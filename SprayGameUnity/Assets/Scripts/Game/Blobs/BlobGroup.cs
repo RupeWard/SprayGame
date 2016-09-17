@@ -193,9 +193,11 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		return false;
 	}
 
+	List<List<Blob>> toRemoveListListBlob = new List<List<Blob>>();
+
 	private bool AddPathPruningSubpaths(List<List<Blob>> paths, List<Blob> newOne, System.Text.StringBuilder debugsb, string debugstr, int sortdirection )
 	{
-		List<List<Blob>> toRemove = new List<List<Blob>>( );
+		toRemoveListListBlob.Clear();
 		foreach (List<Blob> l in paths)
 		{
 			if (IsSubPath(l, newOne))
@@ -232,11 +234,11 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 						Debug.Log( "\n     List " + debugstr + " contains subpath of path " + DebugDescribePathString( newOne ) );
 						Debug.Log( " subset = " + DebugDescribePathString( l ) );
 					}
-					toRemove.Add( l );
+					toRemoveListListBlob.Add( l );
 				}
 			}
 		}
-		foreach (List<Blob> l in toRemove)
+		foreach (List<Blob> l in toRemoveListListBlob)
 		{
 			paths.Remove( l );
 		}
@@ -272,7 +274,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 
 	private bool AddPathPruningSubsets( List<List<Blob>> paths, List<Blob> newOne, System.Text.StringBuilder debugsb, string debugstr )
 	{
-		List<List<Blob>> toRemove = new List<List<Blob>>( );
+        toRemoveListListBlob.Clear( );
 		foreach (List<Blob> l in paths)
 		{
 			if (IsSubSet( l, newOne ))
@@ -309,11 +311,11 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 						Debug.Log( "\n     List " + debugstr + " contains subset of path " + DebugDescribePathString( newOne ) );
 						Debug.Log( " subset = " + DebugDescribePathString( l ) );
 					}
-					toRemove.Add( l );
+					toRemoveListListBlob.Add( l );
 				}
 			}
 		}
-		foreach (List<Blob> l in toRemove)
+		foreach (List<Blob> l in toRemoveListListBlob)
 		{
 			paths.Remove( l );
 		}
@@ -359,6 +361,10 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 
 	static private readonly int MinToSurround = 6;
 
+	private List<List<Blob>> candidatePaths = new List<List<Blob>>( );
+
+	private List<List<Blob>> closedPaths = new List<List<Blob>>( );
+	private List<Blob> candidateBlobs = new List<Blob>( );
 	public List<List<Blob>> GetClosedPaths(  )
 	{
 		if (blobs_.Count < MinToSurround)
@@ -376,8 +382,8 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		{
 			Debug.Log( "GetClosedPaths on group " + name_ + " with " + blobs_.Count + " blobs" );
 		}
-		List<List<Blob>> closedPaths = new List<List<Blob>>();
-		List<Blob> candidateBlobs = new List<Blob>( );
+		closedPaths.Clear();
+		candidateBlobs.Clear( );
 		foreach (Blob b in blobs_)
 		{
 			if (b.connectedBlobs.Count > 1)
@@ -453,7 +459,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		}
 		if (candidateBlobs.Count >= MinToSurround)
 		{
-			List<List<Blob>> candidatePaths = new List<List<Blob>>( );
+			candidatePaths.Clear( );
 			Blob currentCandidate = candidateBlobs[0];
 			foreach (Blob b2 in currentCandidate.connectedBlobs)
 			{
@@ -573,11 +579,14 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 					}
 				}
 #if UNITY_EDITOR
-				double timeTaken = (System.DateTime.Now - startTime).TotalSeconds;
-                if ( timeTaken > maxSecs)
+				if (DEBUG_PATHS || DEBUG_PATHS_VERBOSE)
 				{
-					abort = true;
-					Debug.Log( "Aborting GetClosedPaths because " + timeTaken + " seconds passed" );
+					double timeTaken = (System.DateTime.Now - startTime).TotalSeconds;
+					if (timeTaken > maxSecs)
+					{
+						abort = true;
+						Debug.Log( "Aborting GetClosedPaths because " + timeTaken + " seconds passed" );
+					}
 				}
 #endif
 			}
