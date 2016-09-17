@@ -73,6 +73,11 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 		}
 	}
 
+	public override void SetAppearanceByType(BlobType_Base t)
+	{
+		t.SetConnectorAppearance( this );
+	}
+
 	private bool sameBlobType()
 	{
 		return (parentBlob_ != null && parentBlob_.blobType == childBlob_.blobType);

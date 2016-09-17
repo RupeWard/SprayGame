@@ -365,9 +365,11 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 	private class GroupCountdownToChangeTypeInfo : GroupCountdownInfo
 	{
 		public BlobType_Base newType;
+		public BlobType_Base oldType;
 		public GroupCountdownToChangeTypeInfo( BlobGroupSameType g, BlobType_Base nt, float durn, System.Action<GroupCountdownInfo> ea ) 
 			: base( g, durn, ea)
 		{
+			oldType = g.blobType;
 			newType = nt;
 		}
 
@@ -379,6 +381,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			if (fraction >= 1f)
 			{
 				finished = true;
+				GameManager.Instance.blobManager.SetAllConnectorsAppearanceByType( group, oldType );
 				if (endAction != null)
 				{
 					endAction( this );
@@ -605,6 +608,53 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		return bgt;
 	}
 
+	private List<KeyValuePair<Blob, Blob>> GetConnectionsInGroup(BlobGroupSameType bg)
+	{
+		List<KeyValuePair<Blob, Blob>> result = new List<KeyValuePair<Blob, Blob>>();
+
+		for (int i = 0; i < bg.blobs.Count; i++)
+		{
+			Blob b = bg.blobs[i];
+			for (int j = 0; j < b.connectedBlobs.Count; j++)
+			{
+				Blob otherB = b.connectedBlobs[j];
+				//				if (! bg.blobs.Contains( otherB ))
+				{
+					if (!result.Contains( new KeyValuePair<Blob, Blob>( b, otherB ) ) && !result.Contains( new KeyValuePair<Blob, Blob>( otherB, b ) ))
+					{
+						result.Add( new KeyValuePair<Blob, Blob>( b, otherB ) );
+					}
+				}
+			}
+		}
+		return result;
+    }
+
+	private void SetAllConnectorsAppearanceByType(BlobGroupSameType bg, BlobType_Base bt)
+	{
+		List<KeyValuePair<Blob, Blob>> connectors = GetConnectionsInGroup( bg );
+		for (int i = 0; i < connectors.Count; i++)
+		{
+			if (blobConnectors_.ContainsKey(connectors[i]) )
+			{
+				blobConnectors_[connectors[i]].SetAppearanceByType( bt );
+			}
+			else
+			{
+				KeyValuePair<Blob, Blob> reverse = new KeyValuePair<Blob, Blob>( connectors[i].Value, connectors[i].Key );
+				if (blobConnectors_.ContainsKey(reverse))
+				{
+					blobConnectors_[reverse].SetAppearanceByType( bt );
+				}
+				else
+				{
+					Debug.LogWarning( "No blob connector for " + connectors[i].Key.ToString( ) + " " + connectors[i].Value.ToString( ) );
+				}
+			}
+		}
+
+	}
+
 	private void DeleteBlobTypeGroup(BlobGroupSameType bg)
 	{
 		System.Text.StringBuilder sb = null;
@@ -693,7 +743,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 
 	private BlobConnector_Base FindConnection(Blob b0, Blob b1, ref KeyValuePair<Blob, Blob> kvp)
 	{
-		BlobConnector_Base bcb;
+		BlobConnector_Base bcb = null;
 		kvp = new KeyValuePair<Blob, Blob>( b0, b1 );
 		if (!blobConnectors_.TryGetValue( kvp, out bcb ))
 		{
@@ -706,8 +756,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 	private void RemoveConnection(Blob b0, Blob b1)
 	{
 		KeyValuePair<Blob, Blob> kvp = new KeyValuePair<Blob, Blob>( null, null );
-		BlobConnector_Base bcb = FindConnection(b0, b1, ref kvp );
-
+		BlobConnector_Base bcb = FindConnection( b0, b1, ref kvp );
 		if (bcb != null)
 		{
 			blobConnectors_.Remove( kvp );

@@ -74,6 +74,10 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	private Queue<Blob> pendingBlobs_ = new Queue<Blob>( );
 
 	private BlobManager blobManager_ = null;
+	public BlobManager blobManager
+	{
+		get { return blobManager_; }
+	}
 	private AudioSource cachedAudioSource_ = null;
 
 	private float topWallTargetHeight_ = 0f;
