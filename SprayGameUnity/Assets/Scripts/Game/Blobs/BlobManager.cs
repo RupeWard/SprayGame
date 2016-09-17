@@ -317,26 +317,26 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		public BlobGroupSameType group;
 		public float startTime;
 		public float endTime;
-		public System.Action<GroupCountdownInfo> endAction;
+		public float duration;
+		public float elapsed;
 
-		public float duration
-		{
-			get { return endTime - startTime; }
-		}
+		public System.Action<GroupCountdownInfo> endAction;
 
 		public GroupCountdownInfo( BlobGroupSameType g, float durn, System.Action<GroupCountdownInfo> ea)
 		{
+			elapsed = 0f;
+			duration = durn;
 			group = g;
 			startTime = Time.time;
 			endTime = startTime + durn;
 			endAction = ea;
 		}
 
-		public void Restart()
+		public virtual void Restart()
 		{
-			float durn = endTime - startTime;
+			elapsed = 0f;
 			startTime = Time.time;
-			endTime = startTime + durn;
+			endTime = startTime + duration;
 			group.SetCountdownState( 0f );
 		}
 
@@ -344,7 +344,8 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 
 		public virtual void Update()
 		{
-			float fraction = (Time.time - startTime) / duration;
+			elapsed += Time.deltaTime * GameManager.Instance.blobGroupDeleteSpeed;
+			float fraction = elapsed/ duration;
 			group.SetCountdownState( fraction );
 			if (fraction >= 1f)
 			{
@@ -372,7 +373,8 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 
 		public override void Update( )
 		{
-			float fraction = (Time.time - startTime) / duration;
+			elapsed += Time.deltaTime * GameManager.Instance.blobGroupDeleteSpeed;
+			float fraction = elapsed / duration;
 			group.SetTypeTransitionState( newType, fraction );
 			if (fraction >= 1f)
 			{
@@ -386,6 +388,13 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 					Debug.LogWarning( "No endAction" );
 				}
 			}
+		}
+		public override void Restart( )
+		{
+			elapsed = 0f;
+			startTime = Time.time;
+			endTime = startTime + duration;
+			group.SetTypeTransitionState( newType, 0f );
 		}
 
 	}

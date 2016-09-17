@@ -42,6 +42,8 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 	public GameWorldSettings gameWorldSettings = new GameWorldSettings();
 	public LevelSettings levelSettings = new LevelSettings( );
 
+	public float blobGroupDeleteSpeed = 1f;
+
 	public enum ELayer
 	{
 		Default,
