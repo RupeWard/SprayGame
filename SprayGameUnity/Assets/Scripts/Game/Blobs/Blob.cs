@@ -150,6 +150,8 @@ abstract public class Blob : MonoBehaviour
 		get { return connectedBlobs_;  }
 	}
 
+	public int numConnectedOfSameType = 0;
+
 	private BlobType_Base blobType_ = null;
 	public BlobType_Base blobType
 	{
@@ -207,6 +209,10 @@ abstract public class Blob : MonoBehaviour
 		if (false == connectedBlobs_.Contains( b ))
 		{
 			connectedBlobs_.Add( b );
+			if (b.blobType == blobType_)
+			{
+				numConnectedOfSameType++;
+			}
 		}
 	}
 
