@@ -78,6 +78,12 @@ public class BlobConnector_SimpleCylinder : BlobConnector_Base
 		t.SetConnectorAppearance( this );
 	}
 
+	public override void SetWarningState(bool w)
+	{
+		Color c = (w) ? (Color.white) : (Color.black);
+		cachedMaterial_.SetColor( "_Edge", c );
+	}
+
 	private bool sameBlobType()
 	{
 		return (parentBlob_ != null && parentBlob_.blobType == childBlob_.blobType);

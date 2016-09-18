@@ -42,6 +42,7 @@ abstract public class BlobConnector_Base : MonoBehaviour
 	}
 
 	abstract public void SetAppearanceByType( BlobType_Base t );
+	abstract public void SetWarningState( bool w );
 
 	static public BlobConnector_Base CreateConnection(Transform t, Blob b0, Blob b1)
 	{

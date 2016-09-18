@@ -43,9 +43,11 @@ public class BlobGroupSameType: BlobGroup
 
 	public void DisplayWarningState()
 	{
-		for (int i = 0; i < blobs.Count; i++)
+		bool warn = blobType.name != "FIXED" && blobs.Count == GameManager.Instance.levelSettings.numBlobs - 1;
+        for (int i = 0; i < blobs.Count; i++)
 		{
-			blobs[i].SetWarningState( blobType.name != "FIXED" &&  blobs.Count == GameManager.Instance.levelSettings.numBlobs - 1 );
+			blobs[i].SetWarningState( warn );
 		}
+		GameManager.Instance.blobManager.SetAllConnectorsWarningState( this, warn );
 	}
 }

@@ -735,6 +735,31 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 
 	}
 
+	public void SetAllConnectorsWarningState( BlobGroupSameType bg, bool warning)
+	{
+		List<KeyValuePair<Blob, Blob>> connectors = GetConnectionsInGroup( bg );
+		for (int i = 0; i < connectors.Count; i++)
+		{
+			if (blobConnectors_.ContainsKey( connectors[i] ))
+			{
+				blobConnectors_[connectors[i]].SetWarningState( warning );
+			}
+			else
+			{
+				KeyValuePair<Blob, Blob> reverse = new KeyValuePair<Blob, Blob>( connectors[i].Value, connectors[i].Key );
+				if (blobConnectors_.ContainsKey( reverse ))
+				{
+					blobConnectors_[reverse].SetWarningState( warning );
+				}
+				else
+				{
+					Debug.LogWarning( "No blob connector for " + connectors[i].Key.ToString( ) + " " + connectors[i].Value.ToString( ) );
+				}
+			}
+		}
+
+	}
+
 	private void DeleteBlobTypeGroup(BlobGroupSameType bg)
 	{
 		System.Text.StringBuilder sb = null;
