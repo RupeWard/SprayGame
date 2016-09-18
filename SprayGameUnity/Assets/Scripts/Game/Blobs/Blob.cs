@@ -64,6 +64,7 @@ abstract public class Blob : MonoBehaviour
 				Debug.Log( "Blob " + gameObject.name + " enter killzone with state "+state_ );
 			}
 			inKillZone_ = true;
+			OnEnterKillZone( );
 			/* old death condition
 			if (state_ == EState.Hit )
 			{
@@ -77,6 +78,9 @@ abstract public class Blob : MonoBehaviour
 		}
 	}
 
+	abstract protected void OnEnterKillZone( );
+	abstract protected void OnExitKillZone( );
+
 	public void HandleExitKillZone( )
 	{
 		if (inKillZone_)
@@ -86,6 +90,7 @@ abstract public class Blob : MonoBehaviour
 				Debug.Log( "Blob " + gameObject.name + " exit killzone" );
 			}
 			inKillZone_ = false;
+			OnExitKillZone( );
 		}
 		else
 		{

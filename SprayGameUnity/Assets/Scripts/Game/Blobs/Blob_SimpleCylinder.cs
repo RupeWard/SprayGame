@@ -150,10 +150,24 @@ public class Blob_SimpleCylinder : Blob
 		top.gameObject.SetActive( false );
 	}
 
+	override protected void OnEnterKillZone( )
+	{
+		cachedBottomDiscMaterial_.SetColor( "_Color2", cachedBottomDiscMaterial_.GetColor("_Color" ));
+	}
+
+	override protected void OnExitKillZone( )
+	{
+		Color c = (typeGroup.blobType.ShouldDeleteGroupOfNum( typeGroup.blobs.Count + 1 )) ? (Color.white) : (Color.black);
+		cachedBottomDiscMaterial_.SetColor( "_Color2", c );
+	}
+
 	public override void SetWarningState( bool warning )
 	{
-		Color c = (warning) ? (Color.white) : (Color.black);
-		cachedBottomDiscMaterial_.SetColor( "_Color2", c );
+		if (!IsInKillZone)
+		{
+			Color c = (warning) ? (Color.white) : (Color.black);
+			cachedBottomDiscMaterial_.SetColor( "_Color2", c );
+		}
 	}
 
 	protected override void SetAppearanceByType(BlobType_Base t)
