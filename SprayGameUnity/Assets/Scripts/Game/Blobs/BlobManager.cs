@@ -527,6 +527,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		{
 			CheckForEnclosedGroups( retainGroup );
 		}
+		retainGroup.DisplayWarningState( );
 		return retainGroup;
 	}
 

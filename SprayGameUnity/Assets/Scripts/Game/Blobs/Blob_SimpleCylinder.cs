@@ -150,6 +150,12 @@ public class Blob_SimpleCylinder : Blob
 		top.gameObject.SetActive( false );
 	}
 
+	public override void SetWarningState( bool warning )
+	{
+		Color c = (warning) ? (Color.white) : (Color.black);
+		cachedBottomDiscMaterial_.SetColor( "_Color2", c );
+	}
+
 	protected override void SetAppearanceByType(BlobType_Base t)
 	{
 		t.SetBlobAppearance( this );
@@ -166,7 +172,7 @@ public class Blob_SimpleCylinder : Blob
 	public override void HandleDeath( )
 	{
 		base.HandleDeath( );
-		cachedBottomDiscMaterial_.SetColor( "_Color2", Color.white);
+		cachedBottomDiscMaterial_.SetColor( "_Color2", Color.red);
 	}
 
 	override public void SetCountdownState( float fraction01 )

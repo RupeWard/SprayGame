@@ -40,4 +40,12 @@ public class BlobGroupSameType: BlobGroup
 			blobs[i].ChangeType( newType);
 		}
 	}
+
+	public void DisplayWarningState()
+	{
+		for (int i = 0; i < blobs.Count; i++)
+		{
+			blobs[i].SetWarningState( blobType.name != "FIXED" &&  blobs.Count == GameManager.Instance.levelSettings.numBlobs - 1 );
+		}
+	}
 }

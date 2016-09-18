@@ -106,6 +106,8 @@ abstract public class Blob : MonoBehaviour
 		state_ = EState.Hit;
 	}
 
+	abstract public void SetWarningState( bool warning );
+
 	public void Fire()
 	{
 		if (state_ != EState.Loaded)

@@ -476,6 +476,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 			numCandidateBlobs = candidateBlobs.Count;
 			pass++;
 			List<Blob> blobsToRemove = new List<Blob>( );
+			Blob blobWith5 = null;
 			for(int i =0; i<candidateBlobs.Count;i++)
 			{
 				Blob b = candidateBlobs[i];
@@ -492,6 +493,13 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 				{
 					blobsToRemove.Add( b );
 				}
+				else
+				{
+					if (numCandidates == 5)
+					{
+						blobWith5 = b;
+					}
+				}
 			}
 			if (sb != null)
 			{
@@ -501,9 +509,19 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 			{
 				Debug.Log( "\n " + blobsToRemove.Count + " being removed in pass " + pass + " because not connected to >1 candidate" );
 			}
-			for (int i3 = 0; i3 < blobsToRemove.Count; i3++)
+			if (blobsToRemove.Count > 0)
 			{
-				candidateBlobs.Remove( blobsToRemove[i3] );
+				for (int i3 = 0; i3 < blobsToRemove.Count; i3++)
+				{
+					candidateBlobs.Remove( blobsToRemove[i3] );
+				}
+			}
+			else
+			{
+				if (blobWith5 != null)
+				{
+					candidateBlobs.Remove( blobWith5 );
+				}
 			}
 		}
 		if (sb != null)
