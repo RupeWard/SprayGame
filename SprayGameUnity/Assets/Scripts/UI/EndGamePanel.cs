@@ -11,6 +11,7 @@ public class EndGamePanel : MonoBehaviour
 		{
 			Debug.Log( "EndgamePanel: RestartButton" );
 		}
+		Time.timeScale = 1f;
 		SceneManager.Instance.ReloadScene( SceneManager.EScene.Game );
 	}
 
