@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class BlobGroupSameType: BlobGroup
 {
-	private BlobType_Base blobType_ = null;
+    private BlobType_Base blobType_ = null;
 	public BlobType_Base blobType
 	{
 		get { return blobType_;  }
@@ -15,10 +16,31 @@ public class BlobGroupSameType: BlobGroup
 		name_ = name_ + "_" + blobType_.name;
 	}
 
+	private Dictionary<string, Material> cachedMaterials_ = new Dictionary<string, Material>( );
+	private Material AddCachedMaterial( string id, Material m )
+	{
+		if (cachedMaterials_ == null)
+		{
+			cachedMaterials_ = new Dictionary<string, Material>( );
+		}
+		Material newMat = new Material( m );
+		if (cachedMaterials_.ContainsKey( id ))
+		{
+			cachedMaterials_[id] = newMat;
+		}
+		else
+		{
+			cachedMaterials_.Add( id, newMat );
+		}
+		return newMat;
+	}
+
+
 	public BlobGroupSameType( Blob b): base(b.blobType.DebugDescribe(), b)
 	{
+//		b.CacheAndSetMaterials( cachedMaterials_ );
 		blobType_ = b.blobType;
-		SeedFrom( b );
+		Init( b );
 		SetTypeName( );
 	}
 
@@ -43,7 +65,7 @@ public class BlobGroupSameType: BlobGroup
 
 	public void DisplayWarningState()
 	{
-		bool warn = blobType.name != "FIXED" && blobs.Count == GameManager.Instance.levelSettings.numBlobs - 1;
+		bool warn = blobType.name != "FIXED" && blobType.ShouldDeleteGroupOfNum( blobs.Count +1);
         for (int i = 0; i < blobs.Count; i++)
 		{
 			blobs[i].SetWarningState( warn );

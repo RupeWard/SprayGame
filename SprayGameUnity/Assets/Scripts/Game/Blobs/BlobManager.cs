@@ -130,7 +130,6 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 				else
 				{
 					if (!b1AlreadyHitAndInKillZone)
-//						if (!bEitherAlreadyHitAndInKillZone)
 					{
 						typeGroupsToCheck_.Add( bgt );
 					}
@@ -147,7 +146,6 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			}
 		}
 		if (b1AlreadyHitAndInKillZone)
-		//if (bEitherAlreadyHitAndInKillZone)
 		{
 			if (b0.IsInKillZone)
 			{

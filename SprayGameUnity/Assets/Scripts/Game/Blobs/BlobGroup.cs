@@ -58,11 +58,18 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		}
 	}
 
-	public void SeedFrom(Blob seedBlob)
+	protected void Init(Blob seedBlob)
 	{
 		seedName_ = seedBlob.gameObject.name;
 		SetName( );
 		blobs_.Clear( );
+		blobs.Add( seedBlob );
+	}
+
+
+	public void SeedFrom(Blob seedBlob)
+	{
+		Init( seedBlob );
 
 		Queue<Blob> blobsToCheck = new Queue<Blob>( );
 		HashSet<Blob> blobsNotFollowed = new HashSet<Blob>( );
