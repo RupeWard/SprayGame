@@ -605,7 +605,10 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 								}
 								else
 								{
-									Debug.Log( "Changing type of enclosed group " + bgst_e.name + " to " + bgst.blobType.name );
+									if (BlobGroup.DEBUG_ENCLOSURE)
+									{
+										Debug.Log( "Starting countdown to change type of enclosed group " + bgst_e.name + " to " + bgst.blobType.name );
+									}
 									AddGroupCountdownToChangeType( bgst_e, bgst.blobType );
 									//							bgst_e.ChangeType( bgst.blobType );
 									//							MergeIntoIfConnected( bgst, bgst_e );
