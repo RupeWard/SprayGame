@@ -57,11 +57,13 @@ public class SceneControllerGame : SceneController_Base
 
 	public void HandleBackButton()
 	{
+		Time.timeScale = 1f;
 		SceneManager.Instance.SwitchScene( SceneManager.EScene.DevSetup );
 	}
 
 	public void HandleSettingsButton()
 	{
+		Time.timeScale = 1f;
 		gameSettingsPanel.Init( );
 	}
 }

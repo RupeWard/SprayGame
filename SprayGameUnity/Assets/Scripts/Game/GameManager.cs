@@ -345,6 +345,8 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 
 	public void HandlePlayPauseButton()
 	{
+		Time.timeScale = 1f;
+
 		if (isGameOver_)
 		{
 			SceneManager.Instance.ReloadScene( SceneManager.EScene.Game );
@@ -430,6 +432,7 @@ public class GameManager : RJWard.Core.Singleton.SingletonSceneLifetime<GameMana
 				}
 				MessageBus.instance.sendGameOver( );
 				ShowEndGamePanel( );
+				Time.timeScale = 0f;
 			}
 			else
 			{
