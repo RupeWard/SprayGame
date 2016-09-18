@@ -225,6 +225,40 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		groupsToDelete_.Clear( );
 	}
 
+	private void DeleteGroupCountdownToDelete(BlobGroupSameType bg)
+	{
+		GroupCountdownInfo gci = null;
+		for (int i = 0; i < groupCountdownToDeletes_.Count; i++)
+		{
+			if (groupCountdownToDeletes_[i].group == bg)
+			{
+				gci = groupCountdownToDeletes_[i];
+			}
+        }
+		if (gci != null)
+		{
+			gci.group.SetCountdownState( 0f );
+			groupCountdownToDeletes_.Remove( gci );
+		}
+	}
+
+	private void DeleteGroupCountdownToChangeType( BlobGroupSameType bg )
+	{
+		GroupCountdownToChangeTypeInfo gci = null;
+		for (int i = 0; i < groupCountdownToChangeTypes_.Count; i++)
+		{
+			if (groupCountdownToChangeTypes_[i].group == bg)
+			{
+				gci = groupCountdownToChangeTypes_[i];
+			}
+		}
+		if (gci != null)
+		{
+			gci.group.SetTypeTransitionState( gci.newType, 0f );
+			groupCountdownToDeletes_.Remove( gci );
+		}
+	}
+
 	private void AddGroupCountdownToChangeType(BlobGroupSameType bg, BlobType_Base newType)
 	{
 		GroupCountdownToChangeTypeInfo gci = null;
@@ -250,6 +284,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			{
 				Debug.Log( "Adding countdown to change type for group " + bg.name );
 			}
+			DeleteGroupCountdownToDelete( bg );
 			groupCountdownToChangeTypes_.Add( new GroupCountdownToChangeTypeInfo( bg, newType, GameManager.Instance.levelSettings.groupTypeChangeCountdown, HandleCountdownToTypeChangeFinished ) );
 		}
 
@@ -257,6 +292,19 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 
 	private void AddGroupCountdownToDelete( BlobGroupSameType bg)
 	{
+		GroupCountdownToChangeTypeInfo gcti = null;
+		for( int i = 0; i < groupCountdownToChangeTypes_.Count; i++)
+		{
+			if (groupCountdownToChangeTypes_[i].group == bg)
+			{
+				gcti = groupCountdownToChangeTypes_[i];
+				break;
+			}
+		}
+		if (gcti != null)
+		{
+			groupCountdownToChangeTypes_.Remove( gcti );
+		}
 		GroupCountdownInfo gci = null;
 		for (int i=0; i<groupCountdownToDeletes_.Count; i++)
 		{
@@ -279,6 +327,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			{
 				Debug.Log( "Adding countdown for group " + bg.name );
 			}
+			DeleteGroupCountdownToChangeType( bg );
 			groupCountdownToDeletes_.Add( new GroupCountdownInfo( bg, GameManager.Instance.levelSettings.groupDeleteCountdown, HandleCountdownToDeleteFinished ) );
 		}
 	}
@@ -498,25 +547,45 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 					List<BlobGroup> enclosedGroup = enclosedGroups[enclosedSetIndex];
 					if (bgst.blobType.name == "FIXED")
 					{
-						// if only one enclosed type, change to that type, then merge with it, and add to groups to check for number
-						if (enclosedGroup.Count == 1)
+						BlobType_Base typeFound = null;
+						for (int g=0; g<enclosedGroup.Count; g++)
 						{
-							BlobGroupSameType bgst_e = enclosedGroup[0] as BlobGroupSameType;
-							if (bgst == null)
+							if (typeFound == null)
 							{
-								Debug.LogError( "Enclosed group isn't a type group!" );
+								typeFound = (enclosedGroup[g] as BlobGroupSameType).blobType;
 							}
 							else
 							{
-								if (BlobGroup.DEBUG_ENCLOSURE)
+								BlobGroupSameType bgst_e = (enclosedGroup[g] as BlobGroupSameType);
+								if (bgst_e == null)
 								{
-									Debug.Log( "Changing type of enclosing group " + bgst.name + " to " + bgst_e.blobType.name );
+									Debug.LogError( "Enclosed group isn't a type group" );
 								}
-								AddGroupCountdownToChangeType( bgst, bgst_e.blobType );
-								//							bgst.ChangeType( bgst_e.blobType );
-								//							BlobGroupSameType newGroup = MergeIntoIfConnected( bgst_e, bgst );
-								//							CheckForConnectionsToSameTypeGroups( newGroup );
+								else
+								{
+									if (typeFound != bgst_e.blobType)
+									{
+										if (BlobGroup.DEBUG_ENCLOSURE)
+										{
+											Debug.LogWarning( "Path encloses groups with types " + typeFound.name + " and " + bgst_e.blobType.name );
+										}
+										typeFound = null;
+										break;
+									}
+								}
 							}
+						}
+						// if only one enclosed type, change to that type, then merge with it, and add to groups to check for number
+						if (typeFound != null)
+						{
+							if (BlobGroup.DEBUG_ENCLOSURE)
+							{
+								Debug.Log( "Changing type of enclosing group " + bgst.name + " to " + typeFound );
+							}
+							AddGroupCountdownToChangeType( bgst, typeFound );
+							//							bgst.ChangeType( bgst_e.blobType );
+							//							BlobGroupSameType newGroup = MergeIntoIfConnected( bgst_e, bgst );
+							//							CheckForConnectionsToSameTypeGroups( newGroup );
 						}
 					}
 					else
@@ -731,19 +800,8 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 		}
 		typeGroups_.Remove( bg );
 
-		List<GroupCountdownInfo> toRemove = new List<GroupCountdownInfo>( );
-		for (int i = 0; i < groupCountdownToDeletes_.Count; i++)
-		{
-			GroupCountdownInfo info = groupCountdownToDeletes_[i];
-            if (info.group == bg)
-			{
-				toRemove.Add( info );
-			}
-		}
-		for (int i = 0; i< toRemove.Count; i++)
-		{
-			groupCountdownToDeletes_.Remove( toRemove[i] );
-		}
+		DeleteGroupCountdownToDelete( bg );
+		DeleteGroupCountdownToChangeType( bg );
 
 		if (sb!= null)
 		{
