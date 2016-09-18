@@ -356,7 +356,7 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			// change group type, looks for mergers
 			info2.group.ChangeType( info2.newType);
 			CheckForConnectionsToSameTypeGroups( info2.group );
-//			CheckForEnclosedGroups( info2.group ); // TODO remove countdowns
+			CheckForEnclosedGroups( info2.group ); 
 		}
 	}
 
