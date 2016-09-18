@@ -144,18 +144,19 @@ public class BlobManager : MonoBehaviour, RJWard.Core.IDebugDescribable
 			{
 				Debug.Log( this.DebugDescribe( ) );
 			}
-		}
-		if (b1AlreadyHitAndInKillZone)
-		{
-			if (b0.IsInKillZone)
+			// Only do death if it's a new hit!
+			if (b1AlreadyHitAndInKillZone)
 			{
-				b0.HandleDeath( );
+				if (b0.IsInKillZone)
+				{
+					b0.HandleDeath( );
+				}
+				if (b1.IsInKillZone)
+				{
+					b1.HandleDeath( );
+				}
+				MessageBus.instance.sendBlobHitInKillZoneAction( b0, b1 );
 			}
-			if (b1.IsInKillZone)
-			{
-				b1.HandleDeath( );
-			}
-			MessageBus.instance.sendBlobHitInKillZoneAction( b0, b1 );
 		}
 	}
 
