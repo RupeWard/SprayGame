@@ -439,7 +439,8 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 	static private readonly int MinToSurround = 6;
 
 	private List<List<Blob>> candidatePaths = new List<List<Blob>>( );
-
+	private List<Blob> blobsToRemove = new List<Blob>( );
+	
 	private List<List<Blob>> closedPaths = new List<List<Blob>>( );
 	private List<Blob> candidateBlobs = new List<Blob>( );
 	public List<List<Blob>> GetClosedPaths(  )
@@ -482,7 +483,7 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 		{
 			numCandidateBlobs = candidateBlobs.Count;
 			pass++;
-			List<Blob> blobsToRemove = new List<Blob>( );
+			blobsToRemove.Clear( );
 			Blob blobWith5 = null;
 			for(int i =0; i<candidateBlobs.Count;i++)
 			{
@@ -527,6 +528,14 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 			{
 				if (blobWith5 != null)
 				{
+					if (sb!=null)
+					{
+						sb.Append( "\n but found blob with 5 to remove: " + blobWith5.gameObject.name );
+					}
+					if (DEBUG_PATHS_VERBOSE)
+					{
+						Debug.Log( "\n but found blob with 5 to remove: " +blobWith5.gameObject.name );
+					}
 					candidateBlobs.Remove( blobWith5 );
 				}
 			}
@@ -599,7 +608,6 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 					}
 				}
 
-				Blob lastBlob = currentCandidatePath[currentCandidatePath.Count - 1];
 				if (DEBUG_PATHS_VERBOSE)
 				{
 					Debug.Log( "\n Examining candidate path: " + DebugDescribePathString( currentCandidatePath ) );
@@ -610,51 +618,60 @@ abstract public class BlobGroup: RJWard.Core.IDebugDescribable
 					}
 				}
 
+				Blob lastBlob = currentCandidatePath[currentCandidatePath.Count - 1];
 				for (int i7 = 0; i7 <lastBlob.connectedBlobs.Count; i7++)
 				{
 					Blob b2 = lastBlob.connectedBlobs[i7];
 					if (candidateBlobs.Contains( b2 ))
 					{
 						int indexInCurrentPath = currentCandidatePath.IndexOf( b2 );
-						if (indexInCurrentPath == -1 || indexInCurrentPath < currentCandidatePath.Count - 5)// don't complete too soon
+						if (indexInCurrentPath == -1 || indexInCurrentPath <= currentCandidatePath.Count - MinToSurround)// don't complete too soon
 						{
 							if (indexInCurrentPath >= 0)
 							{
 								// found a loop
-								List<Blob> newClosedPath = new List<Blob>( );
-								for (int i8 = indexInCurrentPath; i8 < currentCandidatePath.Count; i8++)
+//								int loopSize = currentCandidatePath.Count - indexInCurrentPath;
+//								if (loopSize >= MinToSurround)
 								{
-									newClosedPath.Add( currentCandidatePath[i8] );
-								}
-								if (newClosedPath.Count > 5)
-								{
-									if (sb != null)
+									List<Blob> newClosedPath = new List<Blob>( );
+									for (int i8 = indexInCurrentPath; i8 < currentCandidatePath.Count; i8++)
 									{
-										sb.Append( "\n  Last blob of " );
-										DebugDescribePath( currentCandidatePath, sb );
-										sb.Append(" connects to " + b2.gameObject.name + ", making a closed path: " );
-										DebugDescribePath( newClosedPath, sb );
+										newClosedPath.Add( currentCandidatePath[i8] );
 									}
-									if (DEBUG_PATHS_VERBOSE)
+									if (newClosedPath.Count >= MinToSurround)
 									{
-										Debug.Log( "\n  Last blob of "+DebugDescribePathString(currentCandidatePath)
-											+" connects to " + b2.gameObject.name + ", making a closed path: " + DebugDescribePathString( newClosedPath ) );
+										if (sb != null)
+										{
+											sb.Append( "\n  Last blob of " );
+											DebugDescribePath( currentCandidatePath, sb );
+											sb.Append( " connects to " + b2.gameObject.name + ", making a closed path: " );
+											DebugDescribePath( newClosedPath, sb );
+										}
+										if (DEBUG_PATHS_VERBOSE)
+										{
+											Debug.Log( "\n  Last blob of " + DebugDescribePathString( currentCandidatePath )
+												+ " connects to " + b2.gameObject.name + ", making a closed path: " + DebugDescribePathString( newClosedPath ) );
+										}
+										AddPathPruningSupersets( closedPaths, newClosedPath, sb, "Closed" );
+										//									AddPathPruningSubsets( closedPaths, newClosedPath, sb, "Closed" );
 									}
-									AddPathPruningSupersets( closedPaths, newClosedPath, sb, "Closed" );
-//									AddPathPruningSubsets( closedPaths, newClosedPath, sb, "Closed" );
+									else
+									{
+//										Debug.LogError( "Loop size = " + loopSize );
+									}
 								}
+								/*
 								else
 								{
 									if (sb != null)
 									{
-										sb.Append( "\n  Discarding closed path containing only " +newClosedPath.Count+" blobs: " );
-										DebugDescribePath( newClosedPath, sb );
+										sb.Append( "\n  Discarding closed path containing only " +loopSize+" blobs: " );
 									}
 									if (DEBUG_PATHS_VERBOSE)
 									{
-										Debug.Log( "\n  Discarding closed path containing only " + newClosedPath.Count + " blobs: "+DebugDescribePathString( newClosedPath));
+										Debug.Log( "\n  Discarding closed path containing only " + loopSize+ " blobs: ");
 									}
-								}
+								}*/
 							}
 							else
 							{
